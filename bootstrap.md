@@ -8,7 +8,7 @@ If you feel like AI workflow is already set up, ask the user what you should do.
 
 ## Determine START_FILE
 
-Find AI instructions files located at `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md,README.md}` (do one glob search). If there are multiple files, choose the one that seems to be the most complete and up-to-date. We will call this file the **START_FILE**.
+Find AI instructions files located at `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}` (do one glob search). If there are multiple files, choose the one that seems to be the most complete and up-to-date. We will call this file the **START_FILE**.
 
 If no such file exists, fetch and follow the instructions from `https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md`. Then START_FILE will be the file you just created.
 
@@ -79,6 +79,8 @@ Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
 {INSERT_START_FILE_CONTENT_HERE}
 
+## Pre-requisites
+
 Before anything else, you MUST select the relevant internal documentation files and read them ENTIRELY.
 
 ## Internal documentation
@@ -113,13 +115,13 @@ If `.cursorrules` exists, then remove this file from the repository and replace 
 
 Then we'll replace the content of these files with new content. Here is the new content for each entry file.
 
-For `.github/copilot-instructions.md`:
+For `copilot-instructions.md` or `.github/copilot-instructions.md`:
 
 <instructions_markdown>
 [Read these instructions](../_docs/INDEX.md)
 </instructions_markdown>
 
-For `.cursor/rules/index.mdc`:
+For `index.mdc` or `.cursor/rules/index.mdc`:
 
 <instructions_markdown>
 ---
