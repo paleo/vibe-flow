@@ -84,9 +84,9 @@ Guidelines for extracting content:
 
 ### 2.6: Code Review & Refactoring Document
 
-Write a new file `_docs/ai-workflow/How to Do Code Review & Refactoring.md`. If there is any information about refactoring in the START_FILE, extract it.
+Write a new file `_docs/ai-workflow/Code Quality & Refactoring.md`. If there is any information about refactoring in the START_FILE, extract it.
 
-Also, look into [these rules](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-do-code-review-refactoring.md) and feel free to copy them.
+Also, look into [these rules](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/code-quality-refactoring.md) and feel free to copy them.
 
 Then you can write this file. The content of this file will be a prompt that must help to improve the code of another AI agent. It should contain these 3 principles: SRP (Single Responsibility Principle), DRY (Don't Repeat Yourself), and YAGNI (You Aren't Gonna Need It). Be concise and clear.
 
@@ -120,7 +120,7 @@ AI Workflow:
 - `ai-workflow/AI Workflow Guide.md` - Needed by the other AI workflow documents
 - `ai-workflow/How to Write a Technical Specification.md`
 - `ai-workflow/How to Write an Implementation Plan.md`
-- `ai-workflow/How to Do Code Review & Refactoring.md`
+- `ai-workflow/Code Quality & Refactoring.md`
 
 </index_md_template>
 
