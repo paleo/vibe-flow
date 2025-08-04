@@ -1,4 +1,4 @@
-# VS Code - Generate Workspace Instructions File
+# Generate Workspace Instructions
 
 Analyze this codebase to generate or update `.github/copilot-instructions.md` for guiding AI coding agents.
 

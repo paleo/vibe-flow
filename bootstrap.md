@@ -21,12 +21,13 @@ The **START_FILE** is the primary AI instruction file that is used locally in th
 
 Search in the codebase for AI instruction files using this glob pattern: `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}`
 
-If multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
+If one or multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
-If no such file exists, then you have a new sub-task:
+If no such file exists:
 
-1. Fetch and follow the instructions in [this specific remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md)
-2. By following these instructions, a new local `.github/copilot-instructions.md` file will be created. This new `.github/copilot-instructions.md` file becomes the **START_FILE**.
+- If you are Claude Code, you should stop now and ask the user to run the `/init` command first.
+- If you are Copilot in VS Code, then you should ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
+- Otherwise, you can fetch and follow the instructions in [this specific remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/generate-workspace-instructions.md). By following these instructions, a new local `.github/copilot-instructions.md` file will be created. You will use this new `.github/copilot-instructions.md` file as the **START_FILE**.
 
 ## Step 1: Create Directories
 
@@ -75,17 +76,17 @@ Guidelines for extracting content:
 
 ### 2.5: Fetch Documents
 
-**Important**: Use the exact URLs below (spaces in URLs are encoded as `%20`):
+**Important**: Use the exact URLs below (spaces in URLs are encoded as `-`):
 
-- Create a new file `_docs/ai-workflow/AI Workflow Guide.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/AI%20Workflow%20Guide.md).
-- Create a new file `_docs/ai-workflow/How to Write a Technical Specification.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20a%20Technical%20Specification.md).
-- Create a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md).
+- Create a new file `_docs/ai-workflow/AI Workflow Guide.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/ai-workflow-guide.md).
+- Create a new file `_docs/ai-workflow/How to Write a Technical Specification.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-write-a-technical-specification.md).
+- Create a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-write-an-implementation-plan.md).
 
 ### 2.6: Code Review & Refactoring Document
 
 Write a new file `_docs/ai-workflow/How to Do Code Review & Refactoring.md`. If there is any information about refactoring in the START_FILE, extract it.
 
-Also, look into [these rules](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Do%20Code%20Review%20%26%20Refactoring.md) and feel free to copy them.
+Also, look into [these rules](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-do-code-review-refactoring.md) and feel free to copy them.
 
 Then you can write this file. The content of this file will be a prompt that must help to improve the code of another AI agent. It should contain these 3 principles: SRP (Single Responsibility Principle), DRY (Don't Repeat Yourself), and YAGNI (You Aren't Gonna Need It). Be concise and clear.
 
