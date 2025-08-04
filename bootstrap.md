@@ -15,16 +15,18 @@ If this is a git repository, ensure that the working tree is clean. If there are
 
 If you feel like AI workflow is already set up, ask the user what you should do. DO NOT PROCEED WITHOUT CONFIRMATION IF AI WORKFLOW IS ALREADY SET UP.
 
-## Determine START_FILE
+## Determine the local START_FILE
 
-Search for AI instruction files using this glob pattern: `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}`
+The **START_FILE** is the primary AI instruction file that is used locally in the codebase.
+
+Search in the codebase for AI instruction files using this glob pattern: `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}`
 
 If multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
 If no such file exists, then you have a new sub-task:
 
-1. Fetch and follow instructions from [this other remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md)
-2. By following these instructions, you create a new file. The file you create becomes the **START_FILE**.
+1. Fetch and follow the instructions in [this specific remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md)
+2. By following these instructions, a new local `.github/copilot-instructions.md` file will be created. This new `.github/copilot-instructions.md` file becomes the **START_FILE**.
 
 ## Step 1: Create Directories
 
