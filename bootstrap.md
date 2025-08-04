@@ -76,8 +76,6 @@ Guidelines for extracting content:
 
 ### 2.5: Fetch Documents
 
-**Important**: Use the exact URLs below (spaces in URLs are encoded as `-`):
-
 - Create a new file `_docs/ai-workflow/AI Workflow Guide.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/ai-workflow-guide.md).
 - Create a new file `_docs/ai-workflow/How to Write a Technical Specification.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-write-a-technical-specification.md).
 - Create a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-write-an-implementation-plan.md).
