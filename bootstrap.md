@@ -1,11 +1,13 @@
 # Bootstrap AI Workflow
 
-This process sets up a standardized AI workflow for a local codebase by:
+This process sets up a standardized AI workflow for a **local codebase** by:
 
 1. Creating documentation directories and files
 2. Extracting/creating project-specific documentation
 3. Fetching standard AI workflow documents from GitHub
 4. Setting up instruction files for various AI agents
+
+**Important: Do not try to fetch any resource except the ones listed below. This is a bootstrap process, and it doesn't depend on any other resources.**
 
 ## Initial Checks
 
