@@ -19,7 +19,10 @@ Search for AI instruction files using this glob pattern: `**/{.github/copilot-in
 
 If multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
-If no such file exists, fetch and follow instructions from [this remote file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md). The file you create becomes the **START_FILE**.
+If no such file exists, then you have a new sub-task:
+
+1. Fetch and follow instructions from [this other remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md)
+2. By following these instructions, you create a new file. The file you create becomes the **START_FILE**.
 
 ## Step 1: Create Directories
 
