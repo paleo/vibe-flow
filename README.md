@@ -4,6 +4,8 @@
 
 ## Get Started
 
+_Notice: it works well on **VS Code + Copilot** with **Clause Sonnet 4**._
+
 Give this URL to your agent:
 
 ```markdown
