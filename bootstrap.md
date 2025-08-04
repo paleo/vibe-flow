@@ -1,13 +1,11 @@
 # Bootstrap AI Workflow
 
-This process sets up a standardized AI workflow for a codebase by:
+This process sets up a standardized AI workflow for a local codebase by:
 
 1. Creating documentation directories and files
 2. Extracting/creating project-specific documentation
 3. Fetching standard AI workflow documents from GitHub
 4. Setting up instruction files for various AI agents
-
-**Important**: When using URLs with spaces in filenames, they are encoded as `%20`. Use the exact URLs provided in this document.
 
 ## Initial Checks
 
@@ -21,7 +19,7 @@ Search for AI instruction files using this glob pattern: `**/{.github/copilot-in
 
 If multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
-If no such file exists, fetch and follow instructions from: `https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md`. The file you create becomes the **START_FILE**.
+If no such file exists, fetch and follow instructions from [this remote file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/vscode-generate-workspace-instructions-file.md). The file you create becomes the **START_FILE**.
 
 ## Step 1: Create Directories
 
@@ -72,15 +70,15 @@ Guidelines for extracting content:
 
 **Important**: Use the exact URLs below (spaces in URLs are encoded as `%20`):
 
-- Create a new file `_docs/ai-workflow/AI Workflow Guide.md`. Fetch its content from: `https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/AI%20Workflow%20Guide.md`
-- Create a new file `_docs/ai-workflow/How to Write a Technical Specification.md`. Fetch its content from: `https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20a%20Technical%20Specification.md`
-- Create a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`. Fetch its content from: `https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md`
+- Create a new file `_docs/ai-workflow/AI Workflow Guide.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/AI%20Workflow%20Guide.md).
+- Create a new file `_docs/ai-workflow/How to Write a Technical Specification.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20a%20Technical%20Specification.md).
+- Create a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md).
 
 ### 2.6: Code Review & Refactoring Document
 
 Write a new file `_docs/ai-workflow/How to Do Code Review & Refactoring.md`. If there is any information about refactoring in the START_FILE, extract it.
 
-Also, look into these rules and feel free to copy them if you don't have anything: `https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Do%20Code%20Review%20%26%20Refactoring.md`
+Also, look into [these rules](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Do%20Code%20Review%20%26%20Refactoring.md) and feel free to copy them.
 
 Then you can write this file. The content of this file will be a prompt that must help to improve the code of another AI agent. It should contain these 3 principles: SRP (Single Responsibility Principle), DRY (Don't Repeat Yourself), and YAGNI (You Aren't Gonna Need It). Be concise and clear.
 
@@ -88,7 +86,7 @@ Then you can write this file. The content of this file will be a prompt that mus
 
 Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
-<claude_md_template>
+<index_md_template>
 
 # {PROJECT_NAME} Development Instructions
 
@@ -116,7 +114,7 @@ AI Workflow:
 - `ai-workflow/How to Write an Implementation Plan.md`
 - `ai-workflow/How to Do Code Review & Refactoring.md`
 
-</claude_md_template>
+</index_md_template>
 
 ## Step 4: New content for all entry files
 
