@@ -25,8 +25,8 @@ If one or multiple files exist, choose the most complete and up-to-date one. Thi
 
 If no such file exists:
 
-- If you are Claude Code, you should stop now and ask the user to run the `/init` command first.
-- If you are Copilot in VS Code, then you should ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
+- If you are Claude Code, you MUST STOP NOW and ask the user to run the `/init` command first.
+- If you are Copilot in VS Code, then you should STOP NOW and ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
 - Otherwise, you can fetch and follow the instructions in [this specific remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/generate-workspace-instructions.md). By following these instructions, a new local `.github/copilot-instructions.md` file will be created. You will use this new `.github/copilot-instructions.md` file as the **START_FILE**.
 
 ## Step 1: Create Directories
@@ -122,17 +122,17 @@ AI Workflow:
 
 </index_md_template>
 
-## Step 4: New content for all entry files
+## Step 4: New content for all instructions files
 
 ### 4.1: Determine the list of instructions files
 
-In this step, we will rewrite all instruction files for AI agents. First, we need to determine the entry files for the AI agents in this codebase. Start with your own instructions file (if it doesn't exist, then you'll create it), and look for others in the codebase. Of course, if START_FILE exists, it is one of them.
+In this step, we will rewrite all instruction files for AI agents. First, we need to determine the instructions files for the AI agents in this codebase. Start with your own instructions file (if it doesn't exist, then you'll create it), and look for others in the codebase. Of course, if START_FILE exists, it is one of them.
 
 If `.cursorrules` exists, then remove this file from the repository and replace it with a new `.cursor/rules/index.mdc` file.
 
 ### 4.2: Create or replace the instructions files
 
-Then we'll replace the content of these files with new content. Here is the new content for each entry file.
+Then we'll replace the content of these files with new content. Here is the new content for each instructions file.
 
 **For `copilot-instructions.md` or `.github/copilot-instructions.md`:**
 
