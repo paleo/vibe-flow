@@ -7,5 +7,5 @@
 Give this URL to your agent:
 
 ```markdown
-https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md
+Follow these instructions: https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md
 ```
