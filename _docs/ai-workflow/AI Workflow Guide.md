@@ -32,6 +32,6 @@ _plans/
 ## Notes
 
 - **TICKET_ID** is a unique identifier for the task, often an issue or ticket number
-- Cycles are identified by a **CYCLE_LETTER** (A, B, C...), the user decides when to start a new one
-- In a cycle, determine the next **FILE_NUMBER** from existing file names
+- Cycles are identified by a **CYCLE_LETTER** (A, B, C...). Start with `A`. The user decides when to start a new one
+- In a cycle, determine the next **FILE_NUMBER** from existing file names (or start with `1`)
 - There is no strict sequence in the workflow. The file type is also flexible; if you need a new one, just create it.
