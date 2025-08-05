@@ -1,19 +1,41 @@
 # Bootstrap AI Workflow
 
-This process sets up a standardized AI workflow for a **local codebase** by:
+This process sets up a minimal AI workflow for a **local codebase** with the following steps:
 
-1. Creating documentation directories and files
-2. Extracting/creating project-specific documentation
-3. Fetching standard AI workflow documents from GitHub
-4. Setting up instruction files for various AI agents
+1. Create Directories
+2. Extract and Infer Documentation
+3. Create `INDEX.md`
+4. Extract the Content of the Previous Instruction File
+5. New content for all instructions files
+6. Back to `CLAUDE.md` (Claude Code only)
+7. Explain the Workflow
 
-**Important: Do not try to fetch any resource except the ones listed below. This is a bootstrap process, and it doesn't depend on any other resources.**
+After completing this process, the codebase will have a structured set of documentation files that guide AI agents in their work. The final structure will look like this:
+
+```text
+_docs/
+├── ai-workflow/
+│   ├── AI Workflow Guide.md
+│   ├── Code Quality & Refactoring.md
+│   ├── How to Write a Technical Specification.md
+│   └── How to Write an Implementation Plan.md
+├── Code Style Guidelines.md
+├── How to Write Unit Tests.md
+├── INDEX.md
+├── Monorepo Overview.md
+└── Onboarding.md
+_plans/
+.github/
+└── copilot-instructions.md
+.gitignore
+CLAUDE.md
+```
 
 ## Initial Checks
 
 If this is a git repository, ensure that the working tree is clean. If there are uncommitted changes, or if there is no version control, ask the user for confirmation before continuing. DO NOT PROCEED WITHOUT CONFIRMATION IF THERE ARE UNCOMMITTED CHANGES.
 
-If you feel like AI workflow is already set up, ask the user what you should do. DO NOT PROCEED WITHOUT CONFIRMATION IF AI WORKFLOW IS ALREADY SET UP.
+If an AI workflow is already set up (in particular, if a `_docs/ai-workflow/` directory already exists), ask the user what you should do. DO NOT PROCEED WITHOUT CONFIRMATION IF AI WORKFLOW IS ALREADY SET UP.
 
 ## Determine the local START_FILE
 
@@ -21,12 +43,12 @@ The **START_FILE** is the primary AI instruction file that is used locally in th
 
 Search in the codebase for AI instruction files using this glob pattern: `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}`
 
-If one or multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
+If one or more files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
 If no such file exists in the repository:
 
 - If you are Claude Code, you MUST STOP NOW and ask the user to run the `/init` command first.
-- If you are Copilot in VS Code, then you MUST STOP NOW and ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
+- If you are GitHub Copilot in VS Code, then you MUST STOP NOW and ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
 - Otherwise, you can fetch and follow the instructions in [this specific remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/generate-workspace-instructions.md). By following these instructions, a new local `.github/copilot-instructions.md` file will be created. You will use this new `.github/copilot-instructions.md` file as the **START_FILE**.
 
 ## Step 1: Create Directories
@@ -35,7 +57,7 @@ Create two directories `_docs` and `_plans` at the root of the repository if the
 
 ## Step 2: Extract and Infer Documentation
 
-For each new document you will write, be really concise. Do not mention obvious best practices. It's not a course or a tutorial. It's a reference for a skilled newcomer to that codebase. Our newcomer likes to read concise documentation.
+For each new document you will write, be very concise. Do not mention obvious best practices. It's not a course or a tutorial. It's a reference for a skilled newcomer to that codebase. The newcomer prefers concise documentation.
 
 ### 2.1: Code Style Guidelines
 
@@ -59,22 +81,13 @@ Write a new file `_docs/How to Write Unit Tests.md` that will explain how to wri
 
 This file must have at least the following sections:
 
-- Mention the tooling.
+- **Tooling**: Mention the tooling used.
 - **Running Tests**: Explain how to run the tests, globally, for one sub-project, or for one file, with and without watcher.
 - **Writing Tests**: Explain how to write tests, where to place them, how to name the files.
 
-Be really concise. Do not mention obvious information. It's not a course or a tutorial. It's a reference for newcomers to that codebase.
+Be very concise. Do not mention obvious information. It's not a course or a tutorial. It's a reference for newcomers to that codebase.
 
-### 2.4: Extract the START_FILE content into specialized documents
-
-If the START_FILE contains more than 5 lines, then extract its content into specialized documents. The goal is to have a very short file that contains only the most useful information for every working session. So, if the START_FILE is too long, extract the main sections into new files in the `_docs/` directory, and keep only the most important information in the START_FILE. Typically, each extracted file should have 20~80 lines.
-
-Guidelines for extracting content:
-
-- Do not replace the extracted content by any link, just remove it from the START_FILE.
-- At the end, the START_FILE must contain 0 to 5 lines.
-
-### 2.5: Fetch Documents
+### 2.4: Fetch Documents
 
 Use **curl** or **wget** (or find another way) to fetch the following files, specifying the output filename explicitly to avoid URL encoding issues:
 
@@ -85,7 +98,7 @@ Use **curl** or **wget** (or find another way) to fetch the following files, spe
 
 **Important:** Use `curl -o "filename"` or `wget -O "filename"` to specify the exact output filename and avoid URL encoding in filenames.
 
-## Step 3: INDEX.md
+## Step 3: Create `INDEX.md`
 
 Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
@@ -93,13 +106,9 @@ Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
 # {PROJECT_NAME} Development Instructions
 
-{INSERT_START_FILE_CONTENT_HERE}
+Always read `_docs/Onboarding.md` ENTIRELY before anything else. Then, you MUST select the relevant _internal documentation_ files and read them ENTIRELY.
 
-## Pre-requisites
-
-Before anything else, you MUST select the relevant internal documentation files and read them ENTIRELY.
-
-## Internal documentation
+## Internal Documentation
 
 Most frequently consulted procedures:
 
@@ -119,23 +128,53 @@ AI Workflow:
 
 </index_md_template>
 
-## Step 4: New content for all instructions files
+## Step 4: Extract the Content of START_FILE
 
-### 4.1: Special Case for `.cursorrules`
+### 4.1: Deprecate Documents
+
+In START_FILE, look for markdown links or paths to other local documentation files in the repository, with file names or descriptions that could be redundant with our workflow documents:
+
+- How to write an implementation plan (or: "How to Write a TIP")
+- Refactoring (or: "Refactoring & Programming Principles")
+- Or a document about Technical specifications
+
+Then:
+
+1. Remove these links or paths from START_FILE.
+2. Rename these files with a `.deprecated` suffix before the file extension.
+
+### 4.2: Extract Links from START_FILE
+
+If there are markdown links or paths to other local documentation files in the monorepo (with relative paths), move these links to the proper place in the `_docs/INDEX.md` file. Pay attention to the relative paths, they must be correct after the move.
+
+### 4.3: Extract Onboarding Content
+
+Now we will move all the remaining content of START_FILE.
+
+Extract the content of START_FILE into a new file `_docs/Onboarding.md` with a new title `# Onboarding Guide`. If this file already exists, append the content to it. If there is no content to add, ensure the file is created.
+
+Guidelines:
+
+- Do not replace the extracted content by any link, just remove it from the START_FILE.
+- At the end, START_FILE should be almost empty (the title can remain, but without anything else).
+
+## Step 5: New content for all instructions files
+
+### 5.1: Special Case for `.cursorrules`
 
 If `.cursorrules` exists, then remove this file from the repository and replace it with a new `.cursor/rules/index.mdc` file with empty content (we'll fill this in later).
 
-### 4.2: Determine the list of instructions files
+### 5.2: Determine the list of instructions files
 
-Now, we want to detect every existing instructions file for AI agents in the codebase.
+Now, we need to detect every existing instruction file for AI agents in the codebase.
 
-Make a list INSTRUCTIONS_FILES of all the instructions files in this repository. Of course, if START_FILE exists, it is one of them. Look for others in the codebase.
+Make a list INSTRUCTIONS_FILES of all the instruction files in this repository. Of course, if START_FILE exists, it is one of them. Look for others in the codebase.
 
-Also, if your own instructions file is not in the list, then add it to INSTRUCTIONS_FILES.
+Also, if your own instruction file is not in the list, then add it to INSTRUCTIONS_FILES.
 
-### 4.3: Create or replace the instructions files
+### 5.3: Create or replace the instructions files
 
-Replace the content of every file in INSTRUCTIONS_FILES. I give here the new content. Use it to replace the content of the file. Do not create new files here, except for your own instructions file if it doesn't exist.
+Replace the content of every file in INSTRUCTIONS_FILES. The new content is provided below. Use it to replace the content of the file. Do not create new files here, except for your own instruction file if it doesn't exist.
 
 **For `copilot-instructions.md` or `.github/copilot-instructions.md`:**
 
@@ -158,3 +197,27 @@ ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ```markdown
 ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ```
+
+## Step 6: Back to `CLAUDE.md` (Claude Code only)
+
+This step is ONLY for Claude Code. All other AI agents (GitHub Copilot, Cursor, Windsurf, Gemini CLI, OpenAI Codex, etc.) should skip this step.
+
+If you are Claude Code, then you MUST STOP and ask the user if they prefer to keep our new multi-agent `_docs/INDEX.md` file or if they want their `CLAUDE.md` file back as the main entry point for the documentation.
+
+If the user prefers to use the `CLAUDE.md` file as the main entry point, then:
+
+1. Replace the content of the `CLAUDE.md` file with the content of `_docs/INDEX.md`
+2. Update the new content of `CLAUDE.md`: correct the relative paths to use the `_docs/` directory
+3. Remove the `_docs/INDEX.md` file
+4. Update every other instruction file in the codebase to point to `CLAUDE.md` instead of `_docs/INDEX.md`.
+
+## Step 7: Explain the Workflow
+
+Display a very concise summary of the changes and a short explanation of the new structure. In particular, you should mention this information:
+
+- The `_docs/` directory is intended for every newcomer to the codebase. AI agents are perpetual newcomers, but it is also for human developers.
+- The `_docs/ai-workflow/` directory contains instructions for AI agents to help with writing specifications, implementation plans, and doing code reviews. But it's only a starting point. The user is encouraged to modify these documents and adapt them to their needs.
+- The `_plans/` directory is where work files related to tasks will be stored. It is git-ignored.
+- The content of the previous instruction file has been extracted to various documents in the `_docs/` directory and in particular the `_docs/Onboarding.md` file.
+
+Why did we reorganize the previous instruction file? The principle is to NOT fill the context window with too much information, but instead to provide a list of documents so the agent will read only what it needs.
