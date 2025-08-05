@@ -76,17 +76,16 @@ Guidelines for extracting content:
 
 ### 2.5: Fetch Documents
 
-- Create a new file `_docs/ai-workflow/AI Workflow Guide.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/ai-workflow-guide.md).
-- Create a new file `_docs/ai-workflow/How to Write a Technical Specification.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-write-a-technical-specification.md).
-- Create a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`. Fetch its content from [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/how-to-write-an-implementation-plan.md).
+Use **curl -O** or **wget** or find a way to fetch the following files, preferably without reading them:
 
-### 2.6: Code Review & Refactoring Document
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/AI%20Workflow%20Guide.md) to a new file `_docs/ai-workflow/AI Workflow Guide.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20a%20Technical%20Specification.md) to a new file `_docs/ai-workflow/How to Write a Technical Specification.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md) to a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/Code%20Quality%20%26%20Refactoring.md) to a new file `_docs/ai-workflow/Code Quality & Refactoring.md`
 
-Write a new file `_docs/ai-workflow/Code Quality & Refactoring.md`. If there is any information about refactoring in the START_FILE, extract it.
+### 2.6: Code Quality & Refactoring Document
 
-Also, look into [these rules](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/code-quality-refactoring.md) and feel free to copy them.
-
-Then you can write this file. The content of this file will be a prompt that must help to improve the code of another AI agent. It should contain these 3 principles: SRP (Single Responsibility Principle), DRY (Don't Repeat Yourself), and YAGNI (You Aren't Gonna Need It). Be concise and clear.
+If there is any information about code quality or how to refactor in the START_FILE, extract it and merge it in `_docs/ai-workflow/Code Quality & Refactoring.md`.
 
 ## Step 3: INDEX.md
 
