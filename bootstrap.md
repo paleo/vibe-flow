@@ -5,7 +5,7 @@ This process sets up a minimal AI workflow for a **local codebase** with the fol
 1. Create Directories
 2. Extract and Infer Documentation
 3. Create `INDEX.md`
-4. Extract the Content of the Previous Instruction File
+4. Extract the Content of the Previous Instructions File
 5. New content for all instructions files
 6. Back to `CLAUDE.md` (Claude Code only)
 7. Explain the Workflow
@@ -39,9 +39,9 @@ If an AI workflow is already set up (in particular, if a `_docs/ai-workflow/` di
 
 ## Determine the local START_FILE
 
-The **START_FILE** is the primary AI instruction file that is used locally in the codebase.
+The **START_FILE** is the primary AI instructions file that is used locally in the codebase.
 
-Search in the codebase for AI instruction files using this glob pattern: `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}`
+Search in the codebase for AI instructions files using this glob pattern: `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,GEMINI.md}`
 
 If one or more files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
@@ -166,15 +166,15 @@ If `.cursorrules` exists, then remove this file from the repository and replace 
 
 ### 5.2: Determine the list of instructions files
 
-Now, we need to detect every existing instruction file for AI agents in the codebase.
+Now, we need to detect every existing instructions file for AI agents in the codebase.
 
-Make a list INSTRUCTIONS_FILES of all the instruction files in this repository. Of course, if START_FILE exists, it is one of them. Look for others in the codebase.
+Make a list INSTRUCTIONS_FILES of all the instructions files in this repository. Of course, if START_FILE exists, it is one of them. Look for others in the codebase.
 
-Also, if your own instruction file is not in the list, then add it to INSTRUCTIONS_FILES.
+Also, if your own instructions file is not in the list, then add it to INSTRUCTIONS_FILES.
 
 ### 5.3: Create or replace the instructions files
 
-Replace the content of every file in INSTRUCTIONS_FILES. The new content is provided below. Use it to replace the content of the file. Do not create new files here, except for your own instruction file if it doesn't exist.
+Replace the content of every file in INSTRUCTIONS_FILES. The new content is provided below. Use it to replace the content of the file. Do not create new files here, except for your own instructions file if it doesn't exist.
 
 **For `copilot-instructions.md` or `.github/copilot-instructions.md`:**
 
@@ -192,7 +192,7 @@ alwaysApply: true
 ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ```
 
-**For all other instruction files:**
+**For all other instructions files:**
 
 ```markdown
 ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
@@ -209,7 +209,7 @@ If the user prefers to use the `CLAUDE.md` file as the main entry point, then:
 1. Replace the content of the `CLAUDE.md` file with the content of `_docs/INDEX.md`
 2. Update the new content of `CLAUDE.md`: correct the relative paths to use the `_docs/` directory
 3. Remove the `_docs/INDEX.md` file
-4. Update every other instruction file in the codebase to point to `CLAUDE.md` instead of `_docs/INDEX.md`.
+4. Update every other instructions file in the codebase to point to `CLAUDE.md` instead of `_docs/INDEX.md`.
 
 ## Step 7: Explain the Workflow
 
@@ -218,6 +218,6 @@ Display a very concise summary of the changes and a short explanation of the new
 - The `_docs/` directory is intended for every newcomer to the codebase. AI agents are perpetual newcomers, but it is also for human developers.
 - The `_docs/ai-workflow/` directory contains instructions for AI agents to help with writing specifications, implementation plans, and doing code reviews. But it's only a starting point. The user is encouraged to modify these documents and adapt them to their needs.
 - The `_plans/` directory is where work files related to tasks will be stored. It is git-ignored.
-- The content of the previous instruction file has been extracted to various documents in the `_docs/` directory and in particular the `_docs/Onboarding.md` file.
+- The content of the previous instructions file has been extracted to various documents in the `_docs/` directory and in particular the `_docs/Onboarding.md` file.
 
-Why did we reorganize the previous instruction file? The principle is to NOT fill the context window with too much information, but instead to provide a list of documents so the agent will read only what it needs.
+Why did we reorganize the previous instructions file? The principle is to NOT fill the context window with too much information, but instead to provide a list of documents so the agent will read only what it needs.
