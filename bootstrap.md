@@ -83,10 +83,6 @@ Use **curl -O** or **wget** or find a way to fetch the following files, preferab
 - Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md) to a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/Code%20Quality%20%26%20Refactoring.md) to a new file `_docs/ai-workflow/Code Quality & Refactoring.md`
 
-### 2.6: Code Quality & Refactoring Document
-
-If there is any information about code quality or how to refactor in the START_FILE, extract it and merge it in `_docs/ai-workflow/Code Quality & Refactoring.md`.
-
 ## Step 3: INDEX.md
 
 Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:

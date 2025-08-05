@@ -68,3 +68,7 @@ After the implementation, run the code quality and refactoring process:
 ```markdown
 Ensure code quality for the ticket 123.
 ```
+
+## Guidelines
+
+There are no guidelines. It's just a starting point for your own workflow. Feel free to adapt it to your needs.
