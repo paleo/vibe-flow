@@ -112,10 +112,10 @@ Additional documentation (read as needed):
 
 AI Workflow:
 
-- `ai-workflow/AI Workflow Guide.md` - Needed by the other AI workflow documents
 - `ai-workflow/How to Write a Technical Specification.md` - For writing a **spec**
 - `ai-workflow/How to Write an Implementation Plan.md` - For writing a **plan**
 - `ai-workflow/Code Quality & Refactoring.md` - For **reviewing** code, ensuring **code quality**, **refactoring** by applying **SRP**, **DRY**, and **YAGNI** principles
+- `ai-workflow/AI Workflow Guide.md` - Needed by the other AI workflow documents
 
 </index_md_template>
 
