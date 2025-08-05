@@ -4,31 +4,30 @@
 
 ## Get Started
 
-_Notice: it works well on **VS Code + Copilot** with **Clause Sonnet 4**._
+Give [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md) to your agent.
 
-Give this URL to your agent:
-
-```markdown
-Follow these instructions: https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md
-```
-
-It should install the following structure:
+It should install the following structure, and plug your AI instructions file on it:
 
 ```text
 _docs/
 ├── ai-workflow/
 │   ├── AI Workflow Guide.md
+│   └── Code Quality & Refactoring.md
 │   ├── How to Write a Technical Specification.md
 │   ├── How to Write an Implementation Plan.md
-│   └── Code Quality & Refactoring.md
-├── INDEX.md
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
+├── INDEX.md
 └── Monorepo Overview.md
 _plans/
 ```
 
-Then, you can start using the workflow.
+Tested with:
+
+- **VS Code Copilot**
+- **Claude Code**
+
+Then, start using the workflow.
 
 ## Using the Workflow
 
@@ -67,5 +66,5 @@ This will write a `_plans/34/A3-handover.md` file.
 After the implementation, run the code quality and refactoring process:
 
 ```markdown
-Check code quality for the ticket 123.
+Ensure code quality for the ticket 123.
 ```
