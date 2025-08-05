@@ -23,7 +23,7 @@ Search in the codebase for AI instruction files using this glob pattern: `**/{.g
 
 If one or multiple files exist, choose the most complete and up-to-date one. This becomes the **START_FILE**.
 
-If no such file exists:
+If no such file exists in the repository:
 
 - If you are Claude Code, you MUST STOP NOW and ask the user to run the `/init` command first.
 - If you are Copilot in VS Code, then you MUST STOP NOW and ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
@@ -76,12 +76,14 @@ Guidelines for extracting content:
 
 ### 2.5: Fetch Documents
 
-Use **curl -O** or **wget** or find a way to fetch the following files, preferably without reading them:
+Use **curl** or **wget** (or find another way) to fetch the following files, specifying the output filename explicitly to avoid URL encoding issues:
 
-- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/AI%20Workflow%20Guide.md) to a new file `_docs/ai-workflow/AI Workflow Guide.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20a%20Technical%20Specification.md) to a new file `_docs/ai-workflow/How to Write a Technical Specification.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md) to a new file `_docs/ai-workflow/How to Write an Implementation Plan.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/Code%20Quality%20%26%20Refactoring.md) to a new file `_docs/ai-workflow/Code Quality & Refactoring.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/AI%20Workflow%20Guide.md) to `_docs/ai-workflow/AI Workflow Guide.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/ai-workflow/How to Write a Technical Specification.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/How%20to%20Write%20an%20Implementation%20Plan.md) to `_docs/ai-workflow/How to Write an Implementation Plan.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/_docs/ai-workflow/Code%20Quality%20%26%20Refactoring.md) to `_docs/ai-workflow/Code Quality & Refactoring.md`
+
+**Important:** Use `curl -o "filename"` or `wget -O "filename"` to specify the exact output filename and avoid URL encoding in filenames.
 
 ## Step 3: INDEX.md
 
