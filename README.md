@@ -24,7 +24,7 @@ _plans/
 
 Tested with:
 
-- **VS Code Copilot**
+- **VS Code Copilot** with **Claude Sonnet 4**
 - **Claude Code**
 
 Then, start using the workflow.
