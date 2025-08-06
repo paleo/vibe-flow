@@ -26,6 +26,7 @@ Tested with:
 
 - **VS Code Copilot** with **Claude Sonnet 4**
 - **Claude Code**
+- **Cursor** with **Claude Sonnet 4**
 
 Then, start using the workflow.
 
