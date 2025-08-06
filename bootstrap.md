@@ -132,16 +132,16 @@ AI Workflow:
 
 ### 4.1: Deprecate Documents
 
-In START_FILE, look for markdown links or paths to other local documentation files in the repository, with file names or descriptions that could be redundant with our workflow documents:
+In START_FILE, look for markdown links or paths to other local markdown files (`.md`) in the repository, with file names or descriptions that could be redundant with our workflow documents:
 
-- How to write an implementation plan (or: "How to Write a TIP")
-- Refactoring (or: "Refactoring & Programming Principles")
+- How to write an implementation plan (or: "How to Write a TIP.md")
+- Refactoring (or: "Refactoring & Programming Principles.md")
 - Or a document about Technical specifications
 
 Then:
 
 1. Remove these links or paths from START_FILE.
-2. Rename these files with a `.deprecated` suffix before the file extension.
+2. Rename these files with a `.DEPRECATED.md` suffix & extension.
 
 ### 4.2: Extract Links from START_FILE
 
@@ -212,7 +212,7 @@ If the user chooses to keep the `_docs/INDEX.md` file, then skip this step and g
 If the user prefers to use START_FILE as the main entry point, then:
 
 1. Replace the content of START_FILE file with the content of `_docs/INDEX.md`
-2. Update the new content of START_FILE: correct the relative paths to the documents
+2. Update the new content of START_FILE: correct the paths to the documents, relative to the root of the repository (prefix with `_docs/`, e.g. `_docs/Onboarding.md`).
 3. Remove the `_docs/INDEX.md` file
 4. Update every other instructions file in the codebase to point to START_FILE instead of `_docs/INDEX.md`.
 5. If START_FILE is a `.mdc` file, then you must also prepend the following lines to the content of START_FILE:
