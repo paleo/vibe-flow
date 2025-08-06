@@ -18,7 +18,7 @@ _docs/
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
 ├── INDEX.md
-└── Monorepo Overview.md
+└── Onboarding.md
 _plans/
 ```
 
