@@ -6,7 +6,7 @@
 
 Give [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md) to your agent.
 
-It should install the following structure and plug your AI instructions file to it:
+It will install the following structure and plug your AI instructions file to it:
 
 ```text
 _docs/
@@ -33,10 +33,10 @@ Then, start using the workflow.
 
 ### Technical Specification
 
-A specification contains design decisions. It can be written long before the implementation so it doesn't contain too much implementation details that could become outdated. It can be stored in the ticket system. The agent helps you to write a spec. by asking you questions and then writing a file:
+A specification contains design decisions. It can be written long before the implementation, so it doesn't contain too many implementation details that could become outdated. It can be stored in the ticket system. The agent helps you write a spec by asking you questions and then writing a file:
 
 ```markdown
-Write a spec for the ticket 123. It's about [some feature you need]
+Help me write a spec for ticket 123. It's about [some feature you need]
 ```
 
 This will write a `_plans/123/A1-spec.md` file.
@@ -46,10 +46,10 @@ This will write a `_plans/123/A1-spec.md` file.
 An implementation plan contains the steps to implement something. It should be written when you are ready to implement. In fact, writing a plan is part of the implementation. The agent can help you write an implementation plan:
 
 ```markdown
-Write the implementation plan for the ticket 123.
+Write the implementation plan for ticket 123.
 ```
 
-This will read the `_plans/123/A1-spec.md` file, then write a `_plans/123/A2-plan.md` file.
+This will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-plan.md` file.
 
 ### Implementation
 
@@ -66,9 +66,9 @@ This will write a `_plans/123/A3-handover.md` file.
 After the implementation, run the code quality and refactoring process:
 
 ```markdown
-Ensure code quality for the ticket 123.
+Ensure code quality for ticket 123.
 ```
 
 ## Guidelines
 
-There are no guidelines. It's just a starting point for your own workflow. Feel free to adapt it to your needs.
+There are no strict guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
