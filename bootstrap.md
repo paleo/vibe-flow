@@ -205,13 +205,13 @@ The processus is achieved but we have one option to propose to the user.
 Here, you MUST STOP and ASK THE USER what they prefer for the main entry point of the documentation:
 
 1. Keep our new multi-agent `_docs/INDEX.md` file;
-2. Or, use the START_FILE (use the real file name here in your message to the user).
+2. Or, use START_FILE (use the real file name here in your message to the user).
 
 If the user chooses to keep the `_docs/INDEX.md` file, then skip this step and go to Step 7.
 
-If the user prefers to use the START_FILE as the main entry point, then:
+If the user prefers to use START_FILE as the main entry point, then:
 
-1. Replace the content of the START_FILE file with the content of `_docs/INDEX.md`
+1. Replace the content of START_FILE file with the content of `_docs/INDEX.md`
 2. Update the new content of START_FILE: correct the relative paths to the documents
 3. Remove the `_docs/INDEX.md` file
 4. Update every other instructions file in the codebase to point to START_FILE instead of `_docs/INDEX.md`.
