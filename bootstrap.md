@@ -7,7 +7,7 @@ This process sets up a minimal AI workflow for a **local codebase** with the fol
 3. Create `INDEX.md`
 4. Extract the Content of the Previous Instructions File
 5. New content for all instructions files
-6. Back to `CLAUDE.md` (Claude Code only)
+6. Back to the Previous Instructions File?
 7. Explain the Workflow
 
 After completing this process, the codebase will have a structured set of documentation files that guide AI agents in their work. The final structure will look like this:
@@ -198,18 +198,30 @@ ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ```
 
-## Step 6: Back to `CLAUDE.md` (Claude Code only)
+## Step 6: Back to START_FILE?
 
-This step is ONLY for Claude Code. All other AI agents (GitHub Copilot, Cursor, Windsurf, Gemini CLI, OpenAI Codex, etc.) should skip this step.
+The processus is achieved but we have one option to propose to the user.
 
-If you are Claude Code, then you MUST STOP and ask the user if they prefer to keep our new multi-agent `_docs/INDEX.md` file or if they want their `CLAUDE.md` file back as the main entry point for the documentation.
+Here, you MUST STOP and ASK THE USER what they prefer for the main entry point of the documentation:
 
-If the user prefers to use the `CLAUDE.md` file as the main entry point, then:
+1. Keep our new multi-agent `_docs/INDEX.md` file;
+2. Or, use the START_FILE (use the real file name here in your message to the user).
 
-1. Replace the content of the `CLAUDE.md` file with the content of `_docs/INDEX.md`
-2. Update the new content of `CLAUDE.md`: correct the relative paths to use the `_docs/` directory
+If the user chooses to keep the `_docs/INDEX.md` file, then skip this step and go to Step 7.
+
+If the user prefers to use the START_FILE as the main entry point, then:
+
+1. Replace the content of the START_FILE file with the content of `_docs/INDEX.md`
+2. Update the new content of START_FILE: correct the relative paths to the documents
 3. Remove the `_docs/INDEX.md` file
-4. Update every other instructions file in the codebase to point to `CLAUDE.md` instead of `_docs/INDEX.md`.
+4. Update every other instructions file in the codebase to point to START_FILE instead of `_docs/INDEX.md`.
+5. If START_FILE is a `.mdc` file, then you must also prepend the following lines to the content of START_FILE:
+
+    ```markdown
+    ---
+    alwaysApply: true
+    ---
+    ```
 
 ## Step 7: Explain the Workflow
 
