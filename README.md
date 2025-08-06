@@ -72,4 +72,4 @@ Ensure code quality for ticket 123.
 
 ## Guidelines
 
-There are no strict guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
+There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
