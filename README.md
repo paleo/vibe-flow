@@ -59,7 +59,7 @@ The plan is self-explanatory and we don't want to fill the context with workflow
 Implement the plan `_plans/123/A2-plan.md`
 ```
 
-This will write a `_plans/123/A3-handover.md` file.
+This will execute the plan and then write a `_plans/123/A3-handover.md` file.
 
 ### Code Quality & Refactoring
 
