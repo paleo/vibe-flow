@@ -198,6 +198,10 @@ ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
 ```
 
+Guidelines:
+
+- Do not keep any previous content in these files, remove it all, even the title.
+
 ## Step 6: Back to START_FILE?
 
 The processus is achieved but we have one option to propose to the user.
