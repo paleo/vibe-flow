@@ -14,6 +14,7 @@ Read the files that were modified, if it's all good just say it's OK. Otherwise,
 
 - Avoid exceeding the height of one screen (~50 lines) for function implementations.
 - Apply the _Single Responsibility Principle_ when dividing code: one function for one concern.
+- Keep code clean and self-explanatory rather than adding explanatory comments.
 
 ### DRY - Don't Repeat Yourself
 
@@ -23,9 +24,8 @@ Each time you see duplicated logic, take the time to refactor it into a reusable
 
 Do not keep unused code such as variables, functions, implementations, etc.
 
-### Remove Unnecessary Inline Comments
+### Remove Unnecessary Comments
 
-- Keep code clean and self-explanatory rather than adding explanatory comments.
-- Remove inline comments that are redundant with the code itself.
+Remove inline comments that are redundant with the code itself.
 
 Only keep inline comments that document hacks, TODOs, or exceptional situations, or when the code's purpose isn't obvious from its structure.
