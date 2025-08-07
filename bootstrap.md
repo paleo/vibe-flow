@@ -106,7 +106,7 @@ Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
 # {PROJECT_NAME} Development Instructions
 
-Always read `Onboarding.md` ENTIRELY before anything else. Then, you MUST select the relevant _internal documentation_ files and read them ENTIRELY.
+ALWAYS READ `Onboarding.md` ENTIRELY before anything else. Then, you MUST select the relevant _internal documentation_ files and read them ENTIRELY.
 
 ## Internal Documentation
 
