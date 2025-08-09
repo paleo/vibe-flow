@@ -22,7 +22,7 @@ _docs/
 _plans/
 ```
 
-Tested with:
+Works well with:
 
 - **VS Code Copilot** with **Claude Sonnet 4**
 - **Claude Code**
@@ -60,7 +60,7 @@ The plan is self-explanatory and we don't want to fill the context with workflow
 Implement the plan `_plans/123/A2-plan.md`
 ```
 
-This will execute the plan and then write a `_plans/123/A3-handover.md` file.
+This will execute the plan and then write a `_plans/123/A3-summary.md` file.
 
 ### Code Quality & Refactoring
 

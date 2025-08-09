@@ -35,14 +35,14 @@ In your plan there is a list of steps, add a new step named "Write a Handover Do
 <content_to_add>
 You are part of our team and you work as a team. After you finish your work, your teammate Joe will continue working using your implementation. So now you are expected to write a handover document for Joe. The document must contain the list of all files you updated. Summarize the changes made in a very concise way. Add only relevant information that would help someone understand what's new. Beware that Joe doesn't like losing his time. Be very concise. Do not mention obvious information. It's not a course or a tutorial. If there is nothing to explain, then do not explain.
 
-Write this handover document in a new `{TASK_DIR}/{TASK_FILE_PREFIX}-handover.md` markdown file. Avoid overwriting an existing file. Ignore lint errors in the summary file.
+Write this handover document in a new `{TASK_DIR}/{TASK_FILE_PREFIX}-summary.md` markdown file. Avoid overwriting an existing file. Ignore lint errors in this file.
 </content_to_add>
 
 Note:
 
 - This is a regular step, it should be numbered like the other steps.
 - Replace "{TASK_DIR}" with the actual TASK_DIR, e.g. `_plans/123/`
-- Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and the next file number, e.g. `A3`
+- Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A3`
 
 Add the following content to the very end of the implementation plan:
 

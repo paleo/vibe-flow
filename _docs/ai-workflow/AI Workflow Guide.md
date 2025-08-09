@@ -15,7 +15,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan  
-- `handover` - implementation completion document
+- `summary` - implementation summary document
 - `commit` - suggested commit message and changelog entry
 
 **Example structure:**
@@ -25,7 +25,7 @@ _plans/
 ├── 123/
 │   ├── A1-spec.md
 │   ├── A2-plan.md
-│   ├── A3-handover.md
+│   ├── A3-summary.md
 │   └── B1-spec.md
 ```
 

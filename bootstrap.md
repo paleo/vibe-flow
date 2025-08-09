@@ -106,9 +106,7 @@ Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
 # {PROJECT_NAME} Development Instructions
 
-ALWAYS READ `Onboarding.md` ENTIRELY before anything else. Then, you MUST select the relevant _internal documentation_ files and read them ENTIRELY.
-
-## Internal Documentation
+## Documentation Files
 
 Most frequently consulted procedures:
 
@@ -124,7 +122,11 @@ AI Workflow:
 - `ai-workflow/How to Write a Technical Specification.md` - For writing a **spec**
 - `ai-workflow/How to Write an Implementation Plan.md` - For writing a **plan**
 - `ai-workflow/Code Quality & Refactoring.md` - For **code review**, ensuring **code quality**, and **refactoring** by applying **SRP**, **DRY**, and **YAGNI** principles
-- `ai-workflow/AI Workflow Guide.md` - Where plans, specifications, and implementation handovers are kept
+- `ai-workflow/AI Workflow Guide.md` - Where plans, specifications, and implementation summaries are kept
+
+## Instructions
+
+ALWAYS READ `Onboarding.md` ENTIRELY before anything else. Then, you MUST select the relevant documentation files and read them ENTIRELY.
 
 </index_md_template>
 
@@ -179,7 +181,7 @@ Replace the content of every file in INSTRUCTIONS_FILES. The new content is prov
 **For `copilot-instructions.md` or `.github/copilot-instructions.md`:**
 
 ```markdown
-[Read these instructions](../_docs/INDEX.md)
+[Follow these instructions](../_docs/INDEX.md)
 ```
 
 **For `index.mdc` or `.cursor/rules/index.mdc`:**
@@ -189,13 +191,13 @@ Replace the content of every file in INSTRUCTIONS_FILES. The new content is prov
 alwaysApply: true
 ---
 
-ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
+ALWAYS follow the instructions in `_docs/INDEX.md` ENTIRELY.
 ```
 
 **For all other instructions files:**
 
 ```markdown
-ALWAYS read the instructions in `_docs/INDEX.md` ENTIRELY.
+ALWAYS follow the instructions in `_docs/INDEX.md` ENTIRELY.
 ```
 
 Guidelines:

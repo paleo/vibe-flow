@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-If the user provides you with a ticket ID, then read the `AI Workflow Guide.md` entirely, it will help you to find the relevant handover document to read.
+If the user provides you with a ticket ID, then read the `AI Workflow Guide.md` entirely, it will help you to find the relevant **summary** document to read.
 
 ## Code Quality Process
 
