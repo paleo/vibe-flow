@@ -67,7 +67,7 @@ This will execute the plan and then write a `_plans/123/A3-summary.md` file.
 After the implementation, run the code quality and refactoring process:
 
 ```markdown
-Ensure code quality for ticket 123.
+Ensure code quality for the last implementation in ticket 123.
 ```
 
 ## Guidelines

@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-If the user provides you with a ticket ID, then read the `AI Workflow Guide.md` entirely, it will help you to find the relevant **summary** document to read.
+If the user provides you with a ticket ID, then read the `AI Workflow Guide.md` entirely, it will help you to find the relevant **summary** document to read. If the user didn't mention which cycle and file number to use, you need to deduce them by yourself.
 
 ## Code Quality Process
 

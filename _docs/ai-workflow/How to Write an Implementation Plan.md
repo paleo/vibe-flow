@@ -6,11 +6,9 @@ Before you start, read the `AI Workflow Guide.md` entirely.
 
 You need:
 
-- the TASK_DIR
-- the current CYCLE_LETTER and the next FILE_NUMBER
-- a SPEC (technical specification)
-
-If you don't have these inputs, then ask the user to provide them.
+- the TASK_DIR - if you don't have it, ask the user for a **ticket ID**
+- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself
+- a SPEC (technical specification) - if you don't have it, ask the user for it
 
 ## Creating an Implementation Plan
 
