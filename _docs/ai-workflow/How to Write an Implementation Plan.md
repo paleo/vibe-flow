@@ -40,7 +40,7 @@ Note:
 
 - This is a regular step, it should be numbered like the other steps.
 - Replace "{TASK_DIR}" with the actual TASK_DIR, e.g. `_plans/123/`
-- Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A3`
+- Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and a bumped FILE_NUMBER, e.g. `A3`
 
 Add the following content to the very end of the implementation plan:
 

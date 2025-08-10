@@ -31,7 +31,9 @@ _plans/
 
 ## Notes
 
-- **TICKET_ID** is a unique identifier for the task, often an issue or ticket number
-- Cycles are identified by a **CYCLE_LETTER** (A, B, C...). Start with `A`. The user decides when to start a new one
-- In a cycle, determine the next **FILE_NUMBER** from existing file names (or start with `1`)
-- There is no strict sequence in the workflow. The file type is also flexible; if you need a new one, just create it.
+- **TICKET_ID** is a unique identifier for the task, often an issue or ticket number.
+- Cycles are identified by a **CYCLE_LETTER** (A, B, C...). The user decides when to start a new one.
+- In a cycle, determine the next **FILE_NUMBER** from existing file names. Every new file must have a bumped file number.
+- Do not bother the user with CYCLE_LETTER or FILE_NUMBER. They are for internal organization. It's up to you to list the files and determine the last CYCLE_LETTER and FILE_NUMBER. Start CYCLE_LETTER with `A` if there is no existing cycle, and FILE_NUMBER with `1`. So you just need to ask for a **ticket ID** if you don't have one.
+- When the user requests a new cycle: bump CYCLE_LETTER and reset FILE_NUMBER.
+- There is no strict sequence of file types in the workflow. Available file types are also flexible; if you need a new one, just create it.
