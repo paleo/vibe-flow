@@ -24,9 +24,11 @@ _plans/
 
 Works well with:
 
-- **VS Code Copilot** with **Claude Sonnet 4**
+- **VS Code Copilot** with **Claude Sonnet 4** or **GPT-5**
 - **Claude Code**
-- **Cursor** with **Claude Sonnet 4**
+- **Cursor** with **Claude Sonnet 4** or **GPT-5**
+
+_Note: I recommend Claude Sonnet 4 rather than GPT-5, at least for installation, as it follows instructions more rigorously._
 
 Then, start using the workflow.
 
@@ -37,7 +39,7 @@ Then, start using the workflow.
 A specification contains design decisions. It can be written long before the implementation, so it doesn't contain too many implementation details that could become outdated. It can be stored in the ticket system. The agent helps you write a spec by investigating and asking you questions:
 
 ```markdown
-Help me write a spec for ticket 123. It's about [some feature you need]
+Help me write a new spec for ticket 123. It's about [some feature you need]
 ```
 
 This will write a `_plans/123/A1-spec.md` file.

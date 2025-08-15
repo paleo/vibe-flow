@@ -7,7 +7,7 @@ Before you start, read the `AI Workflow Guide.md` entirely.
 You need:
 
 - the TASK_DIR - if you don't have it, ask the user for a **ticket ID**
-- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself
+- the current CYCLE_LETTER and the bumped FILE_NUMBER - deduce them by yourself
 - a SPEC (technical specification) - if you don't have it, ask the user for it
 
 ## Creating an Implementation Plan
@@ -40,7 +40,7 @@ Note:
 
 - This is a regular step, it should be numbered like the other steps.
 - Replace "{TASK_DIR}" with the actual TASK_DIR, e.g. `_plans/123/`
-- Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and a bumped FILE_NUMBER, e.g. `A3`
+- Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and the FILE_NUMBER of the plan plus one, e.g. `A3`
 
 Add the following content to the very end of the implementation plan:
 
@@ -52,7 +52,7 @@ Do not trust this implementation plan blindly. Be sure you understand the codeba
 
 ## Save the Implementation Plan
 
-Write your plan in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A2-plan.md`. Do not overwrite an existing file.
+Write your plan in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the FILE_NUMBER incremented from the last one in the same cycle, e.g. `A2-plan.md`. Do not overwrite an existing file.
 
 _Important Note: There will be lint errors in the markdown file you write. Ignore them. NEVER FIX LINT ERRORS IN THE PLAN._
 
