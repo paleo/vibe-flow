@@ -26,7 +26,7 @@ Works well with:
 
 - **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
 - **Claude Code**
-- **Cursor** with **Claude Sonnet 4** or **GPT-5**
+- **Cursor** with **Claude Sonnet 4** or **GPT-5 (fast)**
 
 _Note: I recommend Claude Sonnet 4 rather than GPT-5, at least for installation, as it follows instructions more rigorously._
 
