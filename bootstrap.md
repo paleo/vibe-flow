@@ -37,7 +37,7 @@ If this is a git repository, ensure that the working tree is clean. If there are
 
 If an AI workflow is already set up (in particular, if a `_docs/ai-workflow/` directory already exists), ask the user what you should do. DO NOT PROCEED WITHOUT CONFIRMATION IF AI WORKFLOW IS ALREADY SET UP.
 
-## Determine the local START_FILE
+## Step 1: Determine the local START_FILE
 
 The **START_FILE** is the primary AI instructions file that is used locally in the codebase.
 
@@ -51,19 +51,19 @@ If no such file exists in the repository:
 - If you are GitHub Copilot in VS Code, then you MUST STOP NOW and ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), search and execute the command _"Chat: Generate Workspace Instructions File"_.
 - Otherwise, you can fetch and follow the instructions in [this specific remote instructions file](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/external/generate-workspace-instructions.md). By following these instructions, a new local `.github/copilot-instructions.md` file will be created. You will use this new `.github/copilot-instructions.md` file as the **START_FILE**.
 
-## Step 1: Create Directories
+## Step 2: Create Directories
 
 Create two directories `_docs` and `_plans` at the root of the repository if they do not exist. If a `.gitignore` file exists, add `_plans` to it. Create a `_docs/ai-workflow` directory if it does not exist.
 
-## Step 2: Extract and Infer Documentation
+## Step 3: Extract and Infer Documentation
 
-For each new document you will write, be very concise. Do not mention obvious best practices. It's not a course or a tutorial. It's a reference for a skilled newcomer to that codebase. The newcomer prefers concise documentation.
+In this step you'll extract documents from existing instruction file, and infer them from the codebase. For each new document you write, be very concise. Never mention obvious best practices. It's not a course or a tutorial, but a reference intended for a skilled newcomer. Our newcomer prefers concise documentation.
 
-### 2.1: Code Style Guidelines
+### 3.1: Code Style Guidelines
 
 Write a new file `_docs/Code Style Guidelines.md` that will contain the code style rules of this repository. If there is any information about code style in the START_FILE, extract it. Also explore the codebase to deduce existing code style rules. Do not invent any rule that is not observed in the codebase. The rules must be short, in the form of bullet lists.
 
-### 2.2: Monorepo Overview
+### 3.2: Monorepo Overview
 
 If the current project is not a monorepository, skip this step.
 
@@ -73,9 +73,9 @@ Write a new file `_docs/Monorepo Overview.md` that will contain the monorepo ove
 - **Monorepo Tooling**: Describe the tooling about how the sub-projects are handled in the monorepo
 - **Main Configuration Files**
 
-### 2.3: How to Write Unit Tests
+### 3.3: How to Write Unit Tests
 
-Investigate the codebase. If the current project doesn't contain unit tests, skip this step. If you have any doubt, ask the user.
+Investigate the codebase. If the current project doesn't contain unit tests, skip this step. If you have any doubt, stop and ask the user.
 
 Write a new file `_docs/How to Write Unit Tests.md` that will explain how to write and run unit tests in this repository. If there is any information about unit tests in the START_FILE, extract it. Also explore the codebase to deduce how unit tests work in this codebase.
 
@@ -87,7 +87,7 @@ This file must have at least the following sections:
 
 Be very concise. Do not mention obvious information. It's not a course or a tutorial. It's a reference for newcomers to that codebase.
 
-### 2.4: Fetch Documents
+### 3.4: Fetch Documents
 
 Use **curl** or **wget** (or find another way) to fetch the following files, specifying the output filename explicitly to avoid URL encoding issues:
 
@@ -98,7 +98,7 @@ Use **curl** or **wget** (or find another way) to fetch the following files, spe
 
 **Important:** Use `curl -o "filename"` or `wget -O "filename"` to specify the exact output filename and avoid URL encoding in filenames.
 
-## Step 3: Create `INDEX.md`
+## Step 4: Create `INDEX.md`
 
 Create the `_docs/INDEX.md` file. Here is a template, adjust it to our project:
 
@@ -128,9 +128,9 @@ AI Workflow:
 
 </index_md_template>
 
-## Step 4: Extract the Content of START_FILE
+## Step 5: Extract the Content of START_FILE
 
-### 4.1: Deprecate Documents
+### 5.1: Deprecate Documents
 
 In START_FILE, look for markdown links or paths to other local markdown files (`.md`) in the repository, with file names or descriptions that could be redundant with our workflow documents:
 
@@ -143,11 +143,11 @@ Then:
 1. Remove these links or paths from START_FILE.
 2. Rename these files with a `.DEPRECATED.md` suffix & extension.
 
-### 4.2: Extract Links from START_FILE
+### 5.2: Extract Links from START_FILE
 
 If there are markdown links or paths to other local documentation files in the monorepo (with relative paths), move these links to the proper place in the `_docs/INDEX.md` file. Pay attention to the relative paths, they must be correct after the move.
 
-### 4.3: Extract Onboarding Content
+### 5.3: Extract Onboarding Content
 
 Now we will move all the remaining content of START_FILE.
 
@@ -158,13 +158,13 @@ Guidelines:
 - Do not replace the extracted content by any link, just remove it from the START_FILE.
 - At the end, START_FILE should be almost empty (the title can remain, but without anything else).
 
-## Step 5: New content for all instructions files
+## Step 6: New content for all instructions files
 
-### 5.1: Special Case for `.cursorrules`
+### 6.1: Special Case for `.cursorrules`
 
 If `.cursorrules` exists, then remove this file from the repository and replace it with a new `.cursor/rules/index.mdc` file with empty content (we'll fill this in later).
 
-### 5.2: Determine the list of instructions files
+### 6.2: Determine the list of instructions files
 
 Now, we need to detect every existing instructions file for AI agents in the codebase.
 
@@ -172,7 +172,7 @@ Make a list INSTRUCTIONS_FILES of all the instructions files in this repository.
 
 Also, if your own instructions file is not in the list, then add it to INSTRUCTIONS_FILES.
 
-### 5.3: Create or replace the instructions files
+### 6.3: Create or replace the instructions files
 
 Replace the content of every file in INSTRUCTIONS_FILES. The new content is provided below. Use it to replace the content of the file. Do not create new files here, except for your own instructions file if it doesn't exist.
 
@@ -205,7 +205,7 @@ Guidelines:
 
 - Do not keep any previous content in these files, remove it all, even the title.
 
-## Step 6: Back to START_FILE?
+## Step 7: Back to START_FILE?
 
 The processus is achieved but we have one option to propose to the user.
 
@@ -230,7 +230,7 @@ If the user prefers to use START_FILE as the main entry point, then:
     ---
     ```
 
-## Step 7: Explain the Workflow
+## Step 8: Explain the Workflow
 
 Display a very concise summary of the changes and a short explanation of the new structure. In particular, you should mention this information:
 
