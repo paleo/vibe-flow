@@ -78,11 +78,11 @@ There are no guidelines. This is just a starting point for your own workflow. Fe
 
 ## Rationale
 
-The documentation for AI agents must be **reorganized into multiple files**, because:
+The documentation for AI agents must be reorganized into multiple files, because:
 
-- We want our code base documentation to be sustainable and not specific to how agents work today.
-- We want the same documentation to be shared among several agents.
-- We don't want to fill the context window with unnecessary instructions.
+- We want our **code base documentation to be sustainable** and not specific to how agents work today.
+- We want the same documentation to be **shared among several agents**.
+- We **don't want to fill the context window** with unnecessary instructions.
 
 Why AI Workflow is beneficial:
 
