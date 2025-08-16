@@ -24,7 +24,7 @@ _plans/
 
 Works well with:
 
-- **VS Code Copilot** with **Claude Sonnet 4** or **GPT-5**
+- **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
 - **Claude Code**
 - **Cursor** with **Claude Sonnet 4** or **GPT-5**
 
