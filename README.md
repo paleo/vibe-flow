@@ -72,7 +72,7 @@ After the implementation, run the code quality and refactoring process:
 Ensure code quality for the last implementation in ticket 123.
 ```
 
-## Guidelines
+## No Guidelines
 
 There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
 
@@ -93,4 +93,4 @@ Why AI Workflow is beneficial:
 
 ## Example
 
-See [the ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example with its `_docs/` directory.
+See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example with its `_docs/` directory.
