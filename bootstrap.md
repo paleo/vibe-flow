@@ -55,6 +55,18 @@ If no such file exists in the repository:
 
 Create two directories `_docs` and `_plans` at the root of the repository if they do not exist. If a `.gitignore` file exists, add `_plans` to it. Create a `_docs/ai-workflow` directory if it does not exist.
 
+### 2.1: Edit README.md
+
+If there is a `README.md` file at the root of the repository, update it:
+
+1. Find the best section and add a reference to the `_docs` folder:
+
+   ```markdown
+   See our technical documentation in the [_docs](_docs/) folder.
+   ```
+
+2. If there is a section dedicated to installation, add instructions for creating the `_plans` folder.
+
 ## Step 3: Extract and Infer Documentation
 
 In this step you'll extract documents from existing instruction file, and infer them from the codebase. For each new document you write, be very concise. Never mention obvious best practices. It's not a course or a tutorial, but a reference intended for a skilled newcomer. Our newcomer prefers concise documentation.
