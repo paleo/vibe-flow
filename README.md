@@ -38,7 +38,7 @@ Then, start using the workflow.
 A specification contains design decisions. It can be written long before the implementation, so it doesn't contain too many implementation details that could become outdated. It can be stored in the ticket system. The agent helps you write a spec by investigating and initiating a discussion:
 
 ```markdown
-Help me write a new spec for ticket 123. It's about [some feature you need]
+Read your documentation, then help me write a new spec for ticket 123. It's about [some feature you need]
 ```
 
 This will write a `_plans/123/A1-spec.md` file.
@@ -55,7 +55,7 @@ This will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-
 
 ### Implementation
 
-The plan is self-explanatory and we don't want to fill the context with workflow details:
+The plan is self-explanatory and we don't want to fill the context with workflow details. Clear the context, then:
 
 ```markdown
 Implement the plan `_plans/123/A2-plan.md`
