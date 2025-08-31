@@ -25,11 +25,9 @@ _plans/
 
 Works well with:
 
-- **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
+- **VS Code & GitHub Copilot**, with **GPT-5** or **Claude Sonnet 4**
 - **Claude Code**
-- **Cursor**, with **Claude Sonnet 4** or **GPT-5**
-
-_Note: I recommend Claude Sonnet 4 rather than GPT-5, at least for installation, as it follows instructions more rigorously._
+- **Cursor**, with **GPT-5** or **Claude Sonnet 4**
 
 Then, start using the workflow.
 
