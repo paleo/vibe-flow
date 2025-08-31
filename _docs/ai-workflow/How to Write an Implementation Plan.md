@@ -21,19 +21,18 @@ Use the SPEC text as a starting point, but do not trust it. Investigate the code
 - Remember that you are a newcomer to this project while the user has extensive experience with the codebase and will be happy to help guide you. If you have any doubt, or if you discover that an important design choice still needs to be made, STOP and ask.
 - The implementation plan will be a prompt for a coding agent, so help it by explaining what you discovered.
 - Start with some context: explain how it works currently, and how it will work after the task is done.
-- Select the relevant documentation from the `_docs/` directory. Do not repeat any documentation. Instead, mention the documentation that needs to be read.
+- Select the relevant documentation from the `_docs/` directory. Do not repeat any documentation. Instead, mention the documentation that needs to be read. Always include `Code Style Guidelines.md` in the list.
 - Mention a way to find important source files: by giving file paths, or by providing a function name to search for, for example.
 - **Do not add backwards compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
 - If the SPEC contains some code, and if you think it is relevant, include it in the implementation plan. Include all useful information from the SPEC, but do not copy-paste the full SPEC as-is.
+- About tests: Investigate first in the code base if there are tests already in place for the kind of tests you consider. Do not mention to write tests unless you are sure they will be well-integrated in the project.
 
-### Add Content To The Plan
+### Add a Final Step to the Plan
 
 In your plan there is a list of steps, add a new step named "Write a Handover Document" with this content:
 
 <content_to_add>
-You are part of our team and you work as a team. After you finish your work, your teammate Joe will continue working using your implementation. So now you are expected to write a handover document for Joe. The document must contain the list of all files you updated. Summarize the changes made in a very concise way. Add only relevant information that would help someone understand what's new. Beware that Joe doesn't like losing his time. Be very concise. Do not mention obvious information. It's not a course or a tutorial. If there is nothing to explain, then do not explain.
-
-Write this handover document in a new `{TASK_DIR}/{TASK_FILE_PREFIX}-summary.md` markdown file. Avoid overwriting an existing file. Ignore lint errors in this file.
+Write a **handover document**. This document must contain the list of all files you updated. Also, summarize the changes made in a very concise way. Add only relevant information that will help your teammates understand what's new. Do not mention obvious information. It's not a course or a tutorial, if there is nothing to explain, then do not explain. Write this handover document in a new `{TASK_DIR}/{TASK_FILE_PREFIX}-summary.md` markdown file. Avoid overwriting an existing file. Ignore lint errors (formatting issues) in this file.
 </content_to_add>
 
 Note:
@@ -41,6 +40,8 @@ Note:
 - This is a regular step, it should be numbered like the other steps.
 - Replace "{TASK_DIR}" with the actual TASK_DIR, e.g. `_plans/123/`
 - Replace "{TASK_FILE_PREFIX}" with the current CYCLE_LETTER and the FILE_NUMBER of the plan plus one, e.g. `A3`
+
+### Last Paragraph
 
 Add the following content to the very end of the implementation plan:
 
@@ -54,7 +55,7 @@ Do not trust this implementation plan blindly. Be sure you understand the codeba
 
 Write your plan in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the FILE_NUMBER incremented from the last one in the same cycle, e.g. `A2-plan.md`. Do not overwrite an existing file.
 
-_Important Note: There will be lint errors in the markdown file you write. Ignore them. NEVER FIX LINT ERRORS IN THE PLAN._
+_Important Note: There will be lint errors in the markdown file you write. Ignore them. NEVER FIX LINT ERRORS (FORMATTING ISSUES) IN THE PLAN._
 
 ## Improve the PLAN
 

@@ -53,19 +53,16 @@ If no such file exists in the repository:
 
 ## Step 2: Create Directories
 
-Create two directories `_docs` and `_plans` at the root of the repository if they do not exist. If a `.gitignore` file exists, add `_plans` to it. Create a `_docs/ai-workflow` directory if it does not exist.
+Create two directories `_docs` and `_plans` at the root of the repository if they do not exist. Create a `_docs/ai-workflow` sub-directory if it does not exist.
 
-### 2.1: Edit README.md
+Also, create an empty file `.gitkeep` in the `_plans` directory.
 
-If there is a `README.md` file at the root of the repository, update it:
+If a `.gitignore` file exists, ensure it contains:
 
-1. Find the best section and add a reference to the `_docs` folder:
-
-   ```markdown
-   See our technical documentation in the [_docs](_docs/) folder.
-   ```
-
-2. If there is a section dedicated to installation, add instructions for creating the `_plans` folder.
+```text
+_plans/*
+!.gitkeep
+```
 
 ## Step 3: Extract and Infer Documentation
 

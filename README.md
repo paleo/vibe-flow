@@ -4,7 +4,8 @@
 
 ## Get Started
 
-Give [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md) to your agent.
+1. Ensure your agent uses GPT-5 or Claude Sonnet 4 (or Claude Opus);
+2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
 
@@ -26,7 +27,7 @@ Works well with:
 
 - **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
 - **Claude Code**
-- **Cursor** with **Claude Sonnet 4** or **GPT-5 (fast)**
+- **Cursor**, with **Claude Sonnet 4** or **GPT-5**
 
 _Note: I recommend Claude Sonnet 4 rather than GPT-5, at least for installation, as it follows instructions more rigorously._
 
@@ -81,7 +82,7 @@ There are no guidelines. This is just a starting point for your own workflow. Fe
 The documentation for AI agents must be reorganized into multiple files, because:
 
 - We want our code base documentation to be **sustainable** and not specific to how agents work today.
-- We want the same documentation to be **shared** among several agents.
+- We want the same documentation to be **shared** among several agents and humans.
 - We don't want to fill the **context window** with unnecessary instructions.
 
 Why AI Workflow is beneficial:
