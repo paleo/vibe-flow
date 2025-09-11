@@ -35,7 +35,7 @@ Then, start using the workflow.
 
 ### Technical Specification
 
-A specification contains design decisions. It can be written long before the implementation, so it doesn't contain too many implementation details that could become outdated. It can be stored in the ticket system. The agent helps you write a spec by investigating and initiating a discussion:
+A specification contains design decisions. It can be written long before the implementation, so it doesn't contain too many implementation details that could become outdated. The agent helps you write a spec by investigating and initiating a discussion:
 
 ```markdown
 Read your documentation, then help me write a new spec for ticket 123. It's about [some feature you need]
