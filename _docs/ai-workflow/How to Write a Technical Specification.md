@@ -41,7 +41,7 @@ You should ask questions freely to ensure you fully understand:
 
 After the user approves your proposal, write the specification in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-spec.md`. Do not overwrite an existing file.
 
-- Usually a specification is around 10~60 lines
+- Usually a specification is around 40~60 lines
 - **Do not add backward compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
 - A specification is not always immediately executed, and you have to assume that the code can change before it is executed. You can mention a function by name, but NEVER mention specific line numbers as they will become obsolete
 - Do not include any detailed code in the specification. Instead, refer to the relevant source files by their paths or function names

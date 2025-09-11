@@ -21,8 +21,8 @@ Remember that you are a newcomer to this project while the user has extensive ex
 ### Guidelines
 
 - The implementation plan must be a **self-explanatory prompt** for a coding agent, so help it by explaining what you discovered.
-- In a "Prerequisites" section, select the **relevant documentation** from the `_docs/` directory. Do not repeat any documentation. Instead, mention the documentation that needs to be read. Always include `Code Style Guidelines.md` in the list.
 - Give some context: explain how it works currently, and how it will work after the task is done.
+- In a "Prerequisites" section, select the **relevant documentation** from the `_docs/` directory. Do not repeat any documentation. Instead, mention the documentation that needs to be read. Always include `Code Style Guidelines.md` in the list.
 - Mention a way to find **important source files**: by giving file paths, or by providing a function name to search for, for example. If needed, line numbers can be mentioned in the plan.
 - Include a list of **numbered steps** and all useful information from the SPEC:
   - If the SPEC is already a good plan, you can use it as-is.

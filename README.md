@@ -4,7 +4,7 @@
 
 ## Get Started
 
-1. Ensure your agent uses GPT-5 or Claude Sonnet 4 (or Claude Opus);
+1. Ensure your agent uses Claude Sonnet 4 or GPT-5 (or Claude Opus);
 2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
@@ -25,9 +25,9 @@ _plans/
 
 Works well with:
 
-- **VS Code & GitHub Copilot**, with **GPT-5** or **Claude Sonnet 4**
+- **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
 - **Claude Code**
-- **Cursor**, with **GPT-5** or **Claude Sonnet 4**
+- **Cursor**, with **Claude Sonnet 4** or **GPT-5**
 
 Then, start using the workflow.
 
