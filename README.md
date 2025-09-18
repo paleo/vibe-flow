@@ -31,6 +31,11 @@ Works well with:
 
 Then, start using the workflow.
 
+## Upgrade from a Previous Version of AI Workflow
+
+1. Ensure your agent uses Claude Sonnet 4 or GPT-5 (or Claude Opus);
+2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/upgrade/upgrade-to agentsmd.md).
+
 ## Use the Workflow
 
 ### Technical Specification

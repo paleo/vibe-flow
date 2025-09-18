@@ -27,7 +27,7 @@ Remember that you are a newcomer to this project while the user has extensive ex
 - Include a list of **numbered steps** and all useful information from the SPEC:
   - If the SPEC is already a good plan, you can use it as-is.
   - Do not add **backwards compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
-  - About **tests**: Investigate first in the code base if there are tests already in place for the kind of tests you consider. Do not mention to write tests unless you are sure they will be well-integrated in the project.
+  - About **tests**: Investigate first in the codebase if there are tests already in place for the kind of tests you consider. Do not mention to write tests unless you are sure they will be well-integrated in the project.
 
 ### Add a Final Step to the Plan
 
