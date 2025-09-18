@@ -17,10 +17,9 @@ _docs/
 │   ├── How to Write a Technical Specification.md
 │   └── How to Write an Implementation Plan.md
 ├── Code Style Guidelines.md
-├── How to Write Unit Tests.md
-├── INDEX.md
-└── Onboarding.md
+└── How to Write Unit Tests.md
 _plans/
+AGENTS.md
 ```
 
 Works well with:
@@ -34,7 +33,7 @@ Then, start using the workflow.
 ## Upgrade from a Previous Version of AI Workflow
 
 1. Ensure your agent uses Claude Sonnet 4 or GPT-5 (or Claude Opus);
-2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/upgrade/upgrade-to agentsmd.md).
+2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/upgrade/upgrade-to-agentsmd.md).
 
 ## Use the Workflow
 
