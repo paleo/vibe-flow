@@ -1,6 +1,10 @@
 # AI Workflow
 
-Pure-prompt **Spec Kit** for **Programming AI Agents**.
+Pure-prompt **Vibe Coding Kit**. Works well with:
+
+- **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
+- **Claude Code**
+- **Cursor**, with **Claude Sonnet 4** or **GPT-5**
 
 ## Get Started
 
@@ -21,12 +25,6 @@ _docs/
 _plans/
 AGENTS.md
 ```
-
-Works well with:
-
-- **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
-- **Claude Code**
-- **Cursor**, with **Claude Sonnet 4** or **GPT-5**
 
 Then, start using the workflow.
 
