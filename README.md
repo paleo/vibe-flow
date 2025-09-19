@@ -1,6 +1,6 @@
 # AI Workflow
 
-**Workflow** for **Programming AI Agents**.
+Pure-prompt **Spec Kit** for **Programming AI Agents**.
 
 ## Get Started
 
