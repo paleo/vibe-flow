@@ -88,7 +88,7 @@ The documentation for AI agents must be reorganized into multiple files, because
 Everything must be written in (git-ignored) local files, because:
 
 1. The context window is limited, the compression mechanism is unreliable, we want to be able to continue an unfinished task in a fresh session;
-2. It's a way to take the time to keep track of what we agreed with the agent and what has been done.
+2. It's a way to keep track of what we agreed with the agent and what has been done.
 
 ## Example
 
