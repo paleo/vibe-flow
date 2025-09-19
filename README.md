@@ -47,7 +47,7 @@ This will write a `_plans/123/A1-spec.md` file.
 
 ### Implementation Plan
 
-The implementation plan is how you can verify that the agent has understood what it need to do. Generating a plan is part of the implementation:
+The implementation plan is how you verify that the agent has understood what it need to do. Generating a plan is part of the implementation:
 
 ```markdown
 Write the implementation plan for ticket 123.
