@@ -1,4 +1,4 @@
-# AI Workflow Guide
+# Vibe Flow Guide
 
 ## TASK_DIR Location
 

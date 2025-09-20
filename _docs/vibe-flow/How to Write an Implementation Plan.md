@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-Before you start, read the `AI Workflow Guide.md` entirely.
+Before you start, read the `Vibe Flow Guide.md` entirely.
 
 You need:
 

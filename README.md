@@ -1,6 +1,6 @@
-# AI Workflow
+# Vibe Flow
 
-Pure-prompt **Vibe Coding Kit**. Works well with:
+Vibe Flow is a hackable set of prompts that enables vibe coding for professional developers. It works well with:
 
 - **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
 - **Claude Code**
@@ -9,14 +9,14 @@ Pure-prompt **Vibe Coding Kit**. Works well with:
 ## Get Started
 
 1. Ensure your agent uses Claude Sonnet 4 or GPT-5 (or Claude Opus);
-2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/bootstrap.md).
+2. Give it [this prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
 
 ```text
 _docs/
-├── ai-workflow/
-│   ├── AI Workflow Guide.md
+├── vibe-flow/
+│   ├── Vibe Flow Guide.md
 │   ├── Code Quality & Refactoring.md
 │   ├── How to Write a Technical Specification.md
 │   └── How to Write an Implementation Plan.md
@@ -28,10 +28,10 @@ AGENTS.md
 
 Then, start using the workflow.
 
-### Or, Upgrade from a Previous Version of AI Workflow
+### Or, Upgrade from a Previous Version of Vibe Flow
 
 1. Ensure your agent uses Claude Sonnet 4 or GPT-5 (or Claude Opus);
-2. Give it [this prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/upgrade/upgrade-to-agentsmd.md).
+2. Give it [this prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/upgrade/upgrade-to-agentsmd.md).
 
 ## Use the Workflow
 
@@ -73,10 +73,6 @@ After the implementation, run the code quality and refactoring process:
 Ensure code quality for the last implementation in ticket 123.
 ```
 
-## No Guidelines
-
-There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
-
 ## Rationale
 
 The documentation for AI agents must be reorganized into multiple files, because:
@@ -89,6 +85,10 @@ Everything must be written in (git-ignored) local files, because:
 
 1. The context window is limited, the compression mechanism is unreliable, we want to be able to continue an unfinished task in a fresh session;
 2. It's a way to keep track of what we agreed with the agent and what has been done.
+
+## No Guidelines
+
+There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
 
 ## Example
 
