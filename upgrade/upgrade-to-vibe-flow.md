@@ -20,7 +20,7 @@ _At first, check if the `AGENTS.md` file at the root of the codebase exists. If 
    - Always ignore `_local` and `_plans` directories when you search for anything in the codebase.
    ```
 
-5. Remove START_FILE.
+5. Remove the START_FILE file. It is replaced by `AGENTS.md`, we don't need it anymore.
 6. Remove every other instructions file in the codebase, except for `CLAUDE.md` if it exists.
 7. If a `CLAUDE.md` file exists, then remove all the previous content, even the title. Replace the content with this one line:
 
