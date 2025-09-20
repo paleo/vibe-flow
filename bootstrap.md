@@ -36,7 +36,7 @@ AGENTS.md
 
 - If this is a git repository, verify the working tree is clean. If there are uncommitted changes or no version control, obtain explicit confirmation before continuing. DO NOT PROCEED WITHOUT CONFIRMATION IF THERE ARE UNCOMMITTED CHANGES.
 - Check if the `_docs/vibe-flow/` directory exists. If it already exists, then a Vibe Flow is already installed, and you must ask how to proceed. DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A VIBE FLOW IS ALREADY SET UP.
-- Check if the `_docs/ai-workflow/` directory exists. If it already exists, then a legacy version of Vibe Flow is installed an you must stop. Suggest to the user they should execute our [migration prompt](https://raw.githubusercontent.com/paleo/ai-workflow/refs/heads/main/upgrade/upgrade-to-vibe-flow.md). DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A LEGACY VERSION OF VIBE FLOW IS ALREADY SET UP.
+- Check if the `_docs/ai-workflow/` directory exists. If it already exists, then a legacy version of Vibe Flow is installed an you must stop. Suggest to the user they should execute our [migration prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/upgrade/upgrade-to-vibe-flow.md). DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A LEGACY VERSION OF VIBE FLOW IS ALREADY SET UP.
 
 ## 2. Determine the local START_FILE
 
