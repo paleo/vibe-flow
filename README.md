@@ -16,10 +16,10 @@ It will install the following structure and plug your AI instructions file into 
 ```text
 _docs/
 ├── vibe-flow/
-│   ├── Vibe Flow Guide.md
 │   ├── Code Quality & Refactoring.md
 │   ├── How to Write a Technical Specification.md
-│   └── How to Write an Implementation Plan.md
+│   ├── How to Write an Implementation Plan.md
+│   └── Vibe Flow Guide.md
 ├── Code Style Guidelines.md
 └── How to Write Unit Tests.md
 _plans/
