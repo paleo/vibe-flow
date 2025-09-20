@@ -133,7 +133,7 @@ Create a new `AGENTS.md` file at the repository root. Use the template below and
 ## Important Instructions
 
 - For each task the user asks, you MUST select the relevant documentation files and read them ENTIRELY.
-- Always ignore `_local` and `_plans` directories when you search for anything in the codebase.
+- Always ignore the `_plans` directory when you search for anything in the codebase.
 
 ## Documentation Files
 

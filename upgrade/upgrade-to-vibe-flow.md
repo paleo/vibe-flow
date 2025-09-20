@@ -17,7 +17,7 @@ _At first, check if the `AGENTS.md` file at the root of the codebase exists. If 
    ## Important Instructions
 
    - For each task the user asks, you MUST select the relevant documentation files and read them ENTIRELY.
-   - Always ignore `_local` and `_plans` directories when you search for anything in the codebase.
+   - Always ignore the `_plans` directory when you search for anything in the codebase.
    ```
 
 5. Remove the START_FILE file. It is replaced by `AGENTS.md`, we don't need it anymore.
