@@ -36,3 +36,11 @@ _At first, check if the `AGENTS.md` file at the root of the codebase exists. If 
 4. In the `AGENTS.md` file, rename the reference to the guide accordingly.
 5. Search for `ai-workflow` in the codebase and replace it with `vibe-flow`.
 6. Search for `AI Workflow` in the codebase and replace it with `Vibe Flow`.
+
+## Step 3 — Move the "Code Quality & Refactoring" document
+
+If a `_docs/vibe-flow/Code Quality & Refactoring.md` file exists, do the following:
+
+1. Move the `_docs/vibe-flow/Code Quality & Refactoring.md` file to `_docs/Code Quality & Refactoring.md`.
+2. Update any references to the document in `AGENTS.md` to reflect its new location. Move the reference from the "Vibe Flow" section to another section (like an "Additional documentation" section).
+3. In `Code Quality & Refactoring.md`, remove any references to `vibe-flow`. Remove the "Pre-requisites" section if it exists.

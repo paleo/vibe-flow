@@ -2,9 +2,9 @@
 
 Vibe Flow is a hackable set of prompts that enables vibe coding for professional developers. It works well with:
 
-- **VS Code & GitHub Copilot**, with **Claude Sonnet 4** or **GPT-5**
+- **VS Code & GitHub Copilot**, with the last versions of **Claude Sonnet** or **GPT**
 - **Claude Code**
-- **Cursor**, with **Claude Sonnet 4** or **GPT-5**
+- **Cursor**, with the last versions of **Claude Sonnet** or **GPT**
 
 ## Get Started
 
@@ -16,7 +16,6 @@ It will install the following structure and plug your AI instructions file into 
 ```text
 _docs/
 ├── vibe-flow/
-│   ├── Code Quality & Refactoring.md
 │   ├── How to Write a Technical Specification.md
 │   ├── How to Write an Implementation Plan.md
 │   └── Vibe Flow Guide.md
@@ -64,14 +63,6 @@ Implement the plan `_plans/123/A2-plan.md`
 ```
 
 This will execute the plan and then write a `_plans/123/A3-summary.md` file.
-
-### Code Quality & Refactoring
-
-After the implementation, run the code quality and refactoring process:
-
-```markdown
-Ensure code quality for the last implementation in ticket 123.
-```
 
 ## Rationale
 
