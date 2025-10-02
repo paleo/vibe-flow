@@ -8,7 +8,7 @@ Vibe Flow is a hackable set of prompts that enables vibe coding for professional
 
 ## Get Started
 
-1. Ensure your agent uses Claude Sonnet 4 or GPT-5 (or Claude Opus);
+1. Ensure your agent uses Claude Sonnet 4.5 or GPT-5-Codex (or another good coding model);
 2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
@@ -29,8 +29,7 @@ Then, start using the workflow.
 
 ### Or, Upgrade from a Previous Version of Vibe Flow
 
-1. Ensure your agent uses Claude Sonnet 4.5 or GPT-5-Codex (or another good coding model);
-2. Give it [this upgrade prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/upgrade/upgrade-to-vibe-flow.md).
+Use [this upgrade prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/upgrade/upgrade-to-vibe-flow.md).
 
 ## Use the Workflow
 
