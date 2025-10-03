@@ -38,7 +38,8 @@ Use [this upgrade prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs
 A specification can be written long before the implementation. The agent helps you write it by investigating and initiating a discussion:
 
 ```markdown
-Read your documentation, then help me write a new spec for ticket 123. It's about [some feature you need]
+Read your documentation, then help me write a new spec for ticket 123.
+It's about [some feature you need]
 ```
 
 This will write a `_plans/123/A1-spec.md` file.
@@ -48,7 +49,7 @@ This will write a `_plans/123/A1-spec.md` file.
 The implementation plan is how you verify that the agent has understood what it need to do. Generating a plan is part of the implementation:
 
 ```markdown
-Write the implementation plan for ticket 123.
+Read your documentation, then write the implementation plan for ticket 123.
 ```
 
 This will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-plan.md` file.
