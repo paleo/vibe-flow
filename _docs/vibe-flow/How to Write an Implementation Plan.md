@@ -25,7 +25,7 @@ Remember that you are a newcomer to this project while the user has extensive ex
 - In a "Prerequisites" section, select the **relevant documentation** from the `_docs/` directory. Do not repeat any documentation. Instead, mention the documentation that needs to be read. Always include `Code Style Guidelines.md` in the list.
 - Mention a way to find **important source files**: by giving file paths, or by providing a function name to search for, for example. If needed, line numbers can be mentioned in the plan.
 - Include a list of **numbered steps** and all useful information from the SPEC:
-  - If the SPEC is already a good plan, you can use it as-is.
+  - If the SPEC is already a good plan, you can use it as-is. You can also extract and reuse parts of it.
   - Do not add **backwards compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
   - About **tests**: Investigate first in the codebase if there are tests already in place for the kind of tests you consider. Do not mention to write tests unless you are sure they will be well-integrated in the project.
 
