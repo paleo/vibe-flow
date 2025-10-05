@@ -1,10 +1,11 @@
 # Vibe Flow
 
-Vibe Flow is a hackable set of prompts that enables vibe coding for professional developers. It works well with:
+Vibe Flow is a hackable set of prompts that enables Spec-Driven Development, i.e. vibe coding for professional developers.
 
-- **VS Code & GitHub Copilot**, with **Claude Sonnet 4+** or **GPT 5+**
-- **Claude Code**
-- **Cursor**, with **Claude Sonnet 4+** or **GPT 5+**
+It works well with **any agent** powered by one of these models:
+
+- **Claude Sonnet 4+**
+- **GPT 5+**
 
 ## Get Started
 
