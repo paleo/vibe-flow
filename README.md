@@ -21,7 +21,8 @@ _docs/
 │   ├── How to Write an Implementation Plan.md
 │   └── Vibe Flow Guide.md
 ├── Code Style Guidelines.md
-└── How to Write Unit Tests.md
+├── How to Write Unit Tests.md
+└── Writing Documentation.md
 _plans/
 AGENTS.md
 ```

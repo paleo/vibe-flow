@@ -119,6 +119,8 @@ Use `curl` or `wget` to fetch the following files:
 
 Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact output filename and avoid URL-encoded names.
 
+Also, do not chain the commands with `&&`. Run them carefully one by one.
+
 ## 6. Create `AGENTS.md`
 
 Create a new `AGENTS.md` file at the repository root. Use the template below and adapt it to this project:
@@ -139,12 +141,12 @@ Create a new `AGENTS.md` file at the repository root. Use the template below and
 Most frequently consulted procedures:
 
 - `_docs/Code Style Guidelines.md` - ALWAYS READ BEFORE CODING
-- `_docs/Writing Documentation.md` - Guidelines for writing documents in the `_docs` directory
 
 Additional documentation (read as needed):
 
 - `_docs/How to Write Unit Tests.md`
 - `_docs/Monorepo Overview.md`
+- `_docs/Writing Documentation.md` - Guidelines for writing documents in the `_docs` directory
 
 Vibe Flow:
 
