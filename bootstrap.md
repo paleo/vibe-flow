@@ -25,7 +25,8 @@ _docs/
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
 ├── Monorepo Overview.md
-└── Unused Instructions.md
+├── Unused Instructions.md
+└── Writing Documentation.md
 _plans/
 └── .gitkeep
 AGENTS.md
