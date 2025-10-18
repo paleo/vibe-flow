@@ -44,3 +44,14 @@ If a `_docs/vibe-flow/Code Quality & Refactoring.md` file exists, do the followi
 1. Move the `_docs/vibe-flow/Code Quality & Refactoring.md` file to `_docs/Code Quality & Refactoring.md`.
 2. Update any references to the document in `AGENTS.md` to reflect its new location. Move the reference from the "Vibe Flow" section to another section (like an "Additional documentation" section).
 3. In `Code Quality & Refactoring.md`, remove any references to `vibe-flow`. Remove the "Pre-requisites" section if it exists.
+
+## Step 4 — Update Vibe Flow Documents
+
+Use `curl` or `wget` to fetch and overwrite the following files with their latest versions:
+
+- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/Writing%20Documentation.md) to `_docs/Writing Documentation.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/vibe-flow/How to Write a Technical Specification.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20an%20Implementation%20Plan.md) to `_docs/vibe-flow/How to Write an Implementation Plan.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/AI%20Workflow%20Guide.md) to `_docs/vibe-flow/Vibe Flow Guide.md`
+
+Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact output filename and avoid URL-encoded names.

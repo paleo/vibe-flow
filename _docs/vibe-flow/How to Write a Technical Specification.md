@@ -45,5 +45,7 @@ After the user approves your proposal, write the specification in a markdown fil
 - **Do not add backward compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
 - A specification is not always immediately executed, and you have to assume that the code can change before it is executed. You can mention a function by name, but NEVER mention specific line numbers as they will become obsolete
 - Do not include any detailed code in the specification. Instead, refer to the relevant source files by their paths or function names
-- Assume that the specification will be read by developers familiar with the codebase
+- Assume that the specification will be read by developers already familiar with the documentation in the codebase
 - Do not include sections like "Benefits", "Code Style Compliance" or anything that adds no new information. Focus on the problem and the solution
+
+_Important Note: There will be lint errors in the markdown file you write. Ignore them. NEVER FIX LINT ERRORS (FORMATTING ISSUES) IN THE SPEC._

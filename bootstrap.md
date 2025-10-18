@@ -112,6 +112,7 @@ Remove from UNUSED_FILE all the information you extracted. Do not leave a link t
 
 Use `curl` or `wget` to fetch the following files:
 
+- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/Writing%20Documentation.md) to `_docs/Writing Documentation.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/vibe-flow/How to Write a Technical Specification.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20an%20Implementation%20Plan.md) to `_docs/vibe-flow/How to Write an Implementation Plan.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/AI%20Workflow%20Guide.md) to `_docs/vibe-flow/Vibe Flow Guide.md`
@@ -138,6 +139,7 @@ Create a new `AGENTS.md` file at the repository root. Use the template below and
 Most frequently consulted procedures:
 
 - `_docs/Code Style Guidelines.md` - ALWAYS READ BEFORE CODING
+- `_docs/Writing Documentation.md` - Guidelines for writing documents in the `_docs` directory
 
 Additional documentation (read as needed):
 
