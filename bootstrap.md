@@ -151,9 +151,9 @@ Additional documentation (read as needed):
 
 Vibe Flow:
 
-- `_docs/vibe-flow/How to Write a Technical Specification.md` - For writing a **spec**
-- `_docs/vibe-flow/How to Write an Implementation Plan.md` - For writing a **plan**
-- `_docs/vibe-flow/Vibe Flow Guide.md` - Where to save plans, specifications, and implementation summaries
+- `_docs/vibe-flow/How to Write a Technical Specification.md` - To design a **spec**
+- `_docs/vibe-flow/How to Write an Implementation Plan.md` - To design a **plan**
+- `_docs/vibe-flow/Vibe Flow Guide.md` - Where to save specifications and plans
 
 ```
 
