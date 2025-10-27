@@ -29,7 +29,7 @@ AGENTS.md
 
 Then, start using the workflow.
 
-## Use the Workflow
+## Using Vibe Flow
 
 ### Technical Specification
 
