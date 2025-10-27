@@ -9,7 +9,7 @@ It works well with **any agent** powered by one of these models:
 
 ## Get Started
 
-1. Ensure your agent uses Claude Sonnet 4.5 or GPT-5-Codex (or another good coding model);
+1. Ensure your agent uses Claude Sonnet 4.5 or GPT-5-Codex (or another good coding model).
 2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
@@ -41,17 +41,17 @@ Read your documentation, then help me write a new spec for ticket 123.
 It's about [some feature you need]
 ```
 
-This will discuss with you, then write a `_plans/123/A1-spec.md` file.
+The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
 ### Implementation Plan
 
-The implementation plan is how you verify that the agent has understood what it need to do. Generating a plan is part of the implementation:
+The implementation plan is how you verify that the agent has understood what it needs to do. Generating a plan is part of the implementation:
 
 ```markdown
 Read your documentation, then write the implementation plan for ticket 123.
 ```
 
-This will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-plan.md` file.
+The agent will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-plan.md` file.
 
 ### Implementation
 
@@ -61,11 +61,11 @@ The plan is self-explanatory and we don't want to fill the context with workflow
 Implement the plan `_plans/123/A2-plan.md`
 ```
 
-This will execute the plan and then write a `_plans/123/A3-summary.md` file.
+The agent will execute the plan and then write a `_plans/123/A3-summary.md` file.
 
 ### Discuss-Then-Do Protocol
 
-There is also a lighter prompt. Here is how to trigger it:
+There is also a lighter prompt. Here's how to trigger it:
 
 ```markdown
 DTDP, ticket ID = 123.
@@ -85,7 +85,7 @@ The documentation for AI agents must be reorganized into multiple files, because
 
 Everything must be written in (git-ignored) local files, because:
 
-1. The context window is limited, the compression mechanism is unreliable, we want to be able to continue an unfinished task in a fresh session;
+1. The context window is limited, the compression mechanism is unreliable, and we want to be able to continue an unfinished task in a fresh session.
 2. It's a way to keep track of what we agreed with the agent and what has been done.
 
 ## No Guidelines
@@ -101,4 +101,4 @@ See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for
 Two migration prompts are available:
 
 - [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the Vibe Flow directory and `AGENTS.md`.
-- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the last versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.
+- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the latest versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.
