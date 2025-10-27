@@ -17,6 +17,7 @@ It will install the following structure and plug your AI instructions file into 
 ```text
 _docs/
 ├── vibe-flow/
+│   ├── Discuss-Then-Do Protocol.md
 │   ├── How to Write a Technical Specification.md
 │   ├── How to Write an Implementation Plan.md
 │   └── Vibe Flow Guide.md
