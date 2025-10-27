@@ -29,10 +29,6 @@ AGENTS.md
 
 Then, start using the workflow.
 
-### Or, Upgrade from a Previous Version of Vibe Flow
-
-Use [this upgrade prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/upgrade/upgrade-to-vibe-flow.md).
-
 ## Use the Workflow
 
 ### Technical Specification
@@ -98,3 +94,10 @@ There are no guidelines. This is just a starting point for your own workflow. Fe
 ## Example
 
 See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example with its `_docs/` directory.
+
+## Migrations (update from older version)
+
+Two migration prompts are available:
+
+- [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the Vibe Flow directory and `AGENTS.md`.
+- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the last versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.
