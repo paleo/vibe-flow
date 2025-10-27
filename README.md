@@ -44,7 +44,7 @@ Read your documentation, then help me write a new spec for ticket 123.
 It's about [some feature you need]
 ```
 
-This will write a `_plans/123/A1-spec.md` file.
+This will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
 ### Implementation Plan
 
@@ -65,6 +65,18 @@ Implement the plan `_plans/123/A2-plan.md`
 ```
 
 This will execute the plan and then write a `_plans/123/A3-summary.md` file.
+
+### Discuss-Then-Do Protocol
+
+There is also a lighter prompt. Here is how to trigger it:
+
+```markdown
+DTDP, ticket ID = 123.
+
+Fix the bug about [something to do]
+```
+
+The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-summary.md` file will be written.
 
 ## Rationale
 
