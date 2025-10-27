@@ -14,7 +14,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 **Common file types:**
 
 - `spec` - technical specification
-- `plan` - implementation plan
+- `plan` - implementation plan  
 - `summary` - implementation summary document
 - `commit` - suggested commit message and changelog entry
 

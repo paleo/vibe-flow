@@ -19,7 +19,11 @@ When the user asks you for a SPEC (technical specification), you MUST follow thi
 
 The discussion phase is MANDATORY. Remember that you are a newcomer to this project while the user has extensive experience with the codebase and will be happy to help guide you.
 
-## Discussion Format
+## Phase 1. Investigation Phase
+
+Investigate the codebase yourself, find the relevant source code, think carefully, take the time to understand how it currently works and what has to be done. If the Context7 MCP is available, feel free to use it.
+
+## Phase 2. Discussion Phase
 
 Engage in a thorough collaborative discussion covering:
 
@@ -37,7 +41,7 @@ You should ask questions freely to ensure you fully understand:
 - User preferences for implementation approaches
 - Any constraints or considerations you might have missed
 
-## Specification File Guidelines
+## Phase 3. Specification Phase
 
 After the user approves your proposal, write the specification in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-spec.md`. Do not overwrite an existing file.
 
