@@ -4,8 +4,9 @@ Vibe Flow is a hackable set of prompts that enables Spec-Driven Development, i.e
 
 It works well with **any agent** powered by one of these models:
 
-- **Claude Sonnet 4+**
-- **GPT 5+**
+- **Claude Sonnet 4+** (Anthropic)
+- **GPT 5+** (OpenAI)
+- **Composer 1** (Cursor)
 
 ## Get Started
 
