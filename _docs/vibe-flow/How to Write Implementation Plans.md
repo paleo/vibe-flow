@@ -188,7 +188,7 @@ Note:
 
 - Replace "{PLAN_FILE_PATH}" with the actual plan file path without extension (e.g., for plan `_plans/123/A2-plan-orchestrator.md`, use `_plans/123/A2-plan-orchestrator`, resulting in `_plans/123/A2-plan-orchestrator.summary.md`)
 
-### 4.3 Last Paragraph for Orchestrator Plan
+### 4.3 Footer for Orchestrator Plan
 
 Add the following content to the very end of the orchestrator plan:
 
