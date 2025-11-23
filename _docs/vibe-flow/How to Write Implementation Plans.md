@@ -84,7 +84,7 @@ Follow these guidelines:
 
 For specialized plans, add these additional requirements:
 
-**At the top of each specialized plan**, add a header indicating which subagent should execute it (or "Coder" if no specific subagent):
+**At the top of each specialized plan**, add a header indicating which subagent should execute it (or "Agent" if no specific subagent):
 
 ```markdown
 **Assigned to**: [Subagent Name or "Agent"]
@@ -129,7 +129,7 @@ The orchestrator plan coordinates the execution of all specialized plans. It sho
 
 1. **Reference to the specification**: Mention the spec file but do not repeat its content.
 2. **Execution strategy**: Specify if plans can be executed in parallel or must be sequential, with dependencies clearly noted.
-3. **Plan assignments**: For each specialized plan, specify which subagent (or "Coder") should execute it.
+3. **Plan assignments**: For each specialized plan, specify which subagent (or "Agent") should execute it.
 4. **Coordination notes**: Any important information about how the plans interact or depend on each other.
 5. **Final step**: Add a step to write an orchestrator handover (see section 4.2).
 
@@ -237,7 +237,7 @@ Repeat the review until you think all plans are solid.
 **Additional review for multiple plans**:
 
 - Each specialized plan is self-contained and independently executable
-- Each specialized plan clearly states its assignment (subagent or "Coder")
+- Each specialized plan clearly states its assignment (subagent or "Agent")
 - The orchestrator plan correctly references all specialized plans
 - The orchestrator specifies if plans can run in parallel or must be sequential
 - Dependencies between plans are clearly documented
