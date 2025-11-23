@@ -19,7 +19,7 @@ _docs/
 ├── vibe-flow/
 │   ├── Discuss-Then-Do Protocol.md
 │   ├── How to Write a Technical Specification.md
-│   ├── How to Write an Implementation Plan.md
+│   ├── How to Write Implementation Plans.md
 │   └── Vibe Flow Guide.md
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
@@ -43,12 +43,12 @@ It's about [some feature you need]
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
-### Implementation Plan
+### Implementation Plan(s)
 
-The implementation plan is how you verify that the agent has understood what it needs to do. Generating a plan is part of the implementation:
+Implementation plans are how you verify that the agent has understood what it needs to do. They can be multiple. Generating plan(s) is part of the implementation:
 
 ```markdown
-Read your documentation, then write the implementation plan for ticket 123.
+Read your documentation, then write plans for ticket 123.
 ```
 
 The agent will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-plan.md` file.
@@ -58,10 +58,10 @@ The agent will read the `_plans/123/A1-spec.md` file and then write a `_plans/12
 The plan is self-explanatory and we don't want to fill the context with workflow details. Clear the context, then:
 
 ```markdown
-Implement the plan `_plans/123/A2-plan.md`
+Execute the plan `_plans/123/A2-plan.md`
 ```
 
-The agent will execute the plan and then write a `_plans/123/A3-summary.md` file.
+The agent will execute the plan and then write a `_plans/123/A2-plan.summary.md` file.
 
 ### Discuss-Then-Do Protocol
 

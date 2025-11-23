@@ -9,7 +9,7 @@ If Vibe Flow is set up, proceed with the following steps:
 Use `curl` or `wget` to fetch and overwrite the following files with their latest versions:
 
 - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/vibe-flow/How to Write a Technical Specification.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20an%20Implementation%20Plan.md) to `_docs/vibe-flow/How to Write an Implementation Plan.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20Implementation%20Plans.md) to `_docs/vibe-flow/How to Write Implementation Plans.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Discuss-Then-Do%20Protocol.md) to `_docs/vibe-flow/Discuss-Then-Do Protocol.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Vibe%20Flow%20Guide.md) to `_docs/vibe-flow/Vibe Flow Guide.md`
 
@@ -25,7 +25,7 @@ Here is an actualized version of the "Vibe Flow" section of a `AGENTS.md` file:
 Vibe Flow:
 
 - `_docs/vibe-flow/How to Write a Technical Specification.md` - To design a **spec**
-- `_docs/vibe-flow/How to Write an Implementation Plan.md` - To design a **plan**
+- `_docs/vibe-flow/How to Write Implementation Plans.md` - To design **plan(s)**
 - `_docs/vibe-flow/Discuss-Then-Do Protocol.md` - **DTDP** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
 - `_docs/vibe-flow/Vibe Flow Guide.md` - Where to save specifications and plans
 ```
