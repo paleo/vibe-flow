@@ -151,6 +151,8 @@ OR
 
 ### Plan Assignments
 
+Execute these specialized plans using **subagents** if available:
+
 1. **Backend Plan** (`A3-plan-backend.md`)
    - **Assigned to**: `backend-coder`
    - **Description**: [Brief description of what this plan accomplishes]
