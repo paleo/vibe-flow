@@ -2,15 +2,16 @@
 
 Vibe Flow is a hackable set of prompts that enables Spec-Driven Development for professional developers.
 
-It works well with **any agent** powered by a capable coding model such as:
+It works well with **any agent** powered by a coding model such as:
 
-- **Claude Sonnet 4** (or later)
-- **GPT-4o**, **o3**
-- **Gemini 2.5 Pro**
+- **Claude Sonnet 4+**
+- **Claude Opus 4+**
+- **Composer 1**
+- **GPT 5+**
 
 ## Get Started
 
-1. Ensure your agent uses a capable coding model (Claude Sonnet 4, GPT-4o, Gemini 2.5 Pro, or similar).
+1. Ensure your agent uses a capable coding model.
 2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
