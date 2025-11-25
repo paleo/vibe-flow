@@ -109,7 +109,7 @@ Be very concise. Do not mention obvious information. It's not a course or a tuto
 
 Remove from UNUSED_FILE all the information you extracted. Do not leave a link to the extracted document.
 
-### 5.4. Fetch Documents
+### 5.4. Download Documents
 
 Use `curl` or `wget` to fetch the following files:
 
@@ -122,6 +122,25 @@ Use `curl` or `wget` to fetch the following files:
 Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact output filename and avoid URL-encoded names.
 
 Also, do not chain the commands with `&&`. Run them carefully one by one.
+
+### 5.5. Download Claude Code / Cursor Commands
+
+If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file), download the command files:
+
+1. Create the `.claude/commands/` directory if it does not exist.
+2. Fetch these files:
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) to `.claude/commands/spec.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) to `.claude/commands/plan.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) to `.claude/commands/dtdp.md`
+
+### 5.6. Detect Ticket ID Format
+
+If this is a git repository, run `git branch -a` to list all local and remote branch names. Look for a common ticket ID pattern in branch names (e.g., `feat/ABC-123-...`, `fix/PROJ-456`, `feature/123-...`).
+
+- If a pattern is found (e.g., `ABC-###`, `PROJ-###`, or numeric), note it as **TICKET_FORMAT**.
+- If no pattern is found, ask the user: "What is your ticket ID format? (e.g., `ABC-###`, `PROJ-###`, or numeric). You can also skip this."
+  - If the user provides a format, use it as **TICKET_FORMAT**.
+  - If the user chooses to skip, set **TICKET_FORMAT** to `(skipped)`.
 
 ## 6. Create `AGENTS.md`
 
@@ -157,9 +176,15 @@ Vibe Flow:
 - `_docs/vibe-flow/Discuss-Then-Do Protocol.md` - **DTDP** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
 - `_docs/vibe-flow/Vibe Flow Guide.md` - Where to save specifications and plans
 
+## For AI Assistants
+
+_Ticket ID_: Format is `{TICKET_FORMAT}`. When not provided, deduce it from the branch name if possible—no need to confirm.
+
 ```
 
 </index_md_template>
+
+If **TICKET_FORMAT** is `(skipped)`, remove the entire "For AI Assistants" section from the generated `AGENTS.md`.
 
 ## 7. Handle Links from UNUSED_FILE
 

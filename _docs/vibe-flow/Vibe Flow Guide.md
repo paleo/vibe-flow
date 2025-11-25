@@ -16,7 +16,6 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 - `spec` - technical specification
 - `plan` - implementation plan
 - `summary` - implementation summary document
-- `commit` - suggested commit message and changelog entry
 
 **Example structure:**
 
