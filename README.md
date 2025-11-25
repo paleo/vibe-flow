@@ -1,16 +1,17 @@
 # Vibe Flow
 
-Vibe Flow is a hackable set of prompts that enables Spec-Driven Development, i.e. vibe coding for professional developers.
+Vibe Flow is a hackable set of prompts that enables Spec-Driven Development for professional developers.
 
-It works well with **any agent** powered by one of these models:
+It works well with **any agent** powered by a coding model such as:
 
 - **Claude Sonnet 4+** (Anthropic)
+- **Claude Opus 4+** (Anthropic)
 - **GPT 5+** (OpenAI)
 - **Composer 1** (Cursor)
 
 ## Get Started
 
-1. Ensure your agent uses Claude Sonnet 4.5 or GPT-5-Codex (or another good coding model).
+1. Ensure your agent uses a capable coding model.
 2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
@@ -20,7 +21,7 @@ _docs/
 ├── vibe-flow/
 │   ├── Discuss-Then-Do Protocol.md
 │   ├── How to Write a Technical Specification.md
-│   ├── How to Write an Implementation Plan.md
+│   ├── How to Write Implementation Plans.md
 │   └── Vibe Flow Guide.md
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
@@ -33,45 +34,48 @@ Then, start using the workflow.
 
 ## Using Vibe Flow
 
-### Technical Specification
+### Generate Technical Specification
 
 A specification can be written long before the implementation. The agent helps you write it by investigating and initiating a discussion:
 
 ```markdown
-Read your documentation, then help me write a new spec for ticket 123.
+Read your documentation, then help me write a new spec.
+
 It's about [some feature you need]
 ```
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
-### Implementation Plan
+_Note: `123` is the ticket ID. If it can be deduced from the branch name, it will. Otherwise the agent will ask you. `A1` means it's the first file of cycle A (files are organized by cycles)._
 
-The implementation plan is how you verify that the agent has understood what it needs to do. Generating a plan is part of the implementation:
+### Generate Implementation Plan(s)
+
+Plans orchestrate what agents or subagents will do:
 
 ```markdown
-Read your documentation, then write the implementation plan for ticket 123.
+Read your documentation, then write plans.
 ```
 
-The agent will read the `_plans/123/A1-spec.md` file and then write a `_plans/123/A2-plan.md` file.
+The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
 ### Implementation
 
-The plan is self-explanatory and we don't want to fill the context with workflow details. Clear the context, then:
+**Clear the context**, then execute the plan(s):
 
 ```markdown
-Implement the plan `_plans/123/A2-plan.md`
+Execute the plan `_plans/123/A2-plan-orchestrator.md`
 ```
 
-The agent will execute the plan and then write a `_plans/123/A3-summary.md` file.
+The agent executes and writes handover document(s) (`.summary.md` files).
 
-### Discuss-Then-Do Protocol
+### Discuss-Then-Do Protocol (DTDP)
 
-There is also a lighter prompt. Here's how to trigger it:
+There is also a lighter prompt for small tasks without spec/plans. Here's how to trigger it:
 
 ```markdown
-DTDP, ticket ID = 123.
+Read your documentation first. I need a DTDP.
 
-Fix the bug about [something to do]
+[Something to do]
 ```
 
 The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-summary.md` file will be written.
@@ -86,7 +90,7 @@ The documentation for AI agents must be reorganized into multiple files, because
 
 Everything must be written in (git-ignored) local files, because:
 
-1. The context window is limited, the compression mechanism is unreliable, and we want to be able to continue an unfinished task in a fresh session.
+1. The context window is limited, the compression mechanism is opaque, and we want to be able to continue an unfinished task in a fresh session.
 2. It's a way to keep track of what we agreed with the agent and what has been done.
 
 ## No Guidelines
