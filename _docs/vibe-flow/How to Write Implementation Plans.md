@@ -20,10 +20,10 @@ Before starting, **read the spec file** and understand it entirely.
 
 In order to generate implementation plans, you MUST follow this process:
 
-1. **Investigation Phase**: Take the time to explore the codebase, understand the current implementation, and identify the problem
-2. **Analysis Phase**: Determine which subagents are needed (if any) based on the files/areas that will be modified
-3. **Designing Phase - Implementation Plan Structure**: Design plan(s) based on the analysis - If you discover issues or missing design decisions, STOP AND ASK THE USER
-4. **Designing Phase - Orchestrator Plan**: If multiple subagents are involved, design an orchestrator plan to coordinate them
+1. **Investigation Phase**: Explore the codebase, understand the current implementation, and identify the problem
+2. **Analysis Phase**: Determine the plan structure (single or multiple plans) and assign subagents if applicable
+3. **Designing Phase - Implementation Plan(s)**: Design plan(s) based on the analysis - If you discover issues or missing design decisions, STOP AND ASK THE USER
+4. **Designing Phase - Orchestrator Plan**: If multiple plans, design an orchestrator plan to coordinate them
 5. **Writing Phase**: Write the plan file(s)
 6. **Review Phase**: Critically review and improve the plan(s)
 
@@ -37,27 +37,22 @@ Use the SPEC text as a starting point, but do not trust it blindly. Verify the c
 
 Based on your investigation, determine the plan structure:
 
-### 2.1 Assess Work Scope and Independence
+### 2.1 Assess Work Scope
 
-First, evaluate if the work can be split into **specialized sub-plans**:
+First, evaluate if the work should be split into **multiple sub-plans**:
 
-- **Single, cohesive work**: Generate a **single plan**
-- **Large work with independent pieces**: Split into multiple plans with an orchestrator
-  - Each sub-plan should be independently executable (no sequential dependencies between them)
-  - Sub-plans work on completely separated parts of the codebase
-  - Example: refactoring 3 independent packages
-  - If **Subagents** (or **Custom Agents**) are defined, use their specialization areas to help determine how to split the work.
+- **Single plan**: Preferred when work is cohesive within one area, or when cross-stack work is small and simple
+- **Multiple plans**: Split into multiple plans with an orchestrator, based on:
+  - **Stack or subagent boundaries**: Different technologies or specialization areas
+  - **Distinct logical units**: Separate features or modules within the same stack, when large enough
+  - Each sub-plan should produce a **coherent, testable deliverable**
 
-### 2.2 Map to Subagents (if applicable)
+### 2.2 Assign Subagents
 
-**If Subagents exist**:
+If **Subagents** (or **Custom Agents**) are defined, assign each plan to the appropriate subagent based on their specialization areas.
 
-1. **Identify affected areas**: List all files, packages, and directories that will be modified
-2. **Map to subagents**: Using the subagent specialization areas, determine which subagents are responsible for each area
-3. **Combine with scope assessment**:
-   - **Single subagent needed**: Create a **single plan** (no orchestrator)
-   - **Multiple subagents OR independent sub-plans**: Create multiple specialized plans + one orchestrator plan
-   - When splitting by independence AND subagents, align sub-plans with both criteria
+- If the plan fits a subagent's specialization, assign it to that subagent
+- If the plan is cross-stack or doesn't fit any specialization, assign it to the generalist agent
 
 ## Phase 3. Designing Phase - Implementation Plan Structure
 
@@ -80,7 +75,7 @@ Follow these guidelines:
 
 ### 3.2 Additional Requirements for Specialized Plans
 
-**Use this when multiple plans are created (either for different subagents or for independent work pieces).**
+**Use this when multiple plans are created.**
 
 For specialized plans, add these additional requirements:
 
@@ -92,9 +87,9 @@ For specialized plans, add these additional requirements:
 
 **In the context section**, explain what you discovered **relevant to this plan's scope** and how it works currently and will work after the task is done **within its scope**.
 
-**In the numbered steps**, include only steps for this plan's work. Each plan should be independently executable.
+**In the numbered steps**, include only steps for this plan's work. Each plan should be self-contained.
 
-**Coordination notes**: If this plan has dependencies on another plan (sequential execution required), mention it explicitly. Otherwise, plans can be executed in parallel.
+**Coordination notes**: If this plan depends on another plan, mention it explicitly.
 
 ### 3.3 Add a Final Step to Plans
 
@@ -130,8 +125,7 @@ The orchestrator plan coordinates the execution of all specialized plans. It sho
 1. **Reference to the specification**: Mention the spec file but do not repeat its content.
 2. **Execution strategy**: Specify if plans can be executed in parallel or must be sequential, with dependencies clearly noted.
 3. **Plan assignments**: For each specialized plan, specify which subagent (or "Agent") should execute it.
-4. **Coordination notes**: Any important information about how the plans interact or depend on each other.
-5. **Final step**: Add a step to write an orchestrator handover (see section 4.2).
+4. **Final step**: Add a step to write an orchestrator handover (see section 4.2).
 
 Format example:
 
@@ -153,16 +147,12 @@ OR
 
 Execute these specialized plans using **subagents** if available:
 
-1. **Backend Plan** (`A3-plan-backend.md`)
-   - **Assigned to**: `backend-coder`
+1. **Plan A** (`A3-plan-xxx.md`)
+   - **Assigned to**: `subagent-name` or `Agent`
    - **Description**: [Brief description of what this plan accomplishes]
 
-2. **React Plan** (`A4-plan-react.md`)
-   - **Assigned to**: `react-coder`
-   - **Description**: [Brief description of what this plan accomplishes]
-
-3. **Plugin Update** (`A5-plan-plugin.md`)
-   - **Assigned to**: `plugin-coder`
+2. **Plan B** (`A4-plan-yyy.md`)
+   - **Assigned to**: `subagent-name` or `Agent`
    - **Description**: [Brief description of what this plan accomplishes]
 
 ### Coordination Notes
@@ -211,15 +201,15 @@ Write the plan file(s) according to the determined structure:
   - Handover: `_plans/123/A2-plan.summary.md`
   - No orchestrator plan needed
 
-**Multiple Plans** (multiple subagents OR independent work pieces):
+**Multiple Plans**:
 
 - **Orchestrator plan**: `_plans/{TASK_DIR}/{CYCLE_LETTER}{FILE_NUMBER}-plan-orchestrator.md`
   - Example: `_plans/123/A2-plan-orchestrator.md`
   - Handover: `_plans/123/A2-plan-orchestrator.summary.md` (written after all specialized plans complete)
 - **Specialized plans**: `_plans/{TASK_DIR}/{CYCLE_LETTER}{FILE_NUMBER}-plan-{DESCRIPTOR}.md`
-  - Use subagent name or descriptive name: `backend`, `react`, `plugin-contact-form`, `package-converter`, etc.
-  - Example: `_plans/123/A3-plan-backend.md`, `_plans/123/A4-plan-plugin-zoom.md`, `_plans/123/A5-plan-plugin-menu.md`
-  - Handovers: `_plans/123/A3-plan-backend.summary.md`, etc.
+  - Use subagent name or descriptive name as `{DESCRIPTOR}`
+  - Example: `_plans/123/A3-plan-api.md`, `_plans/123/A4-plan-ui.md`
+  - Handovers: `_plans/123/A3-plan-api.summary.md`, etc.
 
 **Important**:
 
@@ -238,8 +228,7 @@ Repeat the review until you think all plans are solid.
 
 **Additional review for multiple plans**:
 
-- Each specialized plan is self-contained and independently executable
-- Each specialized plan clearly states its assignment (subagent or "Agent")
+- Each specialized plan is self-contained
+- Each specialized plan clearly states its assignment
 - The orchestrator plan correctly references all specialized plans
-- The orchestrator specifies if plans can run in parallel or must be sequential
 - Dependencies between plans are clearly documented
