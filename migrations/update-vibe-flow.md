@@ -17,6 +17,12 @@ Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact out
 
 Also, do not chain the commands with `&&`. Run them carefully one by one.
 
+### Cleanup Old Files
+
+Delete these old files if they exist:
+
+- `_docs/vibe-flow/How to Write an Implementation Plan.md` (renamed to "Implementation Plans" plural)
+
 ## Step 2 - Update the "Vibe Flow" section in `AGENTS.md`
 
 Here is an actualized version of the "Vibe Flow" section of a `AGENTS.md` file:
