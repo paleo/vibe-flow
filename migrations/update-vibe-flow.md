@@ -1,4 +1,4 @@
-# Updade Vibe Flow
+# Update Vibe Flow
 
 **In order to determine if Vibe Flow is already set up, look for the `_docs/vibe-flow/` directory. If it doesn't exist, then Vibe Flow is not set up and you must stop now. DO NOT PROCEED WITHOUT CONFIRMATION IF VIBE FLOW IS NOT SET UP.**
 
