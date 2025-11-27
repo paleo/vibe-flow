@@ -53,6 +53,7 @@ If **Subagents** (or **Custom Agents**) are defined, assign each plan to the app
 
 - If the plan fits a subagent's specialization, assign it to that subagent
 - If the plan is cross-stack or doesn't fit any specialization, assign it to the generalist agent
+- Multiple instances: The same subagent can be assigned to multiple plans. Each plan runs in a separate subagent instance, so don't group unrelated work into one plan just because it would use the same subagent. Split by logical unit, not by subagent.
 
 ## Phase 3. Designing Phase - Implementation Plan Structure
 
