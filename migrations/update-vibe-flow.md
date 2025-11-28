@@ -56,6 +56,7 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
    - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) to `.claude/commands/spec.md`
    - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) to `.claude/commands/plan.md`
    - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) to `.claude/commands/dtdp.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/doc.md) to `.claude/commands/doc.md`
 
 ## Step 5 - Add "For AI Assistants" Section
 

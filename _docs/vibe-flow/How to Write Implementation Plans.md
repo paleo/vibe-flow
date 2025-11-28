@@ -33,6 +33,8 @@ Investigate the codebase yourself, find the relevant source code, think carefull
 
 Use the SPEC text as a starting point, but do not trust it blindly. Verify the current implementation and ensure the spec is still accurate. If you discover that an important design choice still needs to be made, or if the spec has issues, STOP AND ASK THE USER.
 
+For each operation in the spec, search for existing functions that do a similar job. List functions to reuse or refactor.
+
 ## Phase 2. Analysis Phase
 
 Based on your investigation, determine the plan structure:
@@ -57,7 +59,7 @@ If **Subagents** (or **Custom Agents**) are defined, assign each plan to the app
 
 ## Phase 3. Designing Phase - Implementation Plan Structure
 
-Design an implementation plan based on the spec. Include all useful information from the SPEC. If the SPEC is already detailed enough, you can extract and reuse parts of it. Add implementation details, file paths, and a breakdown into steps that weren't in the spec.
+Design an implementation plan based on the SPEC. Include all useful information from the spec. If the spec is already detailed enough, you can extract and reuse parts of it. Add implementation details, file paths, and a breakdown into steps that weren't in the spec.
 
 ### 3.1 Common Plan Guidelines
 
@@ -73,6 +75,7 @@ Follow these guidelines:
 - **Never plan backward compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
 - About **tests**: Investigate first in the codebase if there are tests already in place for the kind of tests you consider. Do not mention to write tests unless you are sure they will be well-integrated in the project.
 - Do not include sections like "Benefits", "Code Style Compliance", "Rationale" or anything that adds no actionable information. Focus on the problem and the solution.
+- List **existing functions to reuse or refactor**. Plan thin wrappers, not re-implementations. Each operation should have one proper place.
 
 ### 3.2 Additional Requirements for Specialized Plans
 

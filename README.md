@@ -40,8 +40,10 @@ A specification can be written long before the implementation. The agent helps y
 ```markdown
 Read your documentation, then help me write a new spec.
 
-It's about [some feature you need]
+[something to do]
 ```
+
+Or, if you use Claude Code or Cursor, you can use the command: `/spec [something to do]`.
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
@@ -54,6 +56,8 @@ Plans orchestrate what agents or subagents will do:
 ```markdown
 Read your documentation, then write plans.
 ```
+
+Or, if you use Claude Code or Cursor, you can use the command: `/plan`.
 
 The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
@@ -74,8 +78,10 @@ There is also a lighter prompt for small tasks without spec/plans. Here's how to
 ```markdown
 Read your documentation first. I need a DTDP.
 
-[Something to do]
+[something to do]
 ```
+
+Or, if you use Claude Code or Cursor, you can use the command: `/dtdp [something to do]`.
 
 The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-summary.md` file will be written.
 
