@@ -6,16 +6,14 @@ If Vibe Flow is set up, proceed with the following steps:
 
 ## Step 1 - Overwrite Vibe Flow Core Documents
 
-Use `curl` or `wget` to fetch and overwrite the following files with their latest versions:
+Use `curl -o "filename"` or `wget -O "filename"` to fetch and overwrite the following files with their latest versions:
 
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/vibe-flow/How to Write a Technical Specification.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20Implementation%20Plans.md) to `_docs/vibe-flow/How to Write Implementation Plans.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Discuss-Then-Do%20Protocol.md) to `_docs/vibe-flow/Discuss-Then-Do Protocol.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Vibe%20Flow%20Guide.md) to `_docs/vibe-flow/Vibe Flow Guide.md`
+- [How to Write a Technical Specification.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) → `_docs/vibe-flow/How to Write a Technical Specification.md`
+- [How to Write Implementation Plans.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20Implementation%20Plans.md) → `_docs/vibe-flow/How to Write Implementation Plans.md`
+- [Discuss-Then-Do Protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Discuss-Then-Do%20Protocol.md) → `_docs/vibe-flow/Discuss-Then-Do Protocol.md`
+- [Vibe Flow Guide.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Vibe%20Flow%20Guide.md) → `_docs/vibe-flow/Vibe Flow Guide.md`
 
-Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact output filename and avoid URL-encoded names.
-
-Also, do not chain the commands with `&&`. Run them carefully one by one.
+Do not chain the commands with `&&`. Run them carefully one by one.
 
 ### Cleanup Old Files
 
@@ -52,11 +50,11 @@ Check if `_docs/Writing Documentation.md` exists:
 If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file), download the command files:
 
 1. Create the `.claude/commands/` directory if it does not exist.
-2. Fetch these files:
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) to `.claude/commands/spec.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) to `.claude/commands/plan.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) to `.claude/commands/dtdp.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/doc.md) to `.claude/commands/doc.md`
+2. For each file below, check if it exists. If it does not exist, fetch it:
+   - [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
+   - [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
+   - [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
+   - [doc.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/doc.md) → `.claude/commands/doc.md`
 
 ## Step 5 - Add "For AI Assistants" Section
 
