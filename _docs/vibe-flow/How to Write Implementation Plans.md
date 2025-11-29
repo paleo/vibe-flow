@@ -33,7 +33,7 @@ Investigate the codebase yourself, find the relevant source code, think carefull
 
 Use the SPEC text as a starting point, but do not trust it blindly. Verify the current implementation and ensure the spec is still accurate. If you discover that an important design choice still needs to be made, or if the spec has issues, STOP AND ASK THE USER.
 
-For each operation in the spec, search for existing functions that do a similar job. List functions to reuse or refactor.
+For each operation in the spec, search for existing functions that do a similar job.
 
 ## Phase 2. Analysis Phase
 
