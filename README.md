@@ -1,6 +1,6 @@
 # Vibe Flow
 
-Vibe Flow is a hackable set of prompts that enables [Spec-Driven Development](#why-spec-driven-development) for professional developers.
+Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_ for professional developers.
 
 It works well with **any agent** powered by a coding model such as:
 
