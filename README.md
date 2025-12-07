@@ -1,6 +1,6 @@
 # Vibe Flow
 
-Vibe Flow is a hackable set of prompts that enables Spec-Driven Development for professional developers.
+Vibe Flow is a hackable set of prompts that enables [Spec-Driven Development](#why-spec-driven-development) for professional developers.
 
 It works well with **any agent** powered by a coding model such as:
 
@@ -105,6 +105,14 @@ There are no guidelines. This is just a starting point for your own workflow. Fe
 ## Example
 
 See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example with its `_docs/` directory.
+
+## Why "Spec-Driven Development"?
+
+Spec-Driven Development (SDD) has long existed in API development (design-first with OpenAPI/Swagger). In 2024–2025, the term expanded to describe a methodology for AI-assisted coding: writing specifications before code, where specs become the source of truth guiding AI agents through structured phases: **spec → plan → implement**.
+
+SDD is the structured alternative to "vibe coding" — the ad-hoc approach where you prompt an AI and hope for the best. Tools like GitHub Spec Kit and AWS Kiro have popularized this approach.
+
+Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
 
 ## Migrations (update from older version)
 
