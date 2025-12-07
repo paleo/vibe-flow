@@ -108,7 +108,7 @@ See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for
 
 ## Why "Spec-Driven Development"?
 
-Spec-Driven Development (SDD) has long existed in API development (design-first with OpenAPI/Swagger). In 2024–2025, the term expanded to describe a methodology for AI-assisted coding: writing specifications before code, where specs become the source of truth guiding AI agents through structured phases: **spec → plan → implement**.
+Spec-Driven Development (SDD) has long existed in API development (design-first with OpenAPI/Swagger). With AI-assisted coding agents, the term expanded to describe a methodology: writing specifications before code, where specs become the source of truth guiding AI agents through structured phases: **spec → plan → implement**.
 
 SDD is the structured alternative to "vibe coding" — the ad-hoc approach where you prompt an AI and hope for the best. Tools like GitHub Spec Kit and AWS Kiro have popularized this approach.
 
