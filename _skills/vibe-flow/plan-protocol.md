@@ -19,7 +19,7 @@ Before starting, **read the spec file** and understand it entirely.
 In order to generate implementation plans, you MUST follow this process:
 
 1. **Investigation Phase**: Explore the codebase, understand the current implementation, and identify the problem
-2. **Analysis Phase**: Determine the plan structure (single or multiple plans) and assign subagents if applicable
+2. **Analysis Phase**: Determine the plan structure (single or multiple plans) and identify relevant skills
 3. **Designing Phase - Implementation Plan(s)**: Design plan(s) based on the analysis - If you discover issues or missing design decisions, STOP AND ASK THE USER
 4. **Designing Phase - Orchestrator Plan**: If multiple plans, design an orchestrator plan to coordinate them
 5. **Writing Phase**: Write the plan file(s)
@@ -43,17 +43,21 @@ First, evaluate if the work should be split into **multiple sub-plans**:
 
 - **Single plan**: Preferred when work is cohesive within one area, or when cross-stack work is small and simple
 - **Multiple plans**: Split into multiple plans with an orchestrator, based on:
-  - **Stack or subagent boundaries**: Different technologies or specialization areas
+  - **Stack boundaries**: Different technologies or specialization areas
   - **Distinct logical units**: Separate features or modules within the same stack, when large enough
   - Each sub-plan should produce a **coherent, testable deliverable**
 
-### 2.2 Assign Subagents
+### 2.2 Identify Relevant Skills
 
-If **Subagents** (or **Custom Agents**) are defined, assign each plan to the appropriate subagent based on their specialization areas.
+For each plan, identify which **skills** from `_skills/` are relevant:
 
-- If the plan fits a subagent's specialization, assign it to that subagent
-- If the plan is cross-stack or doesn't fit any specialization, assign it to the generalist agent
-- Multiple instances: The same subagent can be assigned to multiple plans. Each plan runs in a separate subagent instance, so don't group unrelated work into one plan just because it would use the same subagent. Split by logical unit, not by subagent.
+- List the skills that the implementing agent should read and follow
+- Always include the `code-style` skill if available
+- Skills provide domain-specific guidelines that must be followed during implementation
+
+### 2.3 Assign Custom Agents (Optional)
+
+If **Custom Agents** are defined in the project, assign each plan to the appropriate agent based on their specialization. Otherwise, skip this step.
 
 ## Phase 3. Designing Phase - Implementation Plan Structure
 
@@ -81,10 +85,11 @@ Follow these guidelines:
 
 For specialized plans, add these additional requirements:
 
-**At the top of each specialized plan**, add a header indicating which subagent should execute it (or "Agent" if no specific subagent):
+**At the top of each specialized plan**, add a header with assignment and skills:
 
 ```markdown
-**Assigned to**: [Subagent Name or "Agent"]
+**Assigned to**: [Custom Agent Name or "Agent"]
+**Skills**: [List of relevant skills for this plan]
 ```
 
 **In the context section**, explain what you discovered **relevant to this plan's scope** and how it works currently and will work after the task is done **within its scope**.
@@ -114,6 +119,8 @@ Add the following content to the very end of each plan (single plan or specializ
 ---
 
 Do not trust this plan blindly. Be sure you understand the codebase and the plan by yourself before applying it.
+
+**IMPORTANT**: Do NOT use external search tools (Context7, web search, documentation fetching) during implementation unless explicitly allowed in this plan. All context should be provided in this plan or discoverable in the codebase.
 ```
 
 ## Phase 4. Designing Phase - Orchestrator Plan
@@ -126,7 +133,9 @@ The orchestrator plan coordinates the execution of all specialized plans. It sho
 
 1. **Reference to the specification**: Mention the spec file but do not repeat its content.
 2. **Execution strategy**: Specify if plans can be executed in parallel or must be sequential, with dependencies clearly noted.
-3. **Plan assignments**: For each specialized plan, specify which subagent (or "Agent") should execute it.
+3. **Plan assignments**: For each specialized plan, specify:
+   - Which agent should execute it (custom agent name or "Agent")
+   - Which **skills** are relevant for that plan
 4. **Final step**: Add a step to write an orchestrator handover (see section 4.2).
 
 Format example:
@@ -147,14 +156,16 @@ OR
 
 ### Plan Assignments
 
-Execute these specialized plans using **subagents** if available:
+Execute these specialized plans:
 
 1. **Plan A** (`A3-plan-xxx.md`)
-   - **Assigned to**: `subagent-name` or `Agent`
+   - **Assigned to**: `custom-agent-name` or `Agent`
+   - **Skills**: `skill-1`, `skill-2`
    - **Description**: [Brief description of what this plan accomplishes]
 
 2. **Plan B** (`A4-plan-yyy.md`)
-   - **Assigned to**: `subagent-name` or `Agent`
+   - **Assigned to**: `custom-agent-name` or `Agent`
+   - **Skills**: `skill-3`
    - **Description**: [Brief description of what this plan accomplishes]
 
 ### Coordination Notes
@@ -190,6 +201,8 @@ Add the following content to the very end of the orchestrator plan:
 ---
 
 Do not trust this plan blindly. Be sure you understand the codebase and all specialized plans before coordinating their execution.
+
+**IMPORTANT**: Do NOT use external search tools (Context7, web search, documentation fetching) during implementation unless explicitly allowed in these plans. All context should be provided in these plans or discoverable in the codebase.
 ```
 
 ## Phase 5. Writing Phase
@@ -209,14 +222,14 @@ Write the plan file(s) according to the determined structure:
   - Example: `_plans/123/A2-plan-orchestrator.md`
   - Handover: `_plans/123/A2-plan-orchestrator.summary.md` (written after all specialized plans complete)
 - **Specialized plans**: `_plans/{TASK_DIR}/{CYCLE_LETTER}{FILE_NUMBER}-plan-{DESCRIPTOR}.md`
-  - Use subagent name or descriptive name as `{DESCRIPTOR}`
+  - Use a descriptive name as `{DESCRIPTOR}` (e.g., work scope, stack area)
   - Example: `_plans/123/A3-plan-api.md`, `_plans/123/A4-plan-ui.md`
   - Handovers: `_plans/123/A3-plan-api.summary.md`, etc.
 
 **Important**:
 
 - Increment FILE_NUMBER for each plan file
-- Use lowercase, hyphenated descriptors for plan names (subagent name or work scope descriptor)
+- Use lowercase, hyphenated descriptors for plan names (work scope descriptor)
 - When multiple plans are created, the orchestrator plan should be written first and have the lowest FILE_NUMBER
 - Be careful never to overwrite an existing file
 
@@ -231,6 +244,6 @@ Repeat the review until you think all plans are solid.
 **Additional review for multiple plans**:
 
 - Each specialized plan is self-contained
-- Each specialized plan clearly states its assignment
-- The orchestrator plan correctly references all specialized plans
+- Each specialized plan clearly states its assignment and relevant skills
+- The orchestrator plan correctly references all specialized plans with their skills
 - Dependencies between plans are clearly documented
