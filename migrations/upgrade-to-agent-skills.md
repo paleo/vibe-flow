@@ -112,20 +112,28 @@ For each skill the user wants to create:
    mv "_docs/{Other File}.md" "_skills/{skill-name}/{other-file}.md"
    ```
 
-4. Prepend YAML frontmatter to `SKILL.md`:
+4. Edit `SKILL.md` to add the required structure:
 
-   ```bash
-   { cat <<'EOF'
+   - Prepend YAML frontmatter with `name` and `description` fields
+   - If the skill has reference files, add a "Reference Files" section listing each file with a brief description
+
+   Example of a complete `SKILL.md`:
+
+   ```markdown
    ---
-   name: {skill-name}
-   description: {agreed description - what the skill does AND when to use it}
+   name: work-on-plugin
+   description: Guidelines for developing plugins. Use when creating, modifying, or debugging plugins.
    ---
 
-   EOF
-   cat "_skills/{skill-name}/SKILL.md"; } > "_skills/{skill-name}/SKILL.md.tmp" && mv "_skills/{skill-name}/SKILL.md.tmp" "_skills/{skill-name}/SKILL.md"
+   # Plugin Development
+
+   (original content here)
+
+   ## Reference Files
+
+   - [plugin-architecture.md](plugin-architecture.md) - Technical details of the plugin system
+   - [plugin-api.md](plugin-api.md) - API reference for plugin development
    ```
-
-5. Update internal references in `SKILL.md` to point to the reference files.
 
 ### 4. Handle Unused Instructions
 
