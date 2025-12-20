@@ -2,8 +2,6 @@
 
 ## Pre-requisites
 
-Before you start, read the `Vibe Flow Guide.md` entirely.
-
 You need:
 
 - the TASK_DIR - if you don't have it, ask the user for a **ticket ID**

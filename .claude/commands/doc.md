@@ -2,6 +2,6 @@
 description: Write in a documentation file
 ---
 
-Read this documentation file:
+Use the documentation skill.
 
-- @"_docs/Writing Documentation.md"
+$ARGUMENTS

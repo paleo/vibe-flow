@@ -1,3 +1,8 @@
+---
+name: documentation
+description: Guidelines for writing documentation. Use when creating or updating documentation files for the project.
+---
+
 # Writing Documentation
 
 This documentation is intended for augmenting or creating a document in the `_docs` folder.

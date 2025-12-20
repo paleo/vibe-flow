@@ -2,8 +2,6 @@
 
 ## Pre-requisites
 
-Before you start, read the `Vibe Flow Guide.md` entirely.
-
 ### Determine TASK_DIR, CYCLE_LETTER, and FILE_NUMBER
 
 You need:
@@ -69,7 +67,7 @@ Follow these guidelines:
 
 - The plan must be a **self-explanatory prompt** for the coding agent, so help it by explaining what you discovered that is relevant.
 - Give some context: explain how it works currently, and how it will work after the task is done.
-- In a "Prerequisites" section, select the **relevant documentation** from the `_docs/` directory. Do not repeat any documentation. Instead, mention the documentation that needs to be read. Always include `Code Style Guidelines.md` in the list.
+- In a "Prerequisites" section, list **relevant skills** to use. Do not repeat any skill content. Always include the `code-style` skill if available.
 - Mention a way to find **important source files**: by giving file paths, or by providing a function name to search for, for example. If needed, line numbers can be mentioned in the plan.
 - Include a list of **numbered steps**.
 - **Never plan backward compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.

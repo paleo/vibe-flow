@@ -1,4 +1,18 @@
+---
+name: vibe-flow
+description: Write technical specifications (spec), create implementation plans (plan), or use Discuss-Then-Do Protocol (dtdp) for collaborative problem-solving.
+---
+
 # Vibe Flow Guide
+
+## Protocols
+
+Choose the appropriate protocol based on the task:
+
+- **Technical Specification** (_spec_): Read [spec-protocol.md](spec-protocol.md) to write a technical specification
+- **Implementation Plans** (_plan_): Read [plan-protocol.md](plan-protocol.md) to create implementation plans from a spec
+- **Discuss-Then-Do Protocol** (_dtdp_): Read [dtdp-protocol.md](dtdp-protocol.md) for smaller tasks without formal spec/plans
+- **PR Message**: Read [pr-message-protocol.md](pr-message-protocol.md) to write a PR message summarizing implemented work
 
 ## TASK_DIR Location
 
