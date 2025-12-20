@@ -1,6 +1,6 @@
-# Vibe Flow
+# Vibe Flow Skill
 
-Vibe Flow is a spec-driven development workflow for AI agents.
+Vibe Flow skill is a spec-driven development workflow for AI agents.
 
 ## Post-Install Setup
 
