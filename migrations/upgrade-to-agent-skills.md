@@ -29,12 +29,12 @@ mkdir -p .claude/skills/vibe-flow
 
 Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
 
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
+- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
+- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
+- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
 
 ### 3. Update Claude/Cursor Commands (if present)
 
@@ -46,10 +46,10 @@ rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md
 
 Then fetch the latest versions:
 
-- [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/spec.md) → `.claude/commands/spec.md`
-- [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/plan.md) → `.claude/commands/plan.md`
-- [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
-- [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
+- [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
+- [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
+- [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
+- [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
 
 ### 4. Clean AGENTS.md
 
@@ -77,7 +77,7 @@ Analyze the documentation files and suggest logical groupings. For example:
 - Multiple plugin-related docs → one `work-on-plugin` skill with reference files
 - Architecture/overview docs → one `architecture` skill
 
-**Important**: These files must always be separate skills (unless the user says otherwise):
+**Important**: By default, these files should be separate skills (unless the user says otherwise):
 
 - `Code Style Guidelines.md` → `code-style` skill
 - `Code Quality & Refactoring.md` → `code-quality` skill
@@ -94,6 +94,8 @@ Present your suggestions to the user and ask:
 
 ### 3. Create Skills Based on User Decision
 
+_**Important**: It's better to move files (using `mv`) than reproduce their content, since the markdown/xml-tags syntax can sometimes be altered during the reproduction. Also, most of the time, you don't need to fill your context with their content._
+
 For each skill the user wants to create:
 
 1. Create the skill directory:
@@ -102,11 +104,9 @@ For each skill the user wants to create:
    mkdir -p ".claude/skills/{skill-name}"
    ```
 
-2. Move the primary file as `SKILL.md`:
+2. Create `SKILL.md` in `.claude/skills/{skill-name}/`:
 
-   ```bash
-   mv "_docs/{Primary File}.md" ".claude/skills/{skill-name}/SKILL.md"
-   ```
+   If there is a primary documentation file, then move it as `SKILL.md`. Otherwise, create an empty `SKILL.md`. The `SKILL.md` will be completed at step 4.
 
 3. Move additional reference files (if any) with kebab-case names:
 
@@ -136,6 +136,8 @@ For each skill the user wants to create:
    - [plugin-architecture.md](plugin-architecture.md) - Technical details of the plugin system
    - [plugin-api.md](plugin-api.md) - API reference for plugin development
    ```
+
+_Note: Only include the "Reference Files" section if there are reference files. Place it as the first `##` section in the document._
 
 ### 4. Handle Unused Instructions
 

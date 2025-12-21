@@ -9,7 +9,7 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 ## Get Started
 
 1. Ensure your agent uses a capable coding model.
-2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/migrations/install-vibe-flow.md).
+2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md).
 
 It will install the Vibe Flow skill:
 
@@ -101,9 +101,9 @@ Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic promp
 
 ## Installation, Migrations
 
-- **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
-- **[Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/migrations/update-vibe-flow.md)**: Update an existing Vibe Flow skill to the latest version.
-- **[Upgrade from Legacy](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
+- **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
+- **[Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md)**: Update an existing Vibe Flow skill to the latest version.
+- **[Upgrade from Legacy](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
 
 ## License
 

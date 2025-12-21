@@ -12,7 +12,7 @@ Search for a `_docs/vibe-flow/` directory in the codebase.
 
   > "You have a legacy Vibe Flow installation (`_docs/vibe-flow/`). Please use the migration prompt instead:
   >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/migrations/upgrade-to-agent-skills.md>"
+  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md>"
 
 - If it does not exist, continue to Step 2.
 
@@ -26,7 +26,7 @@ Search for an existing `vibe-flow` skill directory. Look for any directory conta
 
   > "Vibe Flow is already installed at `{PATH}`. To update it, use the update prompt instead:
   >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/migrations/update-vibe-flow.md>"
+  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md>"
 
 - If not found, continue to Step 3.
 
@@ -40,12 +40,12 @@ mkdir -p .claude/skills/vibe-flow
 
 Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
 
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
+- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
+- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
+- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
 
 ## Step 4 - Post-Install Setup
 
@@ -93,10 +93,10 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
 
 2. Fetch the command files:
 
-   - [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/spec.md) → `.claude/commands/spec.md`
-   - [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/plan.md) → `.claude/commands/plan.md`
-   - [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
-   - [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
+   - [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
+   - [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
+   - [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
+   - [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
 
 ## Done
 
