@@ -168,6 +168,8 @@ Execute these specialized plans:
    - **Skills**: `skill-3`
    - **Description**: [Brief description of what this plan accomplishes]
 
+_**Important:** In the prompt you give to the subagent, do not reproduce the specialized plan. Instead, provide the file path._
+
 ### Coordination Notes
 
 [Any important notes about how the plans interact, if applicable]
