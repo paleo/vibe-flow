@@ -4,6 +4,8 @@ This migration converts your Vibe Flow installation from the `_docs/` system to 
 
 **Reference**: <https://agentskills.io/specification.md>
 
+> **Note**: Commands shown are Unix-style. Adapt to your OS if needed (e.g., PowerShell on Windows).
+
 ## Pre-requisites
 
 - Verify `_docs/vibe-flow/` exists. If not, STOP - this is not a Vibe Flow installation.
@@ -25,7 +27,7 @@ Create the skill directory and fetch the latest files from the repository:
 mkdir -p _skills/vibe-flow
 ```
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files. Do not chain the commands with `&&`. Run them carefully one by one:
+Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
 
 - [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/_skills/vibe-flow/README.md) → `_skills/vibe-flow/README.md`
 - [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/_skills/vibe-flow/SKILL.md) → `_skills/vibe-flow/SKILL.md`
@@ -42,7 +44,7 @@ If `.claude/commands/` exists, delete the old commands and fetch fresh ones:
 rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md .claude/commands/doc.md
 ```
 
-Then fetch the latest versions. Do not chain commands:
+Then fetch the latest versions:
 
 - [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/spec.md) → `.claude/commands/spec.md`
 - [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/refactor/skills/.claude/commands/plan.md) → `.claude/commands/plan.md`
