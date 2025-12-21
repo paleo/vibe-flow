@@ -14,7 +14,7 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 It will install the Vibe Flow skill:
 
 ```text
-your-skills-directory/
+.claude/skills/
 └── vibe-flow/
     ├── SKILL.md
     ├── README.md
@@ -82,10 +82,10 @@ The agent will discuss first, then it will directly work on the codebase. At the
 
 ## Rationale
 
-Every spec, plan, summary must be written in well-organized (git-ignored) local files, because:
+Specs, plans, and summaries must be written in well-organized (git-ignored) local files, because:
 
 1. The context window is limited, the compression mechanism is opaque, and we want to be able to continue an unfinished task in a fresh session.
-2. It's a way to keep track of what we agreed with the agent and what has been done.
+2. It's a way to keep track of what was agreed upon with the agent and what has been done.
 
 ## Example
 

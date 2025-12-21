@@ -28,7 +28,7 @@ Search for an existing `vibe-flow` skill directory. Look for any directory conta
   >
   > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md>"
 
-- If found, note the path (e.g., `_skills/vibe-flow/`) and continue to Step 3.
+- If found, continue to Step 3.
 
 ## Step 3 - Download Fresh Files
 
@@ -36,14 +36,12 @@ Delete all existing files in the vibe-flow directory, then fetch the latest vers
 
 Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
 
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_skills/vibe-flow/SKILL.md) → `{SKILLS_DIR}/vibe-flow/SKILL.md`
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_skills/vibe-flow/README.md) → `{SKILLS_DIR}/vibe-flow/README.md`
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_skills/vibe-flow/spec-protocol.md) → `{SKILLS_DIR}/vibe-flow/spec-protocol.md`
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_skills/vibe-flow/plan-protocol.md) → `{SKILLS_DIR}/vibe-flow/plan-protocol.md`
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_skills/vibe-flow/dtdp-protocol.md) → `{SKILLS_DIR}/vibe-flow/dtdp-protocol.md`
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_skills/vibe-flow/pr-message-protocol.md) → `{SKILLS_DIR}/vibe-flow/pr-message-protocol.md`
-
-Replace `{SKILLS_DIR}` with the actual path where vibe-flow is installed.
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
+- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
+- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
+- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
 
 ## Step 4 - Update Claude/Cursor Commands (Optional)
 

@@ -49,11 +49,11 @@ First, evaluate if the work should be split into **multiple sub-plans**:
 
 ### 2.2 Identify Relevant Skills
 
-For each plan, identify which **skills** from `_skills/` are relevant:
+For each plan, identify which **skills** are relevant:
 
 - List the skills that the implementing agent should read and follow
-- Always include the `code-style` skill if available
 - Skills provide domain-specific guidelines that must be followed during implementation
+- For complex skills with reference files, identify specific files that should be loaded
 
 ### 2.3 Assign Custom Agents (Optional)
 
@@ -71,7 +71,7 @@ Follow these guidelines:
 
 - The plan must be a **self-explanatory prompt** for the coding agent, so help it by explaining what you discovered that is relevant.
 - Give some context: explain how it works currently, and how it will work after the task is done.
-- In a "Prerequisites" section, list **relevant skills** to use. Do not repeat any skill content. Always include the `code-style` skill if available.
+- In a "Prerequisites" section, list **relevant skills** to use. Do not repeat any skill content.
 - Mention a way to find **important source files**: by giving file paths, or by providing a function name to search for, for example. If needed, line numbers can be mentioned in the plan.
 - Include a list of **numbered steps**.
 - **Never plan backward compatibility** unless explicitly requested. Prefer clean code. Unused code must be removed.
