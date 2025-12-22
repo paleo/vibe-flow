@@ -1,74 +1,57 @@
-# Update Vibe Flow
+# Update Vibe Flow Skill
 
-**In order to determine if Vibe Flow is already set up, look for the `_docs/vibe-flow/` directory. If it doesn't exist, then Vibe Flow is not set up and you must stop now. DO NOT PROCEED WITHOUT CONFIRMATION IF VIBE FLOW IS NOT SET UP.**
+This prompt updates an existing Vibe Flow skill installation to the latest version.
 
-If Vibe Flow is set up, proceed with the following steps:
+> **Note**: Commands shown are Unix-style. Adapt to your OS if needed (e.g., PowerShell on Windows).
 
-## Step 1 - Overwrite Vibe Flow Core Documents
+## Step 1 - Check for Legacy Installation
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch and overwrite the following files with their latest versions:
+Search for a `_docs/vibe-flow/` directory in the codebase.
 
-- [How to Write a Technical Specification.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) → `_docs/vibe-flow/How to Write a Technical Specification.md`
-- [How to Write Implementation Plans.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/How%20to%20Write%20Implementation%20Plans.md) → `_docs/vibe-flow/How to Write Implementation Plans.md`
-- [Discuss-Then-Do Protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Discuss-Then-Do%20Protocol.md) → `_docs/vibe-flow/Discuss-Then-Do Protocol.md`
-- [Vibe Flow Guide.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/vibe-flow/Vibe%20Flow%20Guide.md) → `_docs/vibe-flow/Vibe Flow Guide.md`
+- If it exists, **STOP NOW** and tell the user:
 
-Do not chain the commands with `&&`. Run them carefully one by one.
+  > "You have a legacy Vibe Flow installation (`_docs/vibe-flow/`). Please use the migration prompt instead:
+  >
+  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md>"
 
-### Cleanup Old Files
+- If it does not exist, continue to Step 2.
 
-Delete these old files if they exist:
+## Step 2 - Find Existing Installation
 
-- `_docs/vibe-flow/How to Write an Implementation Plan.md` (renamed to "Implementation Plans" plural)
+Search for an existing `vibe-flow` skill directory. Look for any directory containing `vibe-flow/SKILL.md`.
 
-## Step 2 - Update the "Vibe Flow" section in `AGENTS.md`
+**Important**: Ignore directories inside dependencies (`node_modules/`, `vendor/`, `venv/`, `.venv/`, `target/`, `build/`, `dist/`, etc.).
 
-Here is an actualized version of the "Vibe Flow" section of a `AGENTS.md` file:
+- If not found, **STOP NOW** and tell the user:
 
-```markdown
-Vibe Flow:
+  > "No Vibe Flow installation found. To install it, use the install prompt instead:
+  >
+  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md>"
 
-- `_docs/vibe-flow/How to Write a Technical Specification.md` - To design a **spec**
-- `_docs/vibe-flow/How to Write Implementation Plans.md` - To design **plan(s)**
-- `_docs/vibe-flow/Discuss-Then-Do Protocol.md` - **DTDP** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
-- `_docs/vibe-flow/Vibe Flow Guide.md` - Where to save specifications and plans
-```
+- If found, continue to Step 3.
 
-Ensure all the documents are referenced, and update the descriptions if needed.
+## Step 3 - Download Fresh Files
 
-## Step 3 - Add Writing Documentation Guide
+Delete all existing files in the vibe-flow directory, then fetch the latest versions.
 
-Check if `_docs/Writing Documentation.md` exists:
+Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
 
-- If it **does not exist**:
-  1. Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/_docs/Writing%20Documentation.md) to `_docs/Writing Documentation.md` using `curl -o` or `wget -O`.
-  2. Add a reference to this document in `AGENTS.md` under the "Additional documentation" section (or similar section for optional documents). Use this format: `- _docs/Writing Documentation.md - Guidelines for writing documents in the _docs directory`
-- If it **already exists**: Skip this step and do not modify the existing file.
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
+- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
+- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
+- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
 
-## Step 4 - Download Claude Code / Cursor Commands
+## Step 4 - Update Claude/Cursor Commands (Optional)
 
-If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file), download the command files:
+If `.claude/commands/` exists, update the command files:
 
-1. Create the `.claude/commands/` directory if it does not exist.
-2. For each file below, check if it exists. If it does not exist, fetch it:
-   - [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
-   - [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
-   - [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
-   - [doc.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/doc.md) → `.claude/commands/doc.md`
+- [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
+- [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
+- [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
+- [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
 
-## Step 5 - Add "For AI Assistants" Section
+## Done
 
-Check if `AGENTS.md` contains a "For AI Assistants" section:
-
-- If it **already exists**: Skip this step.
-- If it **does not exist**:
-  1. Run `git branch -a` to list all branch names. Look for a common ticket ID pattern (e.g., `feat/ABC-123-...`, `fix/PROJ-456`, `feature/123-...`).
-  2. If a pattern is found, note it as **TICKET_FORMAT**. If not, ask the user: "What is your ticket ID format? (e.g., `ABC-###`, `PROJ-###`, or numeric). You can also skip this."
-  3. If the user chooses to skip, do not add this section.
-  4. Otherwise, add the following section at the end of `AGENTS.md`:
-
-     ```markdown
-     ## For AI Assistants
-
-     _Ticket ID_: Format is `{TICKET_FORMAT}`. When not provided, deduce it from the branch name if possible—no need to confirm.
-     ```
+Tell the user that Vibe Flow has been updated successfully.

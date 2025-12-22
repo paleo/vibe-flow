@@ -2,9 +2,6 @@
 description: Create implementation plan(s)
 ---
 
-Read these documentation files:
+Use the vibe-flow skill. Write the plan.
 
-- @"_docs/vibe-flow/How to Write Implementation Plans.md"
-- @"_docs/vibe-flow/Vibe Flow Guide.md"
-
-Write the implementation plan(s).
+$ARGUMENTS

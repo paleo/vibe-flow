@@ -1,6 +1,8 @@
-# Vibe Flow
+# Vibe Flow Skill
 
-Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It works well with any agent powered by a coding model such as:
+_Note: This is the v2 of Vibe Flow. If you are looking for the v1 (without Agent Skill), see the [v1 branch](https://github.com/paleo/vibe-flow/tree/v1)._
+
+Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It's distributed as an [Agent Skill](https://agentskills.io/) and works well with any agent powered by a coding model such as:
 
 - **Claude Opus 4+** or **Claude Sonnet 4+** (Anthropic)
 - **GPT 5+** (OpenAI)
@@ -9,22 +11,19 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 ## Get Started
 
 1. Ensure your agent uses a capable coding model.
-2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
+2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md).
 
-It will install the following structure and plug your AI instructions file into it:
+It will install the Vibe Flow skill:
 
 ```text
-_docs/
-├── vibe-flow/
-│   ├── Discuss-Then-Do Protocol.md
-│   ├── How to Write a Technical Specification.md
-│   ├── How to Write Implementation Plans.md
-│   └── Vibe Flow Guide.md
-├── Code Style Guidelines.md
-├── How to Write Unit Tests.md
-└── Writing Documentation.md
-_plans/
-AGENTS.md
+.claude/skills/
+└── vibe-flow/
+    ├── SKILL.md
+    ├── README.md
+    ├── spec-protocol.md
+    ├── plan-protocol.md
+    ├── dtdp-protocol.md
+    └── pr-message-protocol.md
 ```
 
 Then, start using the workflow.
@@ -36,7 +35,7 @@ Then, start using the workflow.
 A specification can be written long before the implementation. The agent helps you write it by investigating and initiating a discussion:
 
 ```markdown
-Read your documentation, then help me write a new spec.
+Help me write a new spec.
 
 [something to do]
 ```
@@ -52,7 +51,7 @@ _Note: `123` is the ticket ID. If it can be deduced from the branch name, it wil
 Plans orchestrate what agents or subagents will do:
 
 ```markdown
-Read your documentation, then write plans.
+Write plans for the current spec.
 ```
 
 Or, if you use Claude Code or Cursor, you can use the command: `/plan`.
@@ -74,7 +73,7 @@ The agent executes and writes handover document(s) (`.summary.md` files).
 There is also a lighter prompt for small tasks without spec/plans. Here's how to trigger it:
 
 ```markdown
-Read your documentation first. I need a DTDP.
+I need a DTDP.
 
 [something to do]
 ```
@@ -85,24 +84,14 @@ The agent will discuss first, then it will directly work on the codebase. At the
 
 ## Rationale
 
-The documentation for AI agents must be reorganized into multiple files, because:
-
-- We want our technical documentation to be **sustainable** and not specific to how agents work today.
-- We want the same documentation to be **shared** among several agents and humans.
-- We don't want to fill the **context window** with unnecessary instructions.
-
-Everything must be written in (git-ignored) local files, because:
+Specs, plans, and summaries must be written in well-organized (git-ignored) local files, because:
 
 1. The context window is limited, the compression mechanism is opaque, and we want to be able to continue an unfinished task in a fresh session.
-2. It's a way to keep track of what we agreed with the agent and what has been done.
-
-## No Guidelines
-
-There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
+2. It's a way to keep track of what was agreed upon with the agent and what has been done.
 
 ## Example
 
-See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example with its `_docs/` directory.
+See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example.
 
 ## Why "Spec-Driven Development"?
 
@@ -112,9 +101,12 @@ SDD is the structured alternative to "vibe coding" — the ad-hoc approach where
 
 Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
 
-## Migrations (update from older version)
+## Installation, Migrations
 
-Two migration prompts are available:
+- **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
+- **[Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md)**: Update an existing Vibe Flow skill to the latest version.
+- **[Upgrade from Legacy](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
 
-- [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the Vibe Flow directory and `AGENTS.md`.
-- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the latest versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.
+## License
+
+MIT
