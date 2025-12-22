@@ -105,7 +105,7 @@ Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic promp
 
 - **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
 - **[Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md)**: Update an existing Vibe Flow skill to the latest version.
-- **[Upgrade from Legacy](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
+- **[Upgrade from v1](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
 
 ## License
 
