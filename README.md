@@ -1,4 +1,6 @@
-# Vibe Flow
+# Vibe Flow Skill
+
+_Note: This is the v2 of Vibe Flow. If you are looking for the v1 (without Agent Skill), see the [v1 branch](https://github.com/paleo/vibe-flow/tree/v1)._
 
 Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It's distributed as an [Agent Skill](https://agentskills.io/) and works well with any agent powered by a coding model such as:
 
