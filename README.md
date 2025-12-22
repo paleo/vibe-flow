@@ -9,7 +9,7 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 ## Get Started
 
 1. Ensure your agent uses a capable coding model.
-2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/bootstrap.md).
+2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
 
@@ -116,5 +116,5 @@ Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic promp
 
 Two migration prompts are available:
 
-- [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the Vibe Flow directory and `AGENTS.md`.
-- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the latest versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.
+- [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the Vibe Flow directory and `AGENTS.md`.
+- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the latest versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.

@@ -47,4 +47,4 @@ If a `_docs/vibe-flow/Code Quality & Refactoring.md` file exists, do the followi
 
 ## Step 4 - Update Vibe Flow Documents
 
-Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md
+Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/migrations/update-vibe-flow.md
