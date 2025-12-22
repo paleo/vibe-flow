@@ -2,7 +2,7 @@
 
 _Note: This is the v2 of Vibe Flow. If you are looking for the v1 (without Agent Skill), see the [v1 branch](https://github.com/paleo/vibe-flow/tree/v1)._
 
-Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It's distributed as an [Agent Skill](https://agentskills.io/) and works well with any agent powered by a coding model such as:
+Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It's distributed as an _Agent Skill_ and works well with any agent powered by a coding model such as:
 
 - **Claude Opus 4+** or **Claude Sonnet 4+** (Anthropic)
 - **GPT 5+** (OpenAI)
@@ -11,7 +11,7 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 ## Get Started
 
 1. Ensure your agent uses a capable coding model.
-2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md).
+2. Give it **[this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**.
 
 It will install the Vibe Flow skill:
 
@@ -109,4 +109,4 @@ Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic promp
 
 ## License
 
-MIT
+CC0-1.0 license
