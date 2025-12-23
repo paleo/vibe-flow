@@ -1,36 +1,23 @@
-# Update Vibe Flow Skill
+# Update Skills
 
-This prompt updates an existing Vibe Flow skill installation to the latest version.
+This prompt updates installed skills to the latest version.
 
 > **Note**: Commands shown are Unix-style. Adapt to your OS if needed (e.g., PowerShell on Windows).
 
-## Step 1 - Check for Legacy Installation
+## Step 1 - Find Installed Skills
 
-Search for a `_docs/vibe-flow/` directory in the codebase.
+Search for installed skills. Look for directories containing:
 
-- If it exists, **STOP NOW** and tell the user:
-
-  > "You have a legacy Vibe Flow installation (`_docs/vibe-flow/`). Please use the migration prompt instead:
-  >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md>"
-
-- If it does not exist, continue to Step 2.
-
-## Step 2 - Find Existing Installation
-
-Search for an existing `vibe-flow` skill directory. Look for any directory containing `vibe-flow/SKILL.md`.
+- `.claude/skills/vibe-flow/SKILL.md`
+- `.claude/skills/documentation-authoring/SKILL.md`
 
 **Important**: Ignore directories inside dependencies (`node_modules/`, `vendor/`, `venv/`, `.venv/`, `target/`, `build/`, `dist/`, etc.).
 
-- If not found, **STOP NOW** and tell the user:
+Note which skills are installed and their paths. If neither is found, tell the user and stop.
 
-  > "No Vibe Flow installation found. To install it, use the install prompt instead:
-  >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md>"
+## Step 2 - Update Vibe Flow (if installed)
 
-- If found, continue to Step 3.
-
-## Step 3 - Download Fresh Files
+If `vibe-flow/SKILL.md` was found:
 
 Delete all existing files in the vibe-flow directory, then fetch the latest versions.
 
@@ -43,6 +30,23 @@ Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
 - [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
 - [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
 
+## Step 3 - Update Documentation Authoring (if installed)
+
+If `documentation-authoring/SKILL.md` was found:
+
+Delete all existing files in the documentation-authoring directory, then fetch the latest versions.
+
+Create the references directory if it doesn't exist:
+
+```bash
+mkdir -p .claude/skills/documentation-authoring/references
+```
+
+Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
+
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/documentation-authoring/SKILL.md) → `.claude/skills/documentation-authoring/SKILL.md`
+- [bootstrapping-skills.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/documentation-authoring/references/bootstrapping-skills.md) → `.claude/skills/documentation-authoring/references/bootstrapping-skills.md`
+
 ## Step 4 - Update Claude/Cursor Commands (Optional)
 
 If `.claude/commands/` exists, update the command files:
@@ -54,4 +58,4 @@ If `.claude/commands/` exists, update the command files:
 
 ## Done
 
-Tell the user that Vibe Flow has been updated successfully.
+Tell the user which skills were updated successfully.

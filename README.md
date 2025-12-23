@@ -101,11 +101,23 @@ SDD is the structured alternative to "vibe coding" — the ad-hoc approach where
 
 Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
 
+## Documentation Authoring Skill
+
+The **Documentation Authoring** skill is independent from Vibe Flow but provided here. It helps you create skills that document your project:
+
+1. Give your agent **[this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**.
+2. Clear the context, then ask it:
+
+    ```markdown
+    Help me bootstrap project-specific skills.
+    ```
+
 ## Installation, Migrations
 
-- **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
-- **[Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md)**: Update an existing Vibe Flow skill to the latest version.
 - **[Upgrade from v1](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
+- **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
+- **[Install Documentation Authoring](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**: Create skills that document your project.
+- **[Update Skills](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md)**: Update installed Vibe-Flow and/or Documentation Authoring skills to the latest version.
 
 ## License
 
