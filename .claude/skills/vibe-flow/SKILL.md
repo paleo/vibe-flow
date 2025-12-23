@@ -1,6 +1,6 @@
 ---
 name: vibe-flow
-description: Write technical specifications (spec), create implementation plans (plan), or use Discuss-Then-Do Protocol (dtdp) for collaborative problem-solving.
+description: Collaborative problem-solving protocols: write technical specifications (spec), create implementation plans (plan), or use Discuss-Then-Do Protocol (dtdp). Also generates PR messages.
 ---
 
 # Vibe Flow Guide
