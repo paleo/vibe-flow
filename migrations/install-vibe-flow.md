@@ -26,7 +26,7 @@ Search for an existing `vibe-flow` skill directory. Look for any directory conta
 
   > "Vibe Flow is already installed at `{PATH}`. To update it, use the update prompt instead:
   >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-vibe-flow.md>"
+  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md>"
 
 - If not found, continue to Step 3.
 
