@@ -109,7 +109,7 @@ The **Documentation Authoring** skill is independent from Vibe Flow but provided
 2. Clear the context, then ask it:
 
     ```markdown
-    Help me bootstrap project-specific skills.
+    Help me bootstrap our project skills.
     ```
 
 ## Installation, Migrations
@@ -117,7 +117,7 @@ The **Documentation Authoring** skill is independent from Vibe Flow but provided
 - **[Upgrade from v1](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard
 - **[Install Vibe Flow Skill](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**
 - **[Install Documentation Authoring Skill](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**
-- **[Update Skills](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md)**: Update installed Vibe-Flow and/or Documentation Authoring skills to the latest version
+- **[Update Skills](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md)**: Update installed _Vibe Flow_ and/or _Documentation Authoring_ skills to the latest version
 
 ## License
 
