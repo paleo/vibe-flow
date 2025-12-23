@@ -114,10 +114,10 @@ The **Documentation Authoring** skill is independent from Vibe Flow but provided
 
 ## Installation, Migrations
 
-- **[Upgrade from v1](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard.
-- **[Install Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**: Install the Vibe Flow skill in a new project.
-- **[Install Documentation Authoring](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**: Create skills that document your project.
-- **[Update Skills](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md)**: Update installed Vibe-Flow and/or Documentation Authoring skills to the latest version.
+- **[Upgrade from v1](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard
+- **[Install Vibe Flow Skill](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**
+- **[Install Documentation Authoring Skill](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**
+- **[Update Skills](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md)**: Update installed Vibe-Flow and/or Documentation Authoring skills to the latest version
 
 ## License
 
