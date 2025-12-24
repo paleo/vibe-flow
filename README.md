@@ -30,7 +30,7 @@ Then, start using the workflow.
 
 ### Enable Agent Skills
 
-Agent Skills is an [open standard](https://agentskills.io/) that works out of the box in Claude Code. Editor support is still experimental. See the how to enable it in your editor:
+Agent Skills is an [open standard](https://agentskills.io/) that works out of the box in Claude Code. Editor support is still experimental:
 
 - [Enable Agent Skills in VS Code / GitHub Copilot](https://code.visualstudio.com/docs/copilot/customization/agent-skills)
 - [Enable Agent Skills in Cursor](https://cursor.com/docs/context/skills)
