@@ -5,6 +5,7 @@ license: CC0 1.0
 metadata:
   author: Paleo
   version: "2.0"
+  repository: https://github.com/paleo/vibe-flow
 ---
 
 # Vibe Flow Guide
