@@ -1,6 +1,10 @@
 ---
 name: documentation-authoring
 description: Create or augment skills and documentation. Use when writing new skills, updating existing skills, or modifying project documentation like AGENTS.md.
+license: CC0 1.0
+metadata:
+  author: Paleo
+  version: "1.0"
 ---
 
 # Documentation Authoring

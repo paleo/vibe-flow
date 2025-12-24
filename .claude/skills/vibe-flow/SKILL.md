@@ -1,6 +1,10 @@
 ---
 name: vibe-flow
 description: Collaborative problem-solving protocols: write technical specifications (spec), create implementation plans (plan), or use Discuss-Then-Do Protocol (dtdp). Also generates PR messages.
+license: CC0 1.0
+metadata:
+  author: Paleo
+  version: "2.0"
 ---
 
 # Vibe Flow Guide
