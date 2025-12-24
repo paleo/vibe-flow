@@ -30,28 +30,52 @@ Search for an existing `vibe-flow` skill directory. Look for any directory conta
 
 - If not found, continue to Step 3.
 
-## Step 3 - Download Vibe Flow Skill
+## Step 3 - Detect Skills Directory
+
+Search for existing `skills/` directories in the repository root:
+
+- `.claude/skills/`
+- `.codex/skills/`
+- `.github/skills/`
+- `.cursor/skills/`
+
+**Decision:**
+
+- **If none exists**: Determine the installation directory based on the current agent:
+  - Claude Code → `.claude/skills/`
+  - Codex → `.codex/skills/`
+  - GitHub Copilot → `.github/skills/`
+  - Cursor → `.cursor/skills/`
+  - Other/unknown → `.claude/skills/`
+
+- **If exactly one exists**: Use that directory.
+
+- **If multiple exist**: **STOP** and ask the user which one to use.
+
+Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
+
+## Step 4 - Download Vibe Flow Skill
 
 Create the skill directory:
 
 ```bash
-mkdir -p .claude/skills/vibe-flow
+mkdir -p {SKILLS_DIR}/vibe-flow
 ```
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
+Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files into `{SKILLS_DIR}/vibe-flow/`:
 
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md)
+- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md)
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md)
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md)
+- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md)
+- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md)
 
-## Step 4 - Post-Install Setup
+## Step 5 - Post-Install Setup
 
 1. Look at git branches (`git branch -a`) to detect the ticket ID format (e.g., `ABC-###`, `PROJ-###`, or numeric like `123`).
 
-2. Check if `AGENTS.md` (or `CLAUDE.md`) exists:
+2. Check if `AGENTS.md` exists:
 
    - If it exists, ensure it contains: _"Always ignore the `_plans` directory when searching the codebase."_
    - If it doesn't exist, create `AGENTS.md` with:
@@ -81,9 +105,9 @@ Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
    !_plans/.gitkeep
    ```
 
-## Step 5 - Download Claude/Cursor Commands (Optional)
+## Step 6 - Download Claude/Cursor Commands (Optional)
 
-If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file):
+**Only if** Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file):
 
 1. Create the commands directory:
 
@@ -100,4 +124,4 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
 
 ## Done
 
-Tell the user that Vibe Flow has been installed successfully, and point them to `.claude/skills/vibe-flow/README.md` for usage instructions.
+Tell the user that Vibe Flow has been installed successfully, and point them to `{SKILLS_DIR}/vibe-flow/README.md` for usage instructions.

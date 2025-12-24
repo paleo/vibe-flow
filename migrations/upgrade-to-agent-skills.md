@@ -1,6 +1,6 @@
 # Upgrade to Agent Skills
 
-This migration converts your Vibe Flow installation from the `_docs/` system to the Agent Skills standard (`.claude/skills/`).
+This migration converts your Vibe Flow installation from the `_docs/` system to the Agent Skills standard.
 
 **Reference**: <https://agentskills.io/specification.md>
 
@@ -19,24 +19,48 @@ This migration converts your Vibe Flow installation from the `_docs/` system to 
 rm -rf _docs/vibe-flow
 ```
 
-### 2. Download Fresh Vibe Flow Skill
+### 2. Detect Skills Directory
+
+Search for existing `skills/` directories in the repository root:
+
+- `.claude/skills/`
+- `.codex/skills/`
+- `.github/skills/`
+- `.cursor/skills/`
+
+**Decision:**
+
+- **If none exists**: Determine the installation directory based on the current agent:
+  - Claude Code → `.claude/skills/`
+  - Codex → `.codex/skills/`
+  - GitHub Copilot → `.github/skills/`
+  - Cursor → `.cursor/skills/`
+  - Other/unknown → `.claude/skills/`
+
+- **If exactly one exists**: Use that directory.
+
+- **If multiple exist**: **STOP** and ask the user which one to use.
+
+Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
+
+### 3. Download Fresh Vibe Flow Skill
 
 Create the skill directory and fetch the latest files from the repository:
 
 ```bash
-mkdir -p .claude/skills/vibe-flow
+mkdir -p {SKILLS_DIR}/vibe-flow
 ```
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files:
+Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files into `{SKILLS_DIR}/vibe-flow/`:
 
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md) → `.claude/skills/vibe-flow/README.md`
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md) → `.claude/skills/vibe-flow/SKILL.md`
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md) → `.claude/skills/vibe-flow/spec-protocol.md`
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md) → `.claude/skills/vibe-flow/plan-protocol.md`
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md) → `.claude/skills/vibe-flow/dtdp-protocol.md`
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md) → `.claude/skills/vibe-flow/pr-message-protocol.md`
+- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md)
+- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md)
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md)
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md)
+- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md)
+- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md)
 
-### 3. Update Claude/Cursor Commands (if present)
+### 4. Update Claude Code Commands (if present)
 
 If `.claude/commands/` exists, delete the old commands and fetch fresh ones:
 
@@ -51,7 +75,7 @@ Then fetch the latest versions:
 - [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
 - [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
 
-### 4. Clean AGENTS.md
+### 5. Clean AGENTS.md
 
 Remove all references to `_docs/vibe-flow/` files from `AGENTS.md`. This includes references to:
 
@@ -101,17 +125,17 @@ For each skill the user wants to create:
 1. Create the skill directory:
 
    ```bash
-   mkdir -p ".claude/skills/{skill-name}"
+   mkdir -p "{SKILLS_DIR}/{skill-name}"
    ```
 
-2. Create `SKILL.md` in `.claude/skills/{skill-name}/`:
+2. Create `SKILL.md` in `{SKILLS_DIR}/{skill-name}/`:
 
    If there is a primary documentation file, then move it as `SKILL.md`. Otherwise, create an empty `SKILL.md`. The `SKILL.md` will be completed at step 4.
 
 3. Move additional reference files (if any) with kebab-case names:
 
    ```bash
-   mv "_docs/{Other File}.md" ".claude/skills/{skill-name}/{other-file}.md"
+   mv "_docs/{Other File}.md" "{SKILLS_DIR}/{skill-name}/{other-file}.md"
    ```
 
 4. Edit `SKILL.md` to add the required structure:

@@ -16,14 +16,13 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 It will install the Vibe Flow skill:
 
 ```text
-.claude/skills/
-└── vibe-flow/
-    ├── SKILL.md
-    ├── README.md
-    ├── spec-protocol.md
-    ├── plan-protocol.md
-    ├── dtdp-protocol.md
-    └── pr-message-protocol.md
+{.claude|.github|.cursor|.codex}/skills/vibe-flow/
+├── SKILL.md
+├── README.md
+├── spec-protocol.md
+├── plan-protocol.md
+├── dtdp-protocol.md
+└── pr-message-protocol.md
 ```
 
 Then, start using the workflow.
@@ -34,6 +33,8 @@ Agent Skills is an [open standard](https://agentskills.io/) that works out of th
 
 - [Enable Agent Skills in VS Code / GitHub Copilot](https://code.visualstudio.com/docs/copilot/customization/agent-skills)
 - [Enable Agent Skills in Cursor](https://cursor.com/docs/context/skills)
+- [Agent Skills in Claude Code](https://code.claude.com/docs/en/skills)
+- [Agent Skills in Codex](https://developers.openai.com/codex/skills/)
 
 ## Using Vibe Flow
 
@@ -128,4 +129,4 @@ The **Documentation Authoring** skill is independent from Vibe Flow but provided
 
 ## License
 
-CC0-1.0 license
+CC0 1.0 Universal.
