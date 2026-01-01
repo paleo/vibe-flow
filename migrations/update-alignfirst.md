@@ -87,18 +87,14 @@ Check if `AGENTS.md` contains a "For AI Assistants" section:
 
 If `_docs/vibe-flow/` exists (but not `_docs/alignfirst/`), proceed with upgrading from the legacy Vibe Flow installation.
 
-### Step 1 - Rename the folder
+### Step 1 - Replace the old folder with a fresh one
 
-Rename `_docs/vibe-flow/` to `_docs/alignfirst/`.
+1. Delete the old folder: `rm -rf _docs/vibe-flow/`
+2. Create the new folder: `mkdir -p _docs/alignfirst/`
 
-### Step 2 - Rename and update files in `_docs/alignfirst/`
+### Step 2 - Download AlignFirst documents
 
-1. If `Discuss-Then-Do Protocol.md` exists, rename it to `Align-and-Do Protocol.md`
-2. If `Vibe Flow Guide.md` exists, rename it to `AlignFirst Guide.md`
-
-### Step 3 - Download latest AlignFirst documents
-
-Fetch and overwrite all core documents (same as "Update AlignFirst" Step 1):
+Fetch all core documents (same as "Update AlignFirst" Step 1):
 
 - [How to Write a Technical Specification.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Technical%20Specification.md) → `_docs/alignfirst/How to Write a Technical Specification.md`
 - [How to Write Implementation Plans.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20Implementation%20Plans.md) → `_docs/alignfirst/How to Write Implementation Plans.md`
@@ -107,14 +103,7 @@ Fetch and overwrite all core documents (same as "Update AlignFirst" Step 1):
 
 Do not chain the commands with `&&`. Run them carefully one by one.
 
-### Step 4 - Delete old Vibe Flow files
-
-Delete these legacy files if they exist:
-
-- `_docs/vibe-flow/` (the entire directory, if any remains)
-- `_docs/alignfirst/How to Write an Implementation Plan.md` (old singular name)
-
-### Step 5 - Update `AGENTS.md`
+### Step 3 - Update `AGENTS.md`
 
 1. Replace all references to `_docs/vibe-flow/` with `_docs/alignfirst/`
 2. Replace all references to `Vibe Flow` with `AlignFirst`
@@ -134,7 +123,7 @@ AlignFirst:
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 ```
 
-### Step 6 - Add Writing Documentation Guide
+### Step 4 - Add Writing Documentation Guide
 
 Check if `_docs/Writing Documentation.md` exists:
 
@@ -143,7 +132,7 @@ Check if `_docs/Writing Documentation.md` exists:
   2. Add a reference to this document in `AGENTS.md` under the "Additional documentation" section.
 - If it **already exists**: Skip this step.
 
-### Step 7 - Delete old Claude Code / Cursor commands
+### Step 5 - Delete old Claude Code / Cursor commands
 
 If the `.claude/commands/` directory exists, delete these old command files:
 
@@ -151,7 +140,7 @@ If the `.claude/commands/` directory exists, delete these old command files:
 - `.claude/commands/plan.md`
 - `.claude/commands/dtdp.md`
 
-### Step 8 - Download new Claude Code / Cursor commands
+### Step 6 - Download new Claude Code / Cursor commands
 
 If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file):
 
@@ -162,7 +151,7 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
    - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) → `.claude/commands/al.md`
    - [doc.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) → `.claude/commands/doc.md`
 
-### Step 9 - Add "For AI Assistants" Section
+### Step 7 - Add "For AI Assistants" Section
 
 Check if `AGENTS.md` contains a "For AI Assistants" section:
 
