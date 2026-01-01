@@ -1,14 +1,14 @@
 ---
-name: documentation-authoring
-description: Create or augment skills and documentation. Use when writing new skills, updating existing skills, or modifying project documentation like AGENTS.md.
+name: technical-documentation-authoring
+description: Create or augment technical documentation. Use when writing new skills, updating existing skills. Also use when modifying project documentation like AGENTS.md.
 license: CC0 1.0
 metadata:
   author: Paleo
   version: "1.0"
-  repository: https://github.com/paleo/vibe-flow
+  repository: https://github.com/paleo/alignfirst
 ---
 
-# Documentation Authoring
+# Technical Documentation Authoring
 
 ## References
 
@@ -50,7 +50,7 @@ Follow the guidelines below.
 ## Creating a New Skill
 
 ```
-.claude/skills/skill-name/
+{skills-dir}/skill-name/
 └── SKILL.md           # Required
 ```
 

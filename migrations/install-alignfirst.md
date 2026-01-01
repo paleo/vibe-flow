@@ -1,6 +1,6 @@
-# Install Vibe Flow Skill
+# Install AlignFirst Skill
 
-This prompt installs the Vibe Flow skill in a new project.
+This prompt installs the AlignFirst skill in a new project.
 
 > **Note**: Commands shown are Unix-style. Adapt to your OS if needed (e.g., PowerShell on Windows).
 
@@ -12,21 +12,21 @@ Search for a `_docs/vibe-flow/` directory in the codebase.
 
   > "You have a legacy Vibe Flow installation (`_docs/vibe-flow/`). Please use the migration prompt instead:
   >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md>"
+  > <https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/upgrade-to-agent-skills.md>"
 
 - If it does not exist, continue to Step 2.
 
 ## Step 2 - Check for Existing Installation
 
-Search for an existing `vibe-flow` skill directory. Look for any directory containing `vibe-flow/SKILL.md`.
+Search for an existing `alignfirst` or `vibe-flow` skill directory. Look for any directory containing `alignfirst/SKILL.md` or `vibe-flow/SKILL.md`.
 
 **Important**: Ignore directories inside dependencies (`node_modules/`, `vendor/`, `venv/`, `.venv/`, `target/`, `build/`, `dist/`, etc.).
 
 - If found, **STOP NOW** and tell the user:
 
-  > "Vibe Flow is already installed at `{PATH}`. To update it, use the update prompt instead:
+  > "AlignFirst (or Vibe Flow) is already installed at `{PATH}`. To update it, use the update prompt instead:
   >
-  > <https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md>"
+  > <https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/update-skills.md>"
 
 - If not found, continue to Step 3.
 
@@ -54,22 +54,24 @@ Search for existing `skills/` directories in the repository root:
 
 Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
 
-## Step 4 - Download Vibe Flow Skill
+## Step 4 - Download AlignFirst Skill
 
 Create the skill directory:
 
 ```bash
-mkdir -p {SKILLS_DIR}/vibe-flow
+mkdir -p {SKILLS_DIR}/alignfirst
 ```
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files into `{SKILLS_DIR}/vibe-flow/`:
+**Important**: Use `curl -o "filename"` or `wget -O "filename"` to download files directly. Do NOT fetch file contents into your context.
 
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md)
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md)
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md)
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md)
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md)
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md)
+Fetch the following files into `{SKILLS_DIR}/alignfirst/`:
+
+- [SKILL.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/SKILL.md)
+- [README.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/README.md)
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/spec-protocol.md)
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/plan-protocol.md)
+- [do-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/do-protocol.md)
+- [description-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/description-protocol.md)
 
 ## Step 5 - Post-Install Setup
 
@@ -115,13 +117,13 @@ Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files in
    mkdir -p .claude/commands
    ```
 
-2. Fetch the command files:
+2. Fetch the command files using `curl -o "filename"` or `wget -O "filename"`:
 
-   - [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
-   - [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
-   - [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
-   - [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
+   - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alspec.md) → `.claude/commands/alspec.md`
+   - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alplan.md) → `.claude/commands/alplan.md`
+   - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.claude/commands/al.md`
+   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.claude/commands/aldescription.md`
 
 ## Done
 
-Tell the user that Vibe Flow has been installed successfully, and point them to `{SKILLS_DIR}/vibe-flow/README.md` for usage instructions.
+Tell the user that AlignFirst has been installed successfully, and point them to `{SKILLS_DIR}/alignfirst/README.md` for usage instructions.

@@ -1,4 +1,4 @@
-# How to Write a PR Message
+# How to Write a Description for Implemented Work
 
 ## Pre-requisites
 
@@ -11,8 +11,8 @@ You need:
 
 1. Find the current ticket plan directory.
 2. Read every `*spec.md` and `*summary.md` file in the ticket plan directory.
-3. Draft a PR message summarizing what has been implemented and show it to the user.
-4. Write a new file `{CYCLE_LETTER}1-PR-message.md` with the next cycle letter.
+3. Draft a description summarizing what has been implemented and show it to the user.
+4. Write a new file `{CYCLE_LETTER}1-description.md` with the next cycle letter.
 
 ## Guidelines
 
@@ -27,4 +27,4 @@ You need:
 
 ---
 
-_Important Note: There can be lint errors in the markdown file you write. Ignore them. NEVER FIX LINT ERRORS (FORMATTING ISSUES) IN THE PR MESSAGE._
+_Important Note: There can be lint errors in the markdown file you write. Ignore them. NEVER FIX LINT ERRORS (FORMATTING ISSUES) IN THE DESCRIPTION._

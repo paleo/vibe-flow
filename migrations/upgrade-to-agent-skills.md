@@ -1,6 +1,6 @@
 # Upgrade to Agent Skills
 
-This migration converts your Vibe Flow installation from the `_docs/` system to the Agent Skills standard.
+This migration converts your Vibe Flow v1 installation from the `_docs/` system to the Agent Skills standard.
 
 **Reference**: <https://agentskills.io/specification.md>
 
@@ -8,10 +8,10 @@ This migration converts your Vibe Flow installation from the `_docs/` system to 
 
 ## Pre-requisites
 
-- Verify `_docs/vibe-flow/` exists. If not, STOP - this is not a Vibe Flow installation.
+- Verify `_docs/vibe-flow/` exists. If not, STOP - this is not a Vibe Flow v1 installation.
 - If this is a git repository, verify the working tree is clean. DO NOT PROCEED with uncommitted changes.
 
-## Install the Vibe Flow Skill
+## Install the AlignFirst Skill
 
 ### 1. Delete Old Vibe Flow Files
 
@@ -43,22 +43,24 @@ Search for existing `skills/` directories in the repository root:
 
 Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
 
-### 3. Download Fresh Vibe Flow Skill
+### 3. Download AlignFirst Skill
 
 Create the skill directory and fetch the latest files from the repository:
 
 ```bash
-mkdir -p {SKILLS_DIR}/vibe-flow
+mkdir -p {SKILLS_DIR}/alignfirst
 ```
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files into `{SKILLS_DIR}/vibe-flow/`:
+**Important**: Use `curl -o "filename"` or `wget -O "filename"` to download files directly. Do NOT fetch file contents into your context.
 
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md)
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md)
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md)
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md)
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md)
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md)
+Fetch the following files into `{SKILLS_DIR}/alignfirst/`:
+
+- [README.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/README.md)
+- [SKILL.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/SKILL.md)
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/spec-protocol.md)
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/plan-protocol.md)
+- [do-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/do-protocol.md)
+- [description-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/description-protocol.md)
 
 ### 4. Update Claude Code Commands (if present)
 
@@ -68,12 +70,12 @@ If `.claude/commands/` exists, delete the old commands and fetch fresh ones:
 rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md .claude/commands/doc.md
 ```
 
-Then fetch the latest versions:
+Then fetch the latest versions using `curl -o "filename"` or `wget -O "filename"`:
 
-- [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
-- [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
-- [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
-- [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
+- [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alspec.md) → `.claude/commands/alspec.md`
+- [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alplan.md) → `.claude/commands/alplan.md`
+- [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.claude/commands/al.md`
+- [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.claude/commands/aldescription.md`
 
 ### 5. Clean AGENTS.md
 
@@ -196,8 +198,8 @@ rm -rf _docs
 
 Summarize:
 
-- Vibe Flow skill installed
+- AlignFirst skill installed
 - Number of additional skills created from documentation
 - List of all skill names
 - Remind user that skills are auto-discovered by agents
-- Note: If Ticket ID was not preserved, suggest running the vibe-flow post-install setup
+- Note: If Ticket ID was not preserved, suggest running the alignfirst post-install setup

@@ -1,6 +1,6 @@
-# Vibe Flow Skill
+# AlignFirst Skill
 
-Vibe Flow skill is a spec-driven development workflow for AI agents.
+AlignFirst skill is a spec-driven development workflow for AI agents.
 
 ## Post-Install Setup
 
@@ -9,7 +9,7 @@ After installing this skill, run the following prompt to configure your project:
 **Prompt to run:**
 
 ```markdown
-I just installed the vibe-flow skill. Please help me configure it:
+I just installed the alignfirst skill. Please help me configure it:
 
 1. Look at my git branches (`git branch -a`) to detect my ticket ID format (e.g., `ABC-###`, `PROJ-###`, or numeric).
 2. If you find a pattern, add this section to my `AGENTS.md`:
@@ -24,9 +24,9 @@ I just installed the vibe-flow skill. Please help me configure it:
 6. Add `_plans/*` and `!_plans/.gitkeep` to `.gitignore` if needed.
 ```
 
-This setup enables Vibe Flow to automatically detect ticket IDs from your branch names.
+This setup enables AlignFirst to automatically detect ticket IDs from your branch names.
 
-## Using Vibe Flow
+## Using AlignFirst
 
 ### Generate Technical Specification
 
@@ -38,7 +38,7 @@ Help me write a new spec.
 [something to do]
 ```
 
-Or use the command: `/spec [something to do]`.
+Or use the command: `/alspec [something to do]`.
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
@@ -52,7 +52,7 @@ Plans orchestrate what agents or subagents will do:
 Write plans for the current spec.
 ```
 
-Or use the command: `/plan`.
+Or use the command: `/alplan`.
 
 The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
@@ -66,16 +66,16 @@ Execute the plan `_plans/123/A2-plan-orchestrator.md`
 
 The agent executes and writes handover document(s) (`.summary.md` files).
 
-### Discuss-Then-Do Protocol (DTDP)
+### Align-and-Do Protocol (AADO)
 
 A lighter workflow for small tasks without spec/plans:
 
 ```markdown
-I need a DTDP.
+Start AADO.
 
 [something to do]
 ```
 
-Or use the command: `/dtdp [something to do]`.
+Or use the command: `/al [something to do]`.
 
 The agent will discuss first, then work on the codebase, and write a summary.
