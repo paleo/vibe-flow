@@ -1,4 +1,6 @@
-# Vibe Flow
+# Vibe Flow v1 (with `_docs` directory)
+
+_Note: This is the v1 of AlignFirst (formerly Vibe Flow). If you are looking for the last version (with Agent Skill), see the [main branch](https://github.com/paleo/alignfirst)._
 
 Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It works well with any agent powered by a coding model such as:
 
