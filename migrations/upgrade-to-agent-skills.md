@@ -88,6 +88,18 @@ Remove all references to `_docs/vibe-flow/` files from `AGENTS.md`. This include
 
 Remove the entire "Vibe Flow" section if it becomes empty after removing these references.
 
+## Detect Legacy Documentation Skill
+
+Check if `_docs/Writing Documentation.md` exists. If it does:
+
+1. Delete it:
+
+   ```bash
+   rm -f "_docs/Writing Documentation.md"
+   ```
+
+2. Set **INSTALL_TECH_DOC_SKILL** = true (this will trigger installation of the replacement skill at the end)
+
 ## Convert Documentation to Skills
 
 This section requires a discussion with the user to determine how to organize documentation into skills.
@@ -194,6 +206,12 @@ Otherwise, delete the entire directory:
 rm -rf _docs
 ```
 
+## Install Technical Documentation Authoring Skill
+
+If **INSTALL_TECH_DOC_SKILL** is true, fetch and execute the installation prompt:
+
+<https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-technical-documentation-authoring.md>
+
 ## Report to User
 
 Summarize:
@@ -201,5 +219,6 @@ Summarize:
 - AlignFirst skill installed
 - Number of additional skills created from documentation
 - List of all skill names
+- If **INSTALL_TECH_DOC_SKILL** was true: mention that `Writing Documentation.md` was replaced by the `technical-documentation-authoring` skill
 - Remind user that skills are auto-discovered by agents
 - Note: If Ticket ID was not preserved, suggest running the alignfirst post-install setup
