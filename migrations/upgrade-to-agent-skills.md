@@ -208,9 +208,18 @@ rm -rf _docs
 
 ## Install Technical Documentation Authoring Skill
 
-If **INSTALL_TECH_DOC_SKILL** is true, fetch and execute the installation prompt:
+If **INSTALL_TECH_DOC_SKILL** is true:
 
-<https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-technical-documentation-authoring.md>
+1. Create the skill directory:
+
+   ```bash
+   mkdir -p {SKILLS_DIR}/technical-documentation-authoring/references
+   ```
+
+2. Fetch the skill files using `curl -o "filename"` or `wget -O "filename"`:
+
+   - [SKILL.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/technical-documentation-authoring/SKILL.md) → `{SKILLS_DIR}/technical-documentation-authoring/SKILL.md`
+   - [references/bootstrapping-skills.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/technical-documentation-authoring/references/bootstrapping-skills.md) → `{SKILLS_DIR}/technical-documentation-authoring/references/bootstrapping-skills.md`
 
 ## Report to User
 
