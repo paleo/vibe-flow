@@ -8,15 +8,15 @@ This migration converts your Vibe Flow v1 installation from the `_docs/` system 
 
 ## Pre-requisites
 
-- Verify `_docs/vibe-flow/` exists. If not, STOP - this is not a Vibe Flow v1 installation.
+- Verify `_docs/vibe-flow/` or `_docs/alignfirst/` exists. If neither exists, STOP - this is not an AlignFirst/Vibe Flow v1 installation.
 - If this is a git repository, verify the working tree is clean. DO NOT PROCEED with uncommitted changes.
 
 ## Install the AlignFirst Skill
 
-### 1. Delete Old Vibe Flow Files
+### 1. Delete Old AlignFirst/Vibe Flow Files
 
 ```bash
-rm -rf _docs/vibe-flow
+rm -rf _docs/vibe-flow _docs/alignfirst
 ```
 
 ### 2. Detect Skills Directory
@@ -67,7 +67,7 @@ Fetch the following files into `{SKILLS_DIR}/alignfirst/`:
 If `.claude/commands/` exists, delete the old commands and fetch fresh ones:
 
 ```bash
-rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md .claude/commands/doc.md
+rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md .claude/commands/doc.md .claude/commands/al.md .claude/commands/alspec.md .claude/commands/alplan.md .claude/commands/aldescription.md
 ```
 
 Then fetch the latest versions using `curl -o "filename"` or `wget -O "filename"`:
@@ -79,14 +79,14 @@ Then fetch the latest versions using `curl -o "filename"` or `wget -O "filename"
 
 ### 5. Clean AGENTS.md
 
-Remove all references to `_docs/vibe-flow/` files from `AGENTS.md`. This includes references to:
+Remove all references to `_docs/vibe-flow/` and `_docs/alignfirst/` files from `AGENTS.md`. This includes references to:
 
-- `Vibe Flow Guide.md`
+- `Vibe Flow Guide.md` or `AlignFirst Guide.md`
 - `How to Write a Technical Specification.md`
 - `How to Write Implementation Plans.md`
-- `Discuss-Then-Do Protocol.md`
+- `Discuss-Then-Do Protocol.md` or `Align-and-Do Protocol.md`
 
-Remove the entire "Vibe Flow" section if it becomes empty after removing these references.
+Remove the entire "Vibe Flow" or "AlignFirst" section if it becomes empty after removing these references.
 
 ## Detect Legacy Documentation Skill
 
