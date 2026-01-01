@@ -76,12 +76,12 @@ Execute the plan `_plans/123/A2-plan-orchestrator.md`
 
 The agent executes and writes handover document(s) (`.summary.md` files).
 
-### Align-and-Do Protocol (AADO)
+### Align-and-Do Protocol (ALADO)
 
 There is also a lighter prompt for small tasks without spec/plans. Here's how to trigger it:
 
 ```markdown
-Start AADO.
+Start ALADO.
 
 [something to do]
 ```
@@ -123,7 +123,7 @@ The **Technical Documentation Authoring** skill is independent from AlignFirst b
 It can also work alongside AlignFirst:
 
 ```markdown
-Start AADO. We need a new documentation about [topic].
+Start ALADO. We need a new documentation about [topic].
 ```
 
 ## Installation, Migrations

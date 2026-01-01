@@ -1,6 +1,6 @@
 ---
 name: alignfirst
-description: Collaborative problem-solving protocols: write technical specifications (spec, or alspec), create implementation plans (plan, or alplan), or use Align-and-Do Protocol (AADO). Also generates PR/MR descriptions (aldescription).
+description: Collaborative problem-solving protocols: write technical specifications (spec, or alspec), create implementation plans (plan, or alplan), or use Align-and-Do Protocol (ALADO). Also generates PR/MR descriptions (aldescription).
 license: CC0 1.0
 metadata:
   author: Paleo
@@ -16,7 +16,7 @@ Choose the appropriate protocol based on the task:
 
 - **Technical Specification** (_spec_, or _alspec_): Read [spec-protocol.md](spec-protocol.md) to write a technical specification
 - **Implementation Plans** (_plan_, or _alplan_): Read [plan-protocol.md](plan-protocol.md) to create implementation plans from a spec
-- **Align-and-Do Protocol** (_AADO_): Read [do-protocol.md](do-protocol.md) for smaller tasks without formal spec/plans
+- **Align-and-Do Protocol** (_ALADO_): Read [do-protocol.md](do-protocol.md) for smaller tasks without formal spec/plans
 - **Description** (_aldescription_): Read [description-protocol.md](description-protocol.md) to write a description summarizing implemented work
 
 ## TASK_DIR Location
@@ -34,7 +34,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan
-- `done.summary` - AADO summary document
+- `done.summary` - ALADO summary document
 
 **Example structure:**
 
