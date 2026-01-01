@@ -1,8 +1,8 @@
-# Discuss-Then-Do Protocol (DTDP)
+# Align-and-Do Protocol (ALADO)
 
 ## Pre-requisites
 
-Before you start, read the `Vibe Flow Guide.md` entirely.
+Before you start, read the `AlignFirst Guide.md` entirely.
 
 You need:
 
@@ -11,7 +11,7 @@ You need:
 
 ## Phases
 
-When the user initiates a DTDP, you MUST follow this four-phase process:
+When the user initiates ALADO, you MUST follow this four-phase process:
 
 1. **Investigation Phase**: Research the codebase to understand the current implementation and context
 2. **Discussion Phase**: Collaborate with the user to explore the problem/solution space BEFORE taking action
@@ -62,7 +62,7 @@ When implementing the solution, follow these guidelines:
 
 ## Phase 4. Summary Phase
 
-Write the summary in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-summary.md`. Do not overwrite an existing file.
+Write the summary in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-done.summary.md`. Do not overwrite an existing file.
 
 The summary should capture:
 

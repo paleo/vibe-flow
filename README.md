@@ -1,8 +1,8 @@
-# Vibe Flow v1 (with `_docs` directory)
+# AlignFirst v1 (with `_docs` directory)
 
 _Note: This is the v1 of AlignFirst (formerly Vibe Flow). If you are looking for the last version (with Agent Skill), see the [main branch](https://github.com/paleo/alignfirst)._
 
-Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It works well with any agent powered by a coding model such as:
+AlignFirst is a hackable set of prompts that enables _Spec-Driven Development_. It works well with any agent powered by a coding model such as:
 
 - **Claude Opus 4+** or **Claude Sonnet 4+** (Anthropic)
 - **GPT 5+** (OpenAI)
@@ -11,17 +11,17 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 ## Get Started
 
 1. Ensure your agent uses a capable coding model.
-2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/bootstrap.md).
+2. Give it [this installation prompt](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/bootstrap.md).
 
 It will install the following structure and plug your AI instructions file into it:
 
 ```text
 _docs/
-├── vibe-flow/
-│   ├── Discuss-Then-Do Protocol.md
+├── alignfirst/
+│   ├── Align-and-Do Protocol.md
 │   ├── How to Write a Technical Specification.md
 │   ├── How to Write Implementation Plans.md
-│   └── Vibe Flow Guide.md
+│   └── AlignFirst Guide.md
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
 └── Writing Documentation.md
@@ -31,7 +31,7 @@ AGENTS.md
 
 Then, start using the workflow.
 
-## Using Vibe Flow
+## Using AlignFirst
 
 ### Generate Technical Specification
 
@@ -43,7 +43,7 @@ Read your documentation, then help me write a new spec.
 [something to do]
 ```
 
-Or, if you use Claude Code or Cursor, you can use the command: `/spec [something to do]`.
+Or, if you use Claude Code or Cursor, you can use the command: `/alspec [something to do]`.
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
@@ -57,7 +57,7 @@ Plans orchestrate what agents or subagents will do:
 Read your documentation, then write plans.
 ```
 
-Or, if you use Claude Code or Cursor, you can use the command: `/plan`.
+Or, if you use Claude Code or Cursor, you can use the command: `/alplan`.
 
 The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
@@ -71,19 +71,19 @@ Execute the plan `_plans/123/A2-plan-orchestrator.md`
 
 The agent executes and writes handover document(s) (`.summary.md` files).
 
-### Discuss-Then-Do Protocol (DTDP)
+### Align-and-Do Protocol (ALADO)
 
 There is also a lighter prompt for small tasks without spec/plans. Here's how to trigger it:
 
 ```markdown
-Read your documentation first. I need a DTDP.
+Read your documentation first. Start ALADO.
 
 [something to do]
 ```
 
-Or, if you use Claude Code or Cursor, you can use the command: `/dtdp [something to do]`.
+Or, if you use Claude Code or Cursor, you can use the command: `/al [something to do]`.
 
-The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-summary.md` file will be written.
+The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-done.summary.md` file will be written.
 
 ## Rationale
 
@@ -112,11 +112,11 @@ Spec-Driven Development (SDD) first existed in API development as a design-first
 
 SDD is the structured alternative to "vibe coding" — the ad-hoc approach where you prompt an AI and hope for the best. Tools like GitHub Spec Kit and AWS Kiro have popularized this approach.
 
-Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
+AlignFirst follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
 
 ## Migrations (update from older version)
 
 Two migration prompts are available:
 
-- [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the Vibe Flow directory and `AGENTS.md`.
-- [Update Vibe Flow](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/migrations/update-vibe-flow.md): overwrite your `_docs/vibe-flow/` directory with the latest versions of the Vibe Flow prompts, and reference them in your `AGENTS.md`.
+- [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the AlignFirst directory and `AGENTS.md`.
+- [Update AlignFirst](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/update-alignfirst.md): update your `_docs/alignfirst/` directory with the latest versions of the AlignFirst prompts, or upgrade from legacy `_docs/vibe-flow/`.
