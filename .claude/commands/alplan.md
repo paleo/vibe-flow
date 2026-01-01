@@ -4,7 +4,7 @@ description: Create implementation plan(s)
 
 Read these documentation files:
 
-- @"_docs/vibe-flow/How to Write Implementation Plans.md"
-- @"_docs/vibe-flow/Vibe Flow Guide.md"
+- @"_docs/alignfirst/How to Write Implementation Plans.md"
+- @"_docs/alignfirst/AlignFirst Guide.md"
 
 Write the implementation plan(s).

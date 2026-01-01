@@ -1,6 +1,6 @@
-# Bootstrap Vibe Flow
+# Bootstrap AlignFirst
 
-These instructions install Vibe Flow in a codebase. They produce a small, well-structured documentation set that AI agents and humans can consult on demand.
+These instructions install AlignFirst in a codebase. They produce a small, well-structured documentation set that AI agents and humans can consult on demand.
 
 Process overview:
 
@@ -18,10 +18,10 @@ When complete, the repository will include a concise documentation stack. The ta
 
 ```text
 _docs/
-├── vibe-flow/
+├── alignfirst/
 │   ├── How to Write a Technical Specification.md
 │   ├── How to Write Implementation Plans.md
-│   └── Vibe Flow Guide.md
+│   └── AlignFirst Guide.md
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
 ├── Monorepo Overview.md
@@ -35,8 +35,9 @@ AGENTS.md
 ## 1. Initial Checks
 
 - If this is a git repository, verify the working tree is clean. If there are uncommitted changes or no version control, obtain explicit confirmation before continuing. DO NOT PROCEED WITHOUT CONFIRMATION IF THERE ARE UNCOMMITTED CHANGES.
-- Check if the `_docs/vibe-flow/` directory exists. If it already exists, then a Vibe Flow is already installed, and you must ask how to proceed. DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A VIBE FLOW IS ALREADY SET UP.
-- Check if the `_docs/ai-workflow/` directory exists. If it already exists, then a legacy version of Vibe Flow is installed an you must stop. Suggest to the user they should execute our [migration prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/upgrade/upgrade-to-vibe-flow.md). DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A LEGACY VERSION OF VIBE FLOW IS ALREADY SET UP.
+- Check if the `_docs/alignfirst/` directory exists. If it already exists, then AlignFirst is already installed, and you must ask how to proceed. DO NOT CONTINUE WITHOUT CONFIRMATION WHEN ALIGNFIRST IS ALREADY SET UP.
+- Check if the `_docs/vibe-flow/` directory exists. If it already exists, then a legacy version of AlignFirst is installed and you must stop. Suggest to the user they should execute our [migration prompt](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/update-alignfirst.md). DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A LEGACY VERSION OF ALIGNFIRST IS ALREADY SET UP.
+- Check if the `_docs/ai-workflow/` directory exists. If it already exists, then an even older legacy version is installed and you must stop. Suggest to the user they should execute our [migration prompt](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/upgrade-from-ai-workflow.md). DO NOT CONTINUE WITHOUT CONFIRMATION WHEN A LEGACY VERSION IS ALREADY SET UP.
 
 ## 2. Determine the local START_FILE
 
@@ -48,12 +49,12 @@ Search the codebase for candidate files using this glob pattern: `**/{.github/co
 - If none are found:
   - If you are Claude Code: you MUST STOP NOW and ask the user to run `/init`.
   - If you are GitHub Copilot in VS Code: you MUST STOP NOW and ask the user to press CTRL+SHIFT+P (or CMD+SHIFT+P), then run "Chat: Generate Workspace Instructions File".
-  - Otherwise: fetch and follow the [remote instructions](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/external/generate-workspace-instructions.md) to create `.github/copilot-instructions.md`. Use the created file as the START_FILE.
+  - Otherwise: fetch and follow the [remote instructions](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/external/generate-workspace-instructions.md) to create `.github/copilot-instructions.md`. Use the created file as the START_FILE.
 
 ## 3. Create Directories
 
 - Create two directories `_docs` and `_plans` at the repository root if they do not exist.
-- Create the `_docs/vibe-flow` subdirectory if it does not exist.
+- Create the `_docs/alignfirst` subdirectory if it does not exist.
 - Create an empty file `_plans/.gitkeep`.
 
 If `.gitignore` exists, ensure it includes:
@@ -113,11 +114,11 @@ Remove from UNUSED_FILE all the information you extracted. Do not leave a link t
 
 Use `curl` or `wget` to fetch the following files:
 
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/_docs/Writing%20Documentation.md) to `_docs/Writing Documentation.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/_docs/vibe-flow/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/vibe-flow/How to Write a Technical Specification.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/_docs/vibe-flow/How%20to%20Write%20Implementation%20Plans.md) to `_docs/vibe-flow/How to Write Implementation Plans.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/_docs/vibe-flow/Discuss-Then-Do%20Protocol.md) to `_docs/vibe-flow/Discuss-Then-Do Protocol.md`
-- Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/_docs/vibe-flow/Vibe%20Flow%20Guide.md) to `_docs/vibe-flow/Vibe Flow Guide.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/Writing%20Documentation.md) to `_docs/Writing Documentation.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/alignfirst/How to Write a Technical Specification.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20Implementation%20Plans.md) to `_docs/alignfirst/How to Write Implementation Plans.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/Align-and-Do%20Protocol.md) to `_docs/alignfirst/Align-and-Do Protocol.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/AlignFirst%20Guide.md) to `_docs/alignfirst/AlignFirst Guide.md`
 
 Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact output filename and avoid URL-encoded names.
 
@@ -129,10 +130,10 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
 
 1. Create the `.claude/commands/` directory if it does not exist.
 2. Fetch these files:
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/.claude/commands/spec.md) to `.claude/commands/spec.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/.claude/commands/plan.md) to `.claude/commands/plan.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/.claude/commands/dtdp.md) to `.claude/commands/dtdp.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/.claude/commands/doc.md) to `.claude/commands/doc.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) to `.claude/commands/alspec.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) to `.claude/commands/alplan.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) to `.claude/commands/al.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) to `.claude/commands/doc.md`
 
 ### 5.6. Detect Ticket ID Format
 
@@ -170,12 +171,12 @@ Additional documentation (read as needed):
 - `_docs/Monorepo Overview.md`
 - `_docs/Writing Documentation.md` - Guidelines for writing documents in the `_docs` directory
 
-Vibe Flow:
+AlignFirst:
 
-- `_docs/vibe-flow/How to Write a Technical Specification.md` - To design a **spec**
-- `_docs/vibe-flow/How to Write Implementation Plans.md` - To design **plan(s)**
-- `_docs/vibe-flow/Discuss-Then-Do Protocol.md` - **DTDP** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
-- `_docs/vibe-flow/Vibe Flow Guide.md` - Where to save specifications and plans
+- `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
+- `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
+- `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 
 ## For AI Assistants
 
@@ -235,7 +236,7 @@ Fill in the template below and present it to the user:
 The {START_FILE} instructions file has been reorganized into several documents in the `_docs` directory. The goal is to avoid overloading the context window and instead provide a targeted set of documents so the agent reads only what it needs:
 
 - The `_docs/` directory is intended for every newcomer (AI agents and human developers) to the codebase.
-- The `_docs/vibe-flow/` directory contains AI-agent guidance for writing specifications, implementation plans, and performing code reviews. Treat it as a starting point and adapt as needed.
+- The `_docs/alignfirst/` directory contains AI-agent guidance for writing specifications, implementation plans, and performing code reviews. Treat it as a starting point and adapt as needed.
 - The `_plans/` directory is where work files related to tasks will be stored. Its content is git-ignored.
 
 Most of the content from the previous instructions file has been copied into `_docs/Unused Instructions.md`. Next, you should extract it into smaller, focused documents. This is 👉👉 **a good opportunity to create your first specification request**:

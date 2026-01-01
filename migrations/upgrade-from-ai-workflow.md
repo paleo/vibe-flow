@@ -1,6 +1,6 @@
-# Upgrade from AI-Worflow
+# Upgrade from AI-Workflow
 
-**In order to determine if the legacy version of Vibe Flow is already set up, look for the `_docs/ai-workflow/` directory. If it doesn't exist, then the legacy workflow is not set up and you must stop now. DO NOT PROCEED WITHOUT CONFIRMATION IF THE LEGACY WORKFLOW IS NOT SET UP.**
+**In order to determine if the legacy AI-Workflow is set up, look for the `_docs/ai-workflow/` directory. If it doesn't exist, then the legacy workflow is not set up and you must stop now. DO NOT PROCEED WITHOUT CONFIRMATION IF THE LEGACY WORKFLOW IS NOT SET UP.**
 
 If the legacy workflow is set up, proceed with the following steps:
 
@@ -28,23 +28,29 @@ _At first, check if the `AGENTS.md` file at the root of the codebase exists. If 
    @AGENTS.md
    ```
 
-## Step 2 — Rename `ai-workflow` to `vibe-flow`
+## Step 2 — Rename `ai-workflow` to `alignfirst`
 
-1. Rename the `ai-workflow` directory to `vibe-flow`.
+1. Rename the `_docs/ai-workflow` directory to `_docs/alignfirst`.
 2. In the `AGENTS.md` file, rename the directory in the references files accordingly.
-3. In `_docs/vibe-flow/`, rename the `AI Workflow Guide.md` file to `Vibe Flow Guide.md`.
-4. In the `AGENTS.md` file, rename the reference to the guide accordingly.
-5. Search for `ai-workflow` in the codebase and replace it with `vibe-flow`.
-6. Search for `AI Workflow` in the codebase and replace it with `Vibe Flow`.
+3. In `_docs/alignfirst/`, rename these files if they exist:
+   - `AI Workflow Guide.md` → `AlignFirst Guide.md`
+   - `Discuss-Then-Do Protocol.md` → `Align-and-Do Protocol.md`
+4. In the `AGENTS.md` file, update all references to these renamed files.
+5. Search for `ai-workflow` in the codebase and replace it with `alignfirst`.
+6. Search for `AI Workflow` in the codebase and replace it with `AlignFirst`.
+7. Search for `DTDP` in the codebase and replace it with `ALADO`.
+8. Search for `Discuss-Then-Do` in the codebase and replace it with `Align-and-Do`.
 
 ## Step 3 — Move the "Code Quality & Refactoring" document
 
-If a `_docs/vibe-flow/Code Quality & Refactoring.md` file exists, do the following:
+If a `_docs/alignfirst/Code Quality & Refactoring.md` file exists, do the following:
 
-1. Move the `_docs/vibe-flow/Code Quality & Refactoring.md` file to `_docs/Code Quality & Refactoring.md`.
-2. Update any references to the document in `AGENTS.md` to reflect its new location. Move the reference from the "Vibe Flow" section to another section (like an "Additional documentation" section).
-3. In `Code Quality & Refactoring.md`, remove any references to `vibe-flow`. Remove the "Pre-requisites" section if it exists.
+1. Move the `_docs/alignfirst/Code Quality & Refactoring.md` file to `_docs/Code Quality & Refactoring.md`.
+2. Update any references to the document in `AGENTS.md` to reflect its new location. Move the reference from the "AlignFirst" section to another section (like an "Additional documentation" section).
+3. In `Code Quality & Refactoring.md`, remove any references to `alignfirst`. Remove the "Pre-requisites" section if it exists.
 
-## Step 4 - Update Vibe Flow Documents
+## Step 4 - Update AlignFirst Documents
 
-Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/v1/migrations/update-vibe-flow.md
+Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/update-alignfirst.md
+
+Note: When executing this migration, since you are coming from `ai-workflow`, the script will detect `_docs/alignfirst/` (which you just created in Step 2) and will run the "Update AlignFirst" path.

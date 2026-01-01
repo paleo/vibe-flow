@@ -1,4 +1,4 @@
-# Vibe Flow Guide
+# AlignFirst Guide
 
 ## TASK_DIR Location
 
@@ -15,7 +15,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan
-- `summary` - implementation summary document
+- `done.summary` - implementation summary document for Align-and-Do Protocol (ALADO)
 
 **Example structure:**
 
@@ -24,7 +24,7 @@ _plans/
 ├── 123/
 │   ├── A1-spec.md
 │   ├── A2-plan.md
-│   ├── A3-summary.md
+│   ├── A3-done.summary.md
 │   └── B1-spec.md
 ```
 
