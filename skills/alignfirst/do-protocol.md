@@ -1,4 +1,4 @@
-# Discuss-Then-Do Protocol (DTDP)
+# Align-and-Do Protocol (ALADO)
 
 ## Pre-requisites
 
@@ -9,7 +9,7 @@ You need:
 
 ## Phases
 
-When the user initiates a DTDP, you MUST follow this four-phase process:
+When the user initiates an Align-and-Do Protocol, you MUST follow this four-phase process:
 
 1. **Investigation Phase**: Research the codebase to understand the current implementation and context
 2. **Discussion Phase**: Collaborate with the user to explore the problem/solution space BEFORE taking action
@@ -21,6 +21,8 @@ The discussion phase is MANDATORY. Remember that you are a newcomer to this proj
 ## Phase 1. Investigation Phase
 
 Investigate the codebase yourself, find the relevant source code, think carefully, take the time to understand how it currently works and what needs to be done. If the Context7 MCP is available, feel free to use it.
+
+Check if there are other _skills_ in the workspace that could be relevant to the task. If so, read them.
 
 Your goal is to build a solid understanding of:
 
@@ -53,14 +55,14 @@ You should ask questions freely to ensure you fully understand:
 
 When implementing the solution, follow these guidelines:
 
-- **Code Style**: Adhere to the project's coding standards as outlined in `Code Style Guidelines.md`
+- **Code Style**: Adhere to the project's coding standards
 - **Scope**: Implement only what was discussed and agreed upon
 - **Testing**: Verify your changes work as expected
 - **Communication**: Keep the user informed of progress and any unexpected findings
 
 ## Phase 4. Summary Phase
 
-Write the summary in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-summary.md`. Do not overwrite an existing file.
+Write the summary in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-done.summary.md`. Do not overwrite an existing file.
 
 The summary should capture:
 

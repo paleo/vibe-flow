@@ -1,23 +1,23 @@
 ---
-name: vibe-flow
-description: Collaborative problem-solving protocols: write technical specifications (spec), create implementation plans (plan), or use Discuss-Then-Do Protocol (dtdp). Also generates PR messages.
+name: alignfirst
+description: Collaborative problem-solving protocols: write technical specifications (spec, or alspec), create implementation plans (plan, or alplan), or use Align-and-Do Protocol (ALADO). Also generates PR/MR descriptions (aldescription).
 license: CC0 1.0
 metadata:
   author: Paleo
   version: "2.0"
-  repository: https://github.com/paleo/vibe-flow
+  repository: https://github.com/paleo/alignfirst
 ---
 
-# Vibe Flow Guide
+# AlignFirst Guide
 
 ## Protocols
 
 Choose the appropriate protocol based on the task:
 
-- **Technical Specification** (_spec_): Read [spec-protocol.md](spec-protocol.md) to write a technical specification
-- **Implementation Plans** (_plan_): Read [plan-protocol.md](plan-protocol.md) to create implementation plans from a spec
-- **Discuss-Then-Do Protocol** (_dtdp_): Read [dtdp-protocol.md](dtdp-protocol.md) for smaller tasks without formal spec/plans
-- **PR Message**: Read [pr-message-protocol.md](pr-message-protocol.md) to write a PR message summarizing implemented work
+- **Technical Specification** (_spec_, or _alspec_): Read [spec-protocol.md](spec-protocol.md) to write a technical specification
+- **Implementation Plans** (_plan_, or _alplan_): Read [plan-protocol.md](plan-protocol.md) to create implementation plans from a spec
+- **Align-and-Do Protocol** (_ALADO_): Read [do-protocol.md](do-protocol.md) for smaller tasks without formal spec/plans
+- **Description** (_aldescription_): Read [description-protocol.md](description-protocol.md) to write a description summarizing implemented work
 
 ## TASK_DIR Location
 
@@ -34,7 +34,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan
-- `summary` - implementation summary document
+- `done.summary` - ALADO summary document
 
 **Example structure:**
 
@@ -43,7 +43,7 @@ _plans/
 ├── 123/
 │   ├── A1-spec.md
 │   ├── A2-plan.md
-│   ├── A3-summary.md
+│   └── A3-done.summary.md
 │   └── B1-spec.md
 ```
 

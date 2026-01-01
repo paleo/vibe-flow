@@ -1,6 +1,6 @@
 # Update Skills
 
-This prompt updates installed skills to the latest version.
+This prompt updates installed skills to the latest version. It also migrates old skill names (vibe-flow, documentation-authoring) to new names (alignfirst, technical-documentation-authoring).
 
 > **Note**: Commands shown are Unix-style. Adapt to your OS if needed (e.g., PowerShell on Windows).
 
@@ -8,8 +8,10 @@ This prompt updates installed skills to the latest version.
 
 Search for installed skills in all possible locations. Look for directories containing:
 
-- `vibe-flow/SKILL.md`
-- `documentation-authoring/SKILL.md`
+- `alignfirst/SKILL.md` (new name)
+- `vibe-flow/SKILL.md` (old name)
+- `technical-documentation-authoring/SKILL.md` (new name)
+- `documentation-authoring/SKILL.md` (old name)
 
 Check these directories:
 
@@ -20,49 +22,67 @@ Check these directories:
 
 **Important**: Ignore directories inside dependencies (`node_modules/`, `vendor/`, `venv/`, `.venv/`, `target/`, `build/`, `dist/`, etc.).
 
-Note which skills are installed and their full paths. If neither is found, tell the user and stop.
+Note which skills are installed (old name, new name, or both) and their full paths. Record the **SKILLS_DIR** (parent directory of the skill folders). If no skills are found, tell the user and stop.
 
-## Step 2 - Update Vibe Flow (if installed)
+## Step 2 - Update AlignFirst Skill (if installed)
 
-If `vibe-flow/SKILL.md` was found at path **{VIBE_FLOW_DIR}**:
+**Important**: Use `curl -o "filename"` or `wget -O "filename"` to download files directly. Do NOT fetch file contents into your context.
 
-Delete all existing files in the vibe-flow directory, then fetch the latest versions.
+### If `alignfirst/SKILL.md` exists at path **{ALIGNFIRST_DIR}**:
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files into `{VIBE_FLOW_DIR}/`:
+Delete all existing files in the alignfirst directory, then fetch the latest versions into `{ALIGNFIRST_DIR}/`.
 
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/SKILL.md)
-- [README.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/README.md)
-- [spec-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/spec-protocol.md)
-- [plan-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/plan-protocol.md)
-- [dtdp-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/dtdp-protocol.md)
-- [pr-message-protocol.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/vibe-flow/pr-message-protocol.md)
+### If `vibe-flow/SKILL.md` exists at path **{VIBE_FLOW_DIR}** (old name):
 
-## Step 3 - Update Documentation Authoring (if installed)
+1. Create the new directory: `mkdir -p {SKILLS_DIR}/alignfirst`
+2. Fetch the latest versions into `{SKILLS_DIR}/alignfirst/`
+3. Delete the old vibe-flow directory: `rm -rf {VIBE_FLOW_DIR}`
 
-If `documentation-authoring/SKILL.md` was found at path **{DOC_AUTH_DIR}**:
+### Files to fetch:
 
-Delete all existing files in the documentation-authoring directory, then fetch the latest versions.
+- [SKILL.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/SKILL.md)
+- [README.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/README.md)
+- [spec-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/spec-protocol.md)
+- [plan-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/plan-protocol.md)
+- [do-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/do-protocol.md)
+- [description-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/description-protocol.md)
 
-Create the references directory if it doesn't exist:
+## Step 3 - Update Technical Documentation Authoring Skill (if installed)
 
-```bash
-mkdir -p {DOC_AUTH_DIR}/references
-```
+Use `curl -o "filename"` or `wget -O "filename"` to download files directly.
 
-Use `curl -o "filename"` or `wget -O "filename"` to fetch the following files into `{DOC_AUTH_DIR}/`:
+### If `technical-documentation-authoring/SKILL.md` exists at path **{TECH_DOC_DIR}**:
 
-- [SKILL.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/documentation-authoring/SKILL.md)
-- [references/bootstrapping-skills.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/skills/documentation-authoring/references/bootstrapping-skills.md)
+Delete all existing files in the directory, ensure `references/` subdirectory exists, then fetch the latest versions into `{TECH_DOC_DIR}/`.
 
-## Step 4 - Update Claude Code Commands (Optional)
+### If `documentation-authoring/SKILL.md` exists at path **{DOC_AUTH_DIR}** (old name):
 
-If `.claude/commands/` directory exists, update the command files:
+1. Create the new directory: `mkdir -p {SKILLS_DIR}/technical-documentation-authoring/references`
+2. Fetch the latest versions into `{SKILLS_DIR}/technical-documentation-authoring/`
+3. Delete the old documentation-authoring directory: `rm -rf {DOC_AUTH_DIR}`
 
-- [spec.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/spec.md) → `.claude/commands/spec.md`
-- [plan.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/plan.md) → `.claude/commands/plan.md`
-- [dtdp.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/dtdp.md) → `.claude/commands/dtdp.md`
-- [pr-message.md](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/.claude/commands/pr-message.md) → `.claude/commands/pr-message.md`
+### Files to fetch:
+
+- [SKILL.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/technical-documentation-authoring/SKILL.md)
+- [references/bootstrapping-skills.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/technical-documentation-authoring/references/bootstrapping-skills.md)
+
+## Step 4 - Update Claude Code Commands
+
+If `.claude/commands/` directory exists:
+
+1. **Delete old command files** (if they exist):
+
+   ```bash
+   rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md
+   ```
+
+2. **Fetch the new command files** using `curl -o "filename"` or `wget -O "filename"`:
+
+   - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alspec.md) → `.claude/commands/alspec.md`
+   - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alplan.md) → `.claude/commands/alplan.md`
+   - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.claude/commands/al.md`
+   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.claude/commands/aldescription.md`
 
 ## Done
 
-Tell the user which skills were updated successfully and their locations.
+Tell the user which skills were updated successfully and their locations. Mention if any skills were migrated from old names to new names.

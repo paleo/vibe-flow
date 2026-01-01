@@ -1,8 +1,8 @@
-# Vibe Flow Skill
+# AlignFirst Skill
 
-_Note: This is the v2 of Vibe Flow. If you are looking for the v1 (without Agent Skill), see the [v1 branch](https://github.com/paleo/vibe-flow/tree/v1)._
+_Note: This is the v2 of AlignFirst (formerly Vibe Flow). If you are looking for the v1 (without Agent Skill), see the [v1 branch](https://github.com/paleo/alignfirst/tree/v1)._
 
-Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. It's distributed as an _Agent Skill_ and works well with any agent powered by a coding model such as:
+AlignFirst is a hackable set of prompts that enables _Spec-Driven Development_. It's distributed as an _Agent Skill_ and works well with any agent powered by a coding model such as:
 
 - **Claude Opus 4+** or **Claude Sonnet 4+** (Anthropic)
 - **GPT 5+** (OpenAI)
@@ -11,18 +11,18 @@ Vibe Flow is a hackable set of prompts that enables _Spec-Driven Development_. I
 ## Get Started
 
 1. Ensure your agent uses a capable coding model.
-2. Give it **[this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**.
+2. Give it **[this installation prompt](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-alignfirst.md)**.
 
-It will install the Vibe Flow skill:
+It will install the AlignFirst skill:
 
 ```text
-{.claude|.github|.cursor|.codex}/skills/vibe-flow/
+{.claude|.github|.cursor|.codex}/skills/alignfirst/
 ├── SKILL.md
 ├── README.md
 ├── spec-protocol.md
 ├── plan-protocol.md
-├── dtdp-protocol.md
-└── pr-message-protocol.md
+├── do-protocol.md
+└── description-protocol.md
 ```
 
 Then, start using the workflow.
@@ -36,7 +36,7 @@ Agent Skills is an [open standard](https://agentskills.io/) that works out of th
 - [Agent Skills in Claude Code](https://code.claude.com/docs/en/skills)
 - [Agent Skills in Codex](https://developers.openai.com/codex/skills/)
 
-## Using Vibe Flow
+## Using AlignFirst
 
 ### Generate Technical Specification
 
@@ -48,7 +48,7 @@ Help me write a new spec.
 [something to do]
 ```
 
-Or, if you use Claude Code or Cursor, you can use the command: `/spec [something to do]`.
+Or, if you use Claude Code or Cursor, you can use the command: `/alspec [something to do]`.
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
@@ -62,7 +62,7 @@ Plans orchestrate what agents or subagents will do:
 Write plans for the current spec.
 ```
 
-Or, if you use Claude Code or Cursor, you can use the command: `/plan`.
+Or, if you use Claude Code or Cursor, you can use the command: `/alplan`.
 
 The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
@@ -76,19 +76,19 @@ Execute the plan `_plans/123/A2-plan-orchestrator.md`
 
 The agent executes and writes handover document(s) (`.summary.md` files).
 
-### Discuss-Then-Do Protocol (DTDP)
+### Align-and-Do Protocol (ALADO)
 
 There is also a lighter prompt for small tasks without spec/plans. Here's how to trigger it:
 
 ```markdown
-I need a DTDP.
+Start ALADO.
 
 [something to do]
 ```
 
-Or, if you use Claude Code or Cursor, you can use the command: `/dtdp [something to do]`.
+Or, if you use Claude Code or Cursor, you can use the command: `/al [something to do]`.
 
-The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-summary.md` file will be written.
+The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-done.summary.md` file will be written.
 
 ## Rationale
 
@@ -107,25 +107,31 @@ Spec-Driven Development (SDD) first existed in API development as a design-first
 
 SDD is the structured alternative to "vibe coding" — the ad-hoc approach where you prompt an AI and hope for the best. Tools like GitHub Spec Kit and AWS Kiro have popularized this approach.
 
-Vibe Flow follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
+AlignFirst follows in their footsteps, but as a lightweight, agent-agnostic prompt system — no plugins, no platform lock-in. The same workflow works across any capable coding agent, making it easy for teams to adopt regardless of their tooling choices.
 
-## Documentation Authoring Skill
+## Technical Documentation Authoring Skill
 
-The **Documentation Authoring** skill is independent from Vibe Flow but provided here. It helps you create skills that document your project:
+The **Technical Documentation Authoring** skill is independent from AlignFirst but provided here. It helps you create skills that document your project:
 
-1. Give your agent **[this installation prompt](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**.
+1. Give your agent **[this installation prompt](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-technical-documentation-authoring.md)**.
 2. Clear the context, then ask it:
 
     ```markdown
-    Help me bootstrap our project skills.
+    Help me bootstrap our project skills. Use technical-documentation-authoring.
     ```
+
+It can also work alongside AlignFirst:
+
+```markdown
+Start ALADO. We need a new documentation about [topic].
+```
 
 ## Installation, Migrations
 
-- **[Upgrade from v1](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard
-- **[Install Vibe Flow Skill](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-vibe-flow.md)**
-- **[Install Documentation Authoring Skill](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/install-documentation-authoring.md)**
-- **[Update Skills](https://raw.githubusercontent.com/paleo/vibe-flow/refs/heads/main/migrations/update-skills.md)**: Update installed _Vibe Flow_ and/or _Documentation Authoring_ skills to the latest version
+- **[Upgrade from v1](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/upgrade-to-agent-skills.md)**: If you have an old `_docs/vibe-flow/` installation, migrate to the Agent Skills standard
+- **[Install AlignFirst Skill](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-alignfirst.md)**
+- **[Install Technical Documentation Authoring Skill](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-technical-documentation-authoring.md)**
+- **[Update Skills](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/update-skills.md)**: Update installed _AlignFirst_ and/or _Technical Documentation Authoring_ skills to the latest version
 
 ## License
 
