@@ -84,6 +84,7 @@ Remove all references to `_docs/vibe-flow/` and `_docs/alignfirst/` files from `
 - `Vibe Flow Guide.md` or `AlignFirst Guide.md`
 - `How to Write a Technical Specification.md`
 - `How to Write Implementation Plans.md`
+- `How to Write a Description.md`
 - `Discuss-Then-Do Protocol.md` or `Align-and-Do Protocol.md`
 
 Remove the entire "Vibe Flow" or "AlignFirst" section if it becomes empty after removing these references.
