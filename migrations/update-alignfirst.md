@@ -23,6 +23,7 @@ Use `curl -o "filename"` or `wget -O "filename"` to fetch and overwrite the foll
 - [How to Write a Technical Specification.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Technical%20Specification.md) → `_docs/alignfirst/How to Write a Technical Specification.md`
 - [How to Write Implementation Plans.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20Implementation%20Plans.md) → `_docs/alignfirst/How to Write Implementation Plans.md`
 - [Align-and-Do Protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/Align-and-Do%20Protocol.md) → `_docs/alignfirst/Align-and-Do Protocol.md`
+- [How to Write a Description.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Description.md) → `_docs/alignfirst/How to Write a Description.md`
 - [AlignFirst Guide.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/AlignFirst%20Guide.md) → `_docs/alignfirst/AlignFirst Guide.md`
 
 Do not chain the commands with `&&`. Run them carefully one by one.
@@ -37,6 +38,7 @@ AlignFirst:
 - `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
 - `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
 - `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/How to Write a Description.md` - To write a **description** summarizing implemented work
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 ```
 
@@ -60,6 +62,7 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
    - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) → `.claude/commands/alspec.md`
    - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) → `.claude/commands/alplan.md`
    - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) → `.claude/commands/al.md`
+   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/aldescription.md) → `.claude/commands/aldescription.md`
    - [doc.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) → `.claude/commands/doc.md`
 
 ### Step 5 - Add "For AI Assistants" Section
@@ -99,6 +102,7 @@ Fetch all core documents (same as "Update AlignFirst" Step 1):
 - [How to Write a Technical Specification.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Technical%20Specification.md) → `_docs/alignfirst/How to Write a Technical Specification.md`
 - [How to Write Implementation Plans.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20Implementation%20Plans.md) → `_docs/alignfirst/How to Write Implementation Plans.md`
 - [Align-and-Do Protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/Align-and-Do%20Protocol.md) → `_docs/alignfirst/Align-and-Do Protocol.md`
+- [How to Write a Description.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Description.md) → `_docs/alignfirst/How to Write a Description.md`
 - [AlignFirst Guide.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/AlignFirst%20Guide.md) → `_docs/alignfirst/AlignFirst Guide.md`
 
 Do not chain the commands with `&&`. Run them carefully one by one.
@@ -120,6 +124,7 @@ AlignFirst:
 - `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
 - `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
 - `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/How to Write a Description.md` - To write a **description** summarizing implemented work
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 ```
 
@@ -149,6 +154,7 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
    - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) → `.claude/commands/alspec.md`
    - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) → `.claude/commands/alplan.md`
    - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) → `.claude/commands/al.md`
+   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/aldescription.md) → `.claude/commands/aldescription.md`
    - [doc.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) → `.claude/commands/doc.md`
 
 ### Step 7 - Add "For AI Assistants" Section

@@ -21,6 +21,8 @@ _docs/
 ├── alignfirst/
 │   ├── How to Write a Technical Specification.md
 │   ├── How to Write Implementation Plans.md
+│   ├── Align-and-Do Protocol.md
+│   ├── How to Write a Description.md
 │   └── AlignFirst Guide.md
 ├── Code Style Guidelines.md
 ├── How to Write Unit Tests.md
@@ -118,6 +120,7 @@ Use `curl` or `wget` to fetch the following files:
 - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Technical%20Specification.md) to `_docs/alignfirst/How to Write a Technical Specification.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20Implementation%20Plans.md) to `_docs/alignfirst/How to Write Implementation Plans.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/Align-and-Do%20Protocol.md) to `_docs/alignfirst/Align-and-Do Protocol.md`
+- Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/How%20to%20Write%20a%20Description.md) to `_docs/alignfirst/How to Write a Description.md`
 - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/_docs/alignfirst/AlignFirst%20Guide.md) to `_docs/alignfirst/AlignFirst Guide.md`
 
 Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact output filename and avoid URL-encoded names.
@@ -133,6 +136,7 @@ If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.
    - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) to `.claude/commands/alspec.md`
    - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) to `.claude/commands/alplan.md`
    - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) to `.claude/commands/al.md`
+   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/aldescription.md) to `.claude/commands/aldescription.md`
    - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) to `.claude/commands/doc.md`
 
 ### 5.6. Detect Ticket ID Format
@@ -176,6 +180,7 @@ AlignFirst:
 - `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
 - `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
 - `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/How to Write a Description.md` - To write a **description** summarizing implemented work
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 
 ## For AI Assistants

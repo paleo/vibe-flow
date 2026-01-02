@@ -24,6 +24,8 @@ The discussion phase is MANDATORY. Remember that you are a newcomer to this proj
 
 Investigate the codebase yourself, find the relevant source code, think carefully, take the time to understand how it currently works and what needs to be done. If the Context7 MCP is available, feel free to use it.
 
+Check if there are documentation files that could be relevant to the task. If so, read them.
+
 Your goal is to build a solid understanding of:
 
 - The current implementation and relevant code paths
@@ -55,7 +57,7 @@ You should ask questions freely to ensure you fully understand:
 
 When implementing the solution, follow these guidelines:
 
-- **Code Style**: Adhere to the project's coding standards as outlined in `Code Style Guidelines.md`
+- **Code Style**: Adhere to the project's coding standards
 - **Scope**: Implement only what was discussed and agreed upon
 - **Testing**: Verify your changes work as expected
 - **Communication**: Keep the user informed of progress and any unexpected findings
