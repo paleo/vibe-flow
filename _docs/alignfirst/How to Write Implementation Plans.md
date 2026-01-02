@@ -61,7 +61,7 @@ For each plan, identify which documents from `_docs/` are relevant:
 
 If **Custom Agents** are defined in the project, assign each plan to the appropriate agent based on their specialization. Otherwise, skip this step.
 
-Multiple instances: The same subagent can be assigned to multiple plans. Each plan runs in a separate subagent instance, so don't group unrelated work into one plan just because it would use the same subagent. Split by logical unit, not by subagent.
+Multiple instances: The same custom agent can be assigned to multiple plans. Each plan runs in a separate custom agent instance, so don't group unrelated work into one plan just because it would use the same custom agent. Split by logical unit, not by custom agent.
 
 ## Phase 3. Designing Phase - Implementation Plan Structure
 
