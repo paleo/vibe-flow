@@ -102,10 +102,6 @@ Everything must be written in (git-ignored) local files, because:
 
 There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
 
-## Example
-
-See the [ParoiCMS repository](https://gitlab.com/paroi/opensource/paroicms/) for a real-world example with its `_docs/` directory.
-
 ## Why "Spec-Driven Development"?
 
 Spec-Driven Development (SDD) first existed in API development as a design-first approach using OpenAPI/Swagger. With AI-assisted coding agents, the term expanded to describe a methodology: writing specifications before code, where specs become the source of truth guiding AI agents through structured phases: **spec → plan → implement**.
