@@ -1,4 +1,4 @@
-# Align-and-Do Protocol (ALADO)
+# Align-and-Do Protocol (AAD)
 
 ## Pre-requisites
 

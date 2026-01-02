@@ -66,12 +66,12 @@ Execute the plan `_plans/123/A2-plan-orchestrator.md`
 
 The agent executes and writes handover document(s) (`.summary.md` files).
 
-### Align-and-Do Protocol (ALADO)
+### Align-and-Do Protocol (AAD)
 
 A lighter workflow for small tasks without spec/plans:
 
 ```markdown
-Start ALADO.
+Start AAD.
 
 [something to do]
 ```
