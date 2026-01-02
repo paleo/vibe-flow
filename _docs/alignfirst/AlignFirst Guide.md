@@ -15,7 +15,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan
-- `done.summary` - implementation summary document for Align-and-Do Protocol (ALADO)
+- `done.summary` - implementation summary document for Align-and-Do Protocol (AAD)
 
 **Example structure:**
 

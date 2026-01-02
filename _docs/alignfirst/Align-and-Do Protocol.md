@@ -1,4 +1,4 @@
-# Align-and-Do Protocol (ALADO)
+# Align-and-Do Protocol (AAD)
 
 ## Pre-requisites
 
@@ -11,7 +11,7 @@ You need:
 
 ## Phases
 
-When the user initiates ALADO, you MUST follow this four-phase process:
+When the user initiates AAD, you MUST follow this four-phase process:
 
 1. **Investigation Phase**: Research the codebase to understand the current implementation and context
 2. **Discussion Phase**: Collaborate with the user to explore the problem/solution space BEFORE taking action

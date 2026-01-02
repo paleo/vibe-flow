@@ -38,7 +38,7 @@ _At first, check if the `AGENTS.md` file at the root of the codebase exists. If 
 4. In the `AGENTS.md` file, update all references to these renamed files.
 5. Search for `ai-workflow` in the codebase and replace it with `alignfirst`.
 6. Search for `AI Workflow` in the codebase and replace it with `AlignFirst`.
-7. Search for `DTDP` in the codebase and replace it with `ALADO`.
+7. Search for `DTDP` in the codebase and replace it with `AAD`.
 8. Search for `Discuss-Then-Do` in the codebase and replace it with `Align-and-Do`.
 
 ## Step 3 — Move the "Code Quality & Refactoring" document

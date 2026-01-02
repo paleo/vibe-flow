@@ -179,7 +179,7 @@ AlignFirst:
 
 - `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
 - `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
-- `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/Align-and-Do Protocol.md` - **AAD** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
 - `_docs/alignfirst/How to Write a Description.md` - To write a **description** summarizing implemented work
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 

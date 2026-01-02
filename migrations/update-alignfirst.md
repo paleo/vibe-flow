@@ -37,7 +37,7 @@ AlignFirst:
 
 - `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
 - `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
-- `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/Align-and-Do Protocol.md` - **AAD** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
 - `_docs/alignfirst/How to Write a Description.md` - To write a **description** summarizing implemented work
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 ```
@@ -111,7 +111,7 @@ Do not chain the commands with `&&`. Run them carefully one by one.
 
 1. Replace all references to `_docs/vibe-flow/` with `_docs/alignfirst/`
 2. Replace all references to `Vibe Flow` with `AlignFirst`
-3. Replace all references to `DTDP` with `ALADO`
+3. Replace all references to `DTDP` with `AAD`
 4. Replace `Discuss-Then-Do Protocol.md` with `Align-and-Do Protocol.md`
 5. Replace `Vibe Flow Guide.md` with `AlignFirst Guide.md`
 6. Update the section header from "Vibe Flow:" to "AlignFirst:"
@@ -123,7 +123,7 @@ AlignFirst:
 
 - `_docs/alignfirst/How to Write a Technical Specification.md` - To design a **spec**
 - `_docs/alignfirst/How to Write Implementation Plans.md` - To design **plan(s)**
-- `_docs/alignfirst/Align-and-Do Protocol.md` - **ALADO** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
+- `_docs/alignfirst/Align-and-Do Protocol.md` - **AAD** is a collaborative process for any task except writing a spec or plan: bug fixes, features, design decisions, refactoring, etc.
 - `_docs/alignfirst/How to Write a Description.md` - To write a **description** summarizing implemented work
 - `_docs/alignfirst/AlignFirst Guide.md` - Where to save specifications and plans
 ```
@@ -178,4 +178,4 @@ Check if `AGENTS.md` contains a "For AI Assistants" section:
 
 - The folder has been renamed from `_docs/vibe-flow/` to `_docs/alignfirst/`
 - The commands have changed: `/spec` → `/alspec`, `/plan` → `/alplan`, `/dtdp` → `/al`
-- The protocol is now called "Align-and-Do Protocol" (ALADO)
+- The protocol is now called "Align-and-Do Protocol" (AAD)
