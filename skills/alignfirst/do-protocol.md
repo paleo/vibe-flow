@@ -22,7 +22,7 @@ The discussion phase is MANDATORY. Remember that you are a newcomer to this proj
 
 Investigate the codebase yourself, find the relevant source code, think carefully, take the time to understand how it currently works and what needs to be done. If the Context7 MCP is available, feel free to use it.
 
-List all available _skills_ and read any whose description applies to any aspect of the task.
+List all available _skills_ and read each one whose description applies to any aspect of the task.
 
 Your goal is to build a solid understanding of:
 
