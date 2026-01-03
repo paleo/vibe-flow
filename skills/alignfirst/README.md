@@ -14,7 +14,7 @@ I just installed the alignfirst skill. Please help me configure it:
 1. Look at my git branches (`git branch -a`) to detect my ticket ID format (e.g., `ABC-###`, `PROJ-###`, or numeric).
 2. If you find a pattern, add this section to my `AGENTS.md`:
 
-   ## For AI Assistants
+   ## Ticket ID
 
    _Ticket ID_: Format is `{DETECTED_FORMAT}`. When not provided, deduce it from the branch name if possible—no need to confirm.
 

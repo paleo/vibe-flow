@@ -193,7 +193,7 @@ If `_docs/Unused Instructions.md` exists, leave it in place. The `_docs/` direct
 3. Keep only:
    - Project name/title
    - "Always ignore the `_plans` directory when searching the codebase"
-   - Ticket ID format (in "For AI Assistants" section) if present
+   - Ticket ID format (in "Ticket ID" or "For AI Assistants" section) if present
    - Any project-specific instructions not related to documentation
 
 ### 6. Delete Old Structure

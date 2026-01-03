@@ -96,12 +96,12 @@ Fetch the following files into `{SKILLS_DIR}/alignfirst/`:
 
      Always ignore the `_plans` directory when searching the codebase.
 
-     ## For AI Assistants
+     ## Ticket ID
 
      _Ticket ID_: Format is `{DETECTED_FORMAT}`. When not provided, deduce it from the branch name if possible—no need to confirm.
      ```
 
-     If no ticket format was detected, ask the user for their format or skip the "For AI Assistants" section.
+     If no ticket format was detected, ask the user for their format or skip the "Ticket ID" section.
 
 3. Create `_plans/.gitkeep` if it doesn't exist:
 
