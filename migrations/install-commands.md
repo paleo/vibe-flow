@@ -1,12 +1,12 @@
-# Install AlignFirst Commands
+# Install or Update AlignFirst Commands
 
-This prompt installs AlignFirst commands to all applicable agent locations.
+This prompt installs or updates AlignFirst commands to all applicable agent locations.
 
 > **Note**: Commands shown are Unix-style. Adapt to your OS if needed (e.g., PowerShell on Windows).
 
 ## Instructions
 
-Install commands to **all** applicable agent locations. Check each of the following and install commands wherever applicable.
+Overwrite AlignFirst commands to **all** applicable agent locations. Check each of the following and download commands wherever applicable.
 
 **Important**: Use `curl -o "filename"` or `wget -O "filename"` to download files directly. Do NOT fetch file contents into your context.
 
