@@ -24,7 +24,7 @@ The discussion phase is MANDATORY. Remember that you are a newcomer to this proj
 
 Investigate the codebase yourself, find the relevant source code, think carefully, take the time to understand how it currently works and what needs to be done. If the Context7 MCP is available, feel free to use it.
 
-Check if there are documentation files that could be relevant to the task. If so, read them.
+List all available documentation files and read any that could apply to any aspect of the task.
 
 Your goal is to build a solid understanding of:
 
