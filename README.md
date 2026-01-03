@@ -113,7 +113,7 @@ The **Technical Documentation Authoring** skill is independent from AlignFirst b
 It can also work alongside AlignFirst:
 
 ```markdown
-/al We need a new technical documentation about [topic].
+/al We need a new technical documentation about [topic]. Use technical-documentation-authoring.
 ```
 
 ## Installation, Migrations
