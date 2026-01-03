@@ -43,12 +43,8 @@ Agent Skills is an [open standard](https://agentskills.io/) that works out of th
 A specification can be written long before the implementation. The agent helps you write it by investigating and initiating a discussion:
 
 ```markdown
-Help me write a new spec.
-
-[something to do]
+/alspec [something to do]
 ```
-
-Or, if you use Claude Code or Cursor, you can use the command: `/alspec [something to do]`.
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
@@ -59,10 +55,8 @@ _Note: `123` is the ticket ID. If it can be deduced from the branch name, it wil
 Plans orchestrate what agents or subagents will do:
 
 ```markdown
-Write plans for the current spec.
+/alplan
 ```
-
-Or, if you use Claude Code or Cursor, you can use the command: `/alplan`.
 
 The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
@@ -81,12 +75,8 @@ The agent executes and writes handover document(s) (`.summary.md` files).
 There is also a lighter prompt for small tasks without spec/plans. Here's how to trigger it:
 
 ```markdown
-Start AAD.
-
-[something to do]
+/al [something to do]
 ```
-
-Or, if you use Claude Code or Cursor, you can use the command: `/al [something to do]`.
 
 The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-done.summary.md` file will be written.
 

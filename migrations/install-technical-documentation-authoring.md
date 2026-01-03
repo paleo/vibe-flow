@@ -42,6 +42,15 @@ Search for existing `skills/` directories in the repository root:
 
 Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
 
+**If none exists and the detected directory is NOT `.claude/skills/`**: Ask the user:
+
+> "No existing skills directory found. Where would you like to install skills?
+>
+> 1. `.claude/skills/`
+> 2. `{DETECTED_DIR}` (e.g., `.github/skills/`)"
+
+Wait for the user's choice before proceeding.
+
 ## Step 3 - Download Technical Documentation Authoring Skill
 
 Create the skill directory and sub-directory:

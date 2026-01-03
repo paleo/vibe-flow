@@ -33,12 +33,8 @@ This setup enables AlignFirst to automatically detect ticket IDs from your branc
 A specification can be written long before the implementation. The agent helps you write it by investigating and initiating a discussion:
 
 ```markdown
-Help me write a new spec.
-
-[something to do]
+/alspec [something to do]
 ```
-
-Or use the command: `/alspec [something to do]`.
 
 The agent will discuss with you, then write a `_plans/123/A1-spec.md` file.
 
@@ -49,10 +45,8 @@ _Note: `123` is the ticket ID. If it can be deduced from the branch name, it wil
 Plans orchestrate what agents or subagents will do:
 
 ```markdown
-Write plans for the current spec.
+/alplan
 ```
-
-Or use the command: `/alplan`.
 
 The agent reads the spec and writes plan(s) in `_plans/123/A2-plan*.md`.
 
@@ -71,11 +65,7 @@ The agent executes and writes handover document(s) (`.summary.md` files).
 A lighter workflow for small tasks without spec/plans:
 
 ```markdown
-Start AAD.
-
-[something to do]
+/al [something to do]
 ```
-
-Or use the command: `/al [something to do]`.
 
 The agent will discuss first, then work on the codebase, and write a summary.

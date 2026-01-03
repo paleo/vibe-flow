@@ -43,6 +43,15 @@ Search for existing `skills/` directories in the repository root:
 
 Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
 
+**If none exists and the detected directory is NOT `.claude/skills/`**: Ask the user:
+
+> "No existing skills directory found. Where would you like to install skills?
+>
+> 1. `.claude/skills/`
+> 2. `{DETECTED_DIR}` (e.g., `.github/skills/`)"
+
+Wait for the user's choice before proceeding.
+
 ### 3. Download AlignFirst Skill
 
 Create the skill directory and fetch the latest files from the repository:
@@ -62,20 +71,15 @@ Fetch the following files into `{SKILLS_DIR}/alignfirst/`:
 - [do-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/do-protocol.md)
 - [description-protocol.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/alignfirst/description-protocol.md)
 
-### 4. Update Claude Code Commands (if present)
+### 4. Install Commands
 
-If `.claude/commands/` exists, delete the old commands and fetch fresh ones:
+First, delete old command files:
 
 ```bash
 rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md .claude/commands/doc.md .claude/commands/al.md .claude/commands/alspec.md .claude/commands/alplan.md .claude/commands/aldescription.md
 ```
 
-Then fetch the latest versions using `curl -o "filename"` or `wget -O "filename"`:
-
-- [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alspec.md) → `.claude/commands/alspec.md`
-- [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alplan.md) → `.claude/commands/alplan.md`
-- [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.claude/commands/al.md`
-- [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.claude/commands/aldescription.md`
+Then, follow the instructions in **[install-commands.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-commands.md)**.
 
 ### 5. Clean AGENTS.md
 

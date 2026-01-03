@@ -54,6 +54,15 @@ Search for existing `skills/` directories in the repository root:
 
 Set **SKILLS_DIR** to the chosen directory (e.g., `.claude/skills/`).
 
+**If none exists and the detected directory is NOT `.claude/skills/`**: Ask the user:
+
+> "No existing skills directory found. Where would you like to install skills?
+>
+> 1. `.claude/skills/`
+> 2. `{DETECTED_DIR}` (e.g., `.github/skills/`)"
+
+Wait for the user's choice before proceeding.
+
 ## Step 4 - Download AlignFirst Skill
 
 Create the skill directory:
@@ -107,22 +116,9 @@ Fetch the following files into `{SKILLS_DIR}/alignfirst/`:
    !_plans/.gitkeep
    ```
 
-## Step 6 - Download Claude/Cursor Commands (Optional)
+## Step 6 - Install Commands (Optional)
 
-**Only if** Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file):
-
-1. Create the commands directory:
-
-   ```bash
-   mkdir -p .claude/commands
-   ```
-
-2. Fetch the command files using `curl -o "filename"` or `wget -O "filename"`:
-
-   - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alspec.md) → `.claude/commands/alspec.md`
-   - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alplan.md) → `.claude/commands/alplan.md`
-   - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.claude/commands/al.md`
-   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.claude/commands/aldescription.md`
+Follow the instructions in **[install-commands.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-commands.md)**.
 
 ## Done
 

@@ -66,22 +66,15 @@ Delete all existing files in the directory, ensure `references/` subdirectory ex
 - [SKILL.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/technical-documentation-authoring/SKILL.md)
 - [references/bootstrapping-skills.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/skills/technical-documentation-authoring/references/bootstrapping-skills.md)
 
-## Step 4 - Update Claude Code Commands
+## Step 4 - Update Commands
 
-If `.claude/commands/` directory exists:
+First, delete old command files if they exist:
 
-1. **Delete old command files** (if they exist):
+```bash
+rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md
+```
 
-   ```bash
-   rm -f .claude/commands/spec.md .claude/commands/plan.md .claude/commands/dtdp.md .claude/commands/pr-message.md
-   ```
-
-2. **Fetch the new command files** using `curl -o "filename"` or `wget -O "filename"`:
-
-   - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alspec.md) → `.claude/commands/alspec.md`
-   - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/alplan.md) → `.claude/commands/alplan.md`
-   - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.claude/commands/al.md`
-   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.claude/commands/aldescription.md`
+Then, follow the instructions in **[install-commands.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/migrations/install-commands.md)**.
 
 ## Done
 
