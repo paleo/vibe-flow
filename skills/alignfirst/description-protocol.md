@@ -4,8 +4,8 @@
 
 You need:
 
-- the **TASK_DIR** - if you don't have it, ask the user for a **ticket ID**
-- the next **CYCLE_LETTER** - deduce it by yourself - start with a new cycle (bump the CYCLE_LETTER, reset the FILE_NUMBER to 1)
+- the TASK_DIR - if you don't have it, use your instructions on finding the **ticket ID**, or ask the user
+- the next CYCLE_LETTER - deduce it by yourself - start with a new cycle (bump the CYCLE_LETTER, reset the FILE_NUMBER to 1)
 
 ## Steps
 

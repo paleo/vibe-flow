@@ -6,8 +6,8 @@
 
 You need:
 
-- the **TASK_DIR** - if you don't have it, ask the user for a **ticket ID**
-- the current **CYCLE_LETTER** and the next **FILE_NUMBER** - deduce them by yourself.
+- the TASK_DIR - if you don't have it, use your instructions on finding the **ticket ID**, or ask the user
+- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself.
 - a **spec file** in the `_plans/{TASK_DIR}/` directory
 
 If any of these pieces of information is missing, STOP AND ASK THE USER.
@@ -41,7 +41,7 @@ Based on your investigation, determine the plan structure:
 
 First, evaluate if the work should be split into **multiple sub-plans**:
 
-- **Single plan**: Preferred when work is cohesive within one area, or when cross-stack work is small and simple
+- **Single plan**: Preferred when work is cohesive within one area AND small enough to be manageable, or when cross-stack work is small and simple
 - **Multiple plans**: Split into multiple plans with an orchestrator, based on:
   - **Stack boundaries**: Different technologies or specialization areas
   - **Distinct logical units**: Separate features or modules within the same stack, when large enough
