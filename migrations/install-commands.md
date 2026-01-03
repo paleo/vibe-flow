@@ -55,6 +55,8 @@ Fetch (note the `.prompt.md` extension):
 - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/al.md) → `.github/prompts/al.prompt.md`
 - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/main/commands/aldescription.md) → `.github/prompts/aldescription.prompt.md`
 
+_Note: GitHub Copilot uses the `.prompt.md` extension for prompt files._
+
 ### Cursor
 
 **If** `.cursor/` directory exists, OR `.cursorrules` file exists, OR you are Cursor:
