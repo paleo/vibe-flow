@@ -53,19 +53,7 @@ Check if `_docs/Writing Documentation.md` exists:
   2. Add a reference to this document in `AGENTS.md` under the "Additional documentation" section. Use this format: `- _docs/Writing Documentation.md - Guidelines for writing documents in the _docs directory`
 - If it **already exists**: Skip this step.
 
-### Step 4 - Update Claude Code / Cursor Commands
-
-If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file):
-
-1. Create the `.claude/commands/` directory if it does not exist.
-2. Fetch and overwrite these files:
-   - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) → `.claude/commands/alspec.md`
-   - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) → `.claude/commands/alplan.md`
-   - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) → `.claude/commands/al.md`
-   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/aldescription.md) → `.claude/commands/aldescription.md`
-   - [doc.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) → `.claude/commands/doc.md`
-
-### Step 5 - Add "For AI Assistants" Section
+### Step 4 - Add "For AI Assistants" Section
 
 Check if `AGENTS.md` contains a "For AI Assistants" section:
 
@@ -81,6 +69,10 @@ Check if `AGENTS.md` contains a "For AI Assistants" section:
 
      _Ticket ID_: Format is `{TICKET_FORMAT}`. When not provided, deduce it from the branch name if possible—no need to confirm.
      ```
+
+### Step 5 - Install or Update Commands
+
+Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/install-commands.md
 
 **Update complete.** Report to the user that AlignFirst has been updated.
 
@@ -145,19 +137,7 @@ If the `.claude/commands/` directory exists, delete these old command files:
 - `.claude/commands/plan.md`
 - `.claude/commands/dtdp.md`
 
-### Step 6 - Download new Claude Code / Cursor commands
-
-If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file):
-
-1. Create the `.claude/commands/` directory if it does not exist.
-2. Fetch these files:
-   - [alspec.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) → `.claude/commands/alspec.md`
-   - [alplan.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) → `.claude/commands/alplan.md`
-   - [al.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) → `.claude/commands/al.md`
-   - [aldescription.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/aldescription.md) → `.claude/commands/aldescription.md`
-   - [doc.md](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) → `.claude/commands/doc.md`
-
-### Step 7 - Add "For AI Assistants" Section
+### Step 6 - Add "For AI Assistants" Section
 
 Check if `AGENTS.md` contains a "For AI Assistants" section:
 
@@ -173,6 +153,10 @@ Check if `AGENTS.md` contains a "For AI Assistants" section:
 
      _Ticket ID_: Format is `{TICKET_FORMAT}`. When not provided, deduce it from the branch name if possible—no need to confirm.
      ```
+
+### Step 7 - Install or Update Commands
+
+Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/install-commands.md
 
 **Upgrade complete.** Report to the user that they have been upgraded from Vibe Flow to AlignFirst. Mention:
 

@@ -127,17 +127,9 @@ Important: Use `curl -o "filename"` or `wget -O "filename"` to set the exact out
 
 Also, do not chain the commands with `&&`. Run them carefully one by one.
 
-### 5.5. Download Claude Code / Cursor Commands
+### 5.5. Install Commands
 
-If Claude Code or Cursor is detected (presence of `.claude/` directory, `CLAUDE.md` file, `.cursor/` directory, or `.cursorrules` file), download the command files:
-
-1. Create the `.claude/commands/` directory if it does not exist.
-2. Fetch these files:
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alspec.md) to `.claude/commands/alspec.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/alplan.md) to `.claude/commands/alplan.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/al.md) to `.claude/commands/al.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/aldescription.md) to `.claude/commands/aldescription.md`
-   - Fetch [this file](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/.claude/commands/doc.md) to `.claude/commands/doc.md`
+Fetch this migration prompt and execute all the steps: https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/install-commands.md
 
 ### 5.6. Detect Ticket ID Format
 
