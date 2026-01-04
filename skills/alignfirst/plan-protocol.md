@@ -7,10 +7,10 @@
 You need:
 
 - the TASK_DIR - if you don't have it, use your instructions on finding the **ticket ID**, or ask the user
-- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself.
+- the current CYCLE_LETTER and the bumped FILE_NUMBER - deduce them yourself.
 - a **spec file** in the `_plans/{TASK_DIR}/` directory
 
-If any of these pieces of information is missing, STOP AND ASK THE USER.
+Identify these values before starting the protocol. If any of these pieces of information is missing, STOP AND ASK THE USER.
 
 ## Phases
 

@@ -5,7 +5,9 @@
 You need:
 
 - the TASK_DIR - if you don't have it, use your instructions on finding the **ticket ID**, or ask the user
-- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself
+- the current CYCLE_LETTER and the bumped FILE_NUMBER - deduce them yourself
+
+Identify these values before starting the protocol.
 
 ## Phases
 
@@ -62,7 +64,7 @@ When implementing the solution, follow these guidelines:
 
 ## Phase 4. Summary Phase
 
-Write the summary in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-done.summary.md`. Do not overwrite an existing file.
+Write the summary in a markdown file in TASK_DIR. Compose the filename using the current CYCLE_LETTER and the bumped FILE_NUMBER, then append `-done.summary.md`. For example, if the last file is `E5-plan-something.md`, write a new file `E6-done.summary.md`. Do not overwrite an existing file.
 
 The summary should capture:
 

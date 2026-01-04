@@ -5,7 +5,9 @@
 You need:
 
 - the TASK_DIR - if you don't have it, use your instructions on finding the **ticket ID**, or ask the user
-- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself - by default, start with a new cycle (bump the CYCLE_LETTER, reset the FILE_NUMBER to 1)
+- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them yourself - by default, start with a new cycle (bump the CYCLE_LETTER, reset the FILE_NUMBER to 1)
+
+Identify these values before starting the protocol.
 
 ## Phases
 
