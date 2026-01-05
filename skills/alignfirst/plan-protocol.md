@@ -10,7 +10,7 @@ You need:
 - the current CYCLE_LETTER and the bumped FILE_NUMBER - deduce them yourself.
 - a **spec file** in the `_plans/{TASK_DIR}/` directory
 
-Identify these values before starting the protocol. If any of these pieces of information is missing, STOP AND ASK THE USER.
+Identify and state these values before starting the protocol. If any of these pieces of information is missing, STOP AND ASK THE USER.
 
 ## Phases
 
