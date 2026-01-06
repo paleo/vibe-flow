@@ -13,17 +13,16 @@ Identify and state these values before starting the protocol.
 
 1. Find the current ticket plan directory.
 2. Read every `*spec.md` and `*summary.md` file in the ticket plan directory.
-3. Draft a description summarizing what has been implemented and show it to the user.
-4. Write a new file `{CYCLE_LETTER}1-description.md` with the next cycle letter.
+3. Write the description in a new file `{CYCLE_LETTER}1-description.md` with the next cycle letter.
 
 ## Guidelines
 
 - Write in markdown:
   - If there is one subject, write a single paragraph.
   - Otherwise, write a bulleted list with one subject per item.
-- Be concise. Keep it to the essentials—a brief overview of what was done.
-- Merge related subjects where possible.
+- Mention each subject very concisely. Keep it to the essentials—a brief overview of what was done. To give an idea, most of the time, a subject can be summarized in one sentence of about 5 to 15 words.
 - Prefer functional/business descriptions over technical ones when possible.
+- Merge related subjects where possible.
 - Include technical details only for major changes (e.g., renaming a database table, significant linter config changes, major codebase refactors).
 - Do not mention specs that were not implemented. If in doubt, explore the codebase to confirm what was actually done.
 
