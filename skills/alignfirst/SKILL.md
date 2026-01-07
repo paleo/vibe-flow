@@ -4,7 +4,7 @@ description: Collaborative problem-solving protocols: write technical specificat
 license: CC0 1.0
 metadata:
   author: Paleo
-  version: "2.0.1"
+  version: "2.0.2"
   repository: https://github.com/paleo/alignfirst
 ---
 
@@ -34,7 +34,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan
-- `done.summary` - AAD summary document
+- `aad.summary` - AAD summary document
 
 **Example structure:**
 
@@ -43,7 +43,7 @@ _plans/
 ├── 123/
 │   ├── A1-spec.md
 │   ├── A2-plan.md
-│   └── A3-done.summary.md
+│   └── A3-aad.summary.md
 │   └── B1-spec.md
 ```
 

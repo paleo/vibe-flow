@@ -78,7 +78,7 @@ There is also a lighter prompt for small tasks without spec/plans. Here's how to
 /al [something to do]
 ```
 
-The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-done.summary.md` file will be written.
+The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-aad.summary.md` file will be written.
 
 ## Rationale
 
