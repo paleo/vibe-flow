@@ -34,7 +34,7 @@ Format: `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`
 
 - `spec` - technical specification
 - `plan` - implementation plan
-- `aad.summary` - AAD summary document
+- `AAD.summary` - AAD summary document
 
 **Example structure:**
 
@@ -43,7 +43,7 @@ _plans/
 ├── 123/
 │   ├── A1-spec.md
 │   ├── A2-plan.md
-│   └── A3-aad.summary.md
+│   └── A3-AAD.summary.md
 │   └── B1-spec.md
 ```
 

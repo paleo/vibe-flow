@@ -64,7 +64,7 @@ When implementing the solution, follow these guidelines:
 
 ## Phase 4. Summary Phase
 
-Write the summary in a markdown file in TASK_DIR. Compose the filename using the current CYCLE_LETTER and the bumped FILE_NUMBER, then append `-aad.summary.md`. For example, if the last file is `E5-plan-something.md`, write a new file `E6-aad.summary.md`. Do not overwrite an existing file.
+Write the summary in a markdown file in TASK_DIR. Compose the filename using the current CYCLE_LETTER and the bumped FILE_NUMBER, then append `-AAD.summary.md`. For example, if the last file is `E5-plan-something.md`, write a new file `E6-AAD.summary.md`. Do not overwrite an existing file.
 
 The summary should capture:
 
