@@ -73,11 +73,11 @@ There is also a lighter prompt for small tasks without spec/plans. Here's how to
 /al [something to do]
 ```
 
-The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-done.summary.md` file will be written.
+The agent will discuss first, then it will directly work on the codebase. At the end a `_plans/123/A1-AAD.summary.md` file will be written.
 
 ## Rationale
 
-The documentation for AI agents must be reorganized into multiple files, because:
+Specs, plans, and summaries must be written in well-organized (git-ignored) local files, because:
 
 - We want our technical documentation to be **sustainable** and not specific to how agents work today.
 - We want the same documentation to be **shared** among several agents and humans.
@@ -86,11 +86,7 @@ The documentation for AI agents must be reorganized into multiple files, because
 Everything must be written in (git-ignored) local files, because:
 
 1. The context window is limited, the compression mechanism is opaque, and we want to be able to continue an unfinished task in a fresh session.
-2. It's a way to keep track of what we agreed with the agent and what has been done.
-
-## No Guidelines
-
-There are no guidelines. This is just a starting point for your own workflow. Feel free to adapt it to your needs.
+2. It's a way to keep track of what was agreed upon with the agent and what has been done.
 
 ## Why "Spec-Driven Development"?
 
@@ -106,3 +102,7 @@ Two migration prompts are available:
 
 - [Upgrade from AI Workflow](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/upgrade-from-ai-workflow.md): replace your `_docs/ai-workflow/` directory and the instruction file with the AlignFirst directory and `AGENTS.md`.
 - [Update AlignFirst](https://raw.githubusercontent.com/paleo/alignfirst/refs/heads/v1/migrations/update-alignfirst.md): update your `_docs/alignfirst/` directory with the latest versions of the AlignFirst prompts, or upgrade from legacy `_docs/vibe-flow/`.
+
+## License
+
+CC0 1.0 Universal.

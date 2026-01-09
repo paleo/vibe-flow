@@ -6,8 +6,10 @@ Before you start, read the `AlignFirst Guide.md` entirely.
 
 You need:
 
-- the TASK_DIR - if you don't have it, ask the user for a **ticket ID**
-- the current CYCLE_LETTER and the next FILE_NUMBER - deduce them by yourself
+- the TASK_DIR - if you don't have it, use your instructions on finding the **ticket ID**, or ask the user
+- the current CYCLE_LETTER and the bumped FILE_NUMBER - deduce them yourself
+
+Identify and state these values before starting the protocol.
 
 ## Phases
 
@@ -24,7 +26,7 @@ The discussion phase is MANDATORY. Remember that you are a newcomer to this proj
 
 Investigate the codebase yourself, find the relevant source code, think carefully, take the time to understand how it currently works and what needs to be done. If the Context7 MCP is available, feel free to use it.
 
-List all available documentation files and read any that could apply to any aspect of the task.
+List all available documentation files in the `_docs` directory and read each one whose description applies to any aspect of the task.
 
 Your goal is to build a solid understanding of:
 
@@ -64,7 +66,7 @@ When implementing the solution, follow these guidelines:
 
 ## Phase 4. Summary Phase
 
-Write the summary in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-done.summary.md`. Do not overwrite an existing file.
+Write the summary in a markdown file in TASK_DIR. Compose the filename using the current CYCLE_LETTER and the bumped FILE_NUMBER, then append `-AAD.summary.md`. For example, if the last file is `E5-plan-something.md`, write a new file `E6-AAD.summary.md`. Do not overwrite an existing file.
 
 The summary should capture:
 
