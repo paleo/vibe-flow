@@ -167,14 +167,15 @@ describe("ticket --catchup", () => {
     expect(existsSync(archive)).toBe(false);
   });
 
-  it("reports empty or missing tickets and supports a fresh side ticket", async () => {
+  it("reports empty or missing tickets and rejects a fresh side ticket", async () => {
     const cwd = project();
-    for (const args of [["78"], ["--side"]]) {
-      const result = await runMain(["ticket", ...args, "--catchup"], { cwd });
-      expect(result).toMatchObject({ code: 0, stderr: "" });
-      expect(result.stdout).toContain("No Markdown files to load.");
-    }
-    expect(existsSync(join(cwd, ".plans", "side-1"))).toBe(true);
+    const result = await runMain(["ticket", "78", "--catchup"], { cwd });
+    expect(result).toMatchObject({ code: 0, stderr: "" });
+    expect(result.stdout).toContain("No Markdown files to load.");
+    const side = await runMain(["ticket", "--side", "--catchup"], { cwd });
+    expect(side.code).toBe(1);
+    expect(side.stderr).toContain("--catchup cannot be combined with --side");
+    expect(existsSync(join(cwd, ".plans", "side-1"))).toBe(false);
   });
 
   it("fails without printing content when a selected file is unreadable", async () => {

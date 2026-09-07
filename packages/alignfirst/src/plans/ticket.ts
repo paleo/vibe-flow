@@ -12,13 +12,16 @@ import { basename, join } from "node:path";
 
 import { CliError } from "../cli-error.js";
 import { isNodeError } from "../errors.js";
+import { formatLocalTimestamp } from "../format.js";
 import { gitOutputOrUndefined } from "../git.js";
-import { archivesDir, plansDir } from "./layout.js";
+import { archivesDir, isTicketName, plansDir } from "./layout.js";
 
 const FILE_PREFIX = /^([A-Z])(\d+)-/;
 const SIDE_TICKET = /^side-(\d+)$/;
 const PATH_SAFE_TICKET = /^[A-Za-z0-9._-]+$/;
 const ENTRY_ORDER = new Intl.Collator("en", { numeric: true });
+const BRANCH_SEPARATORS = "[/_.-]";
+const LISTED_TICKETS = 10;
 
 export interface ResolvedTicketDir {
   id: string;
@@ -160,12 +163,86 @@ export function validateTicketId(id: string, pattern?: string): void {
 }
 
 export function detectTicketFromBranch(cwd: string, pattern: string): TicketDetection {
-  const branch = gitOutputOrUndefined(cwd, "branch", "--show-current");
-  if (branch === undefined || branch === "") return { kind: "noBranch" };
+  const branch = currentBranch(cwd);
+  if (branch === undefined) return { kind: "noBranch" };
   const unanchored = pattern.replace(/^\^/, "").replace(/\$$/, "");
   const match = new RegExp(unanchored).exec(branch);
   if (!match) return { kind: "noMatch", branch };
   return { kind: "detected", id: match[0], branch };
+}
+
+function currentBranch(cwd: string): string | undefined {
+  const branch = gitOutputOrUndefined(cwd, "branch", "--show-current");
+  return branch === undefined || branch === "" ? undefined : branch;
+}
+
+export interface DeduceFromExistingOptions {
+  sideAllowed: boolean;
+}
+
+/** Without a ticket id pattern, the branch can still name an existing ticket directory. */
+export function deduceTicketFromExisting(
+  cwd: string,
+  { sideAllowed }: DeduceFromExistingOptions,
+): DeducedTicket {
+  const tickets = listTickets(cwd);
+  const branch = currentBranch(cwd);
+  if (branch !== undefined) {
+    const matches = tickets.filter((ticket) => branchNamesTicket(branch, ticket.id));
+    if (matches.length === 1) return { id: matches[0].id, branch };
+  }
+  throw new CliError(renderMissingTicketId(tickets, sideAllowed));
+}
+
+interface ExistingTicket {
+  id: string;
+  archived: boolean;
+  modifiedAt: Date;
+}
+
+function listTickets(cwd: string): ExistingTicket[] {
+  return [
+    ...ticketDirectories(plansDir(cwd), false),
+    ...ticketDirectories(archivesDir(cwd), true),
+  ].toSorted((left, right) => right.modifiedAt.getTime() - left.modifiedAt.getTime());
+}
+
+function ticketDirectories(dir: string, archived: boolean): ExistingTicket[] {
+  return readEntries(dir)
+    .filter((entry) => entry.isDirectory() && isTicketName(entry.name))
+    .map((entry) => ({
+      id: entry.name,
+      archived,
+      modifiedAt: newestModification(join(dir, entry.name)),
+    }));
+}
+
+function newestModification(dir: string): Date {
+  const entries = listEntries(dir);
+  if (entries.length === 0) return statSync(dir).mtime;
+  return new Date(Math.max(...entries.map((entry) => entry.modifiedAt.getTime())));
+}
+
+function branchNamesTicket(branch: string, id: string): boolean {
+  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|${BRANCH_SEPARATORS})${escaped}($|${BRANCH_SEPARATORS})`).test(branch);
+}
+
+function renderMissingTicketId(tickets: ExistingTicket[], sideAllowed: boolean): string {
+  const hint = sideAllowed
+    ? "Pass a ticket id, or --side for a new side ticket."
+    : "Pass a ticket id.";
+  if (tickets.length === 0) return `No ticket id given. ${hint}`;
+  const listed = tickets.slice(0, LISTED_TICKETS);
+  const width = Math.max(...listed.map((ticket) => ticket.id.length));
+  const lines = listed.map(
+    (ticket) =>
+      `  ${ticket.id.padEnd(width)}  ${formatLocalTimestamp(ticket.modifiedAt)}` +
+      (ticket.archived ? " (archived)" : ""),
+  );
+  const rest = tickets.length - listed.length;
+  if (rest > 0) lines.push(`  … ${rest} more`);
+  return `No ticket id given. Existing tickets:\n${lines.join("\n")}\n${hint}`;
 }
 
 export function deduceTicketFromBranch(cwd: string, pattern: string): DeducedTicket {

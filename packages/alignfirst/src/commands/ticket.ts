@@ -9,6 +9,7 @@ import { renderCatchup } from "../plans/catchup.js";
 import { assertPlansGate } from "../plans/layout.js";
 import {
   deduceTicketFromBranch,
+  deduceTicketFromExisting,
   nextFilePosition,
   peekSideTicket,
   reserveSideTicket,
@@ -21,7 +22,7 @@ import {
 const USAGE = `Usage:
   {{FORM}} ticket [<id>] [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
   {{FORM}} ticket --side [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
-  {{FORM}} ticket [<id> | --side] --catchup
+  {{FORM}} ticket [<id>] --catchup
 
 --catchup prints the ticket's Markdown files, plans excluded, summaries included.
 Files over 64 KiB are listed without content. Above 30 KiB of output, only the entry
@@ -108,12 +109,15 @@ function parseTicketArgs(
     throw new CliError(`A ticket id cannot be combined with --side.\n\n${usage}`);
   if (values["new-cycle"] && values.next === undefined)
     throw new CliError(`--new-cycle requires --next.\n\n${usage}`);
-  if (values.catchup && (values.next !== undefined || values.json || values["dry-run"]))
+  if (
+    values.catchup &&
+    (values.side || values.next !== undefined || values.json || values["dry-run"])
+  )
     throw new CliError(
-      `--catchup cannot be combined with --next, --json, or --dry-run.\n\n${usage}`,
+      `--catchup cannot be combined with --side, --next, --json, or --dry-run.\n\n${usage}`,
     );
   if (normalized.filename !== undefined) validateNextFilename(normalized.filename);
-  const resolution = resolveTicketId(ctx, positionals[0], values.side, values["dry-run"]);
+  const resolution = resolveTicketId(ctx, positionals[0], values);
   return {
     ...resolution,
     next: values.next === undefined ? undefined : (normalized.filename ?? true),
@@ -166,19 +170,26 @@ interface TicketResolution {
   branch?: string;
 }
 
+interface TicketFlags {
+  side: boolean;
+  "dry-run": boolean;
+  catchup: boolean;
+}
+
 function resolveTicketId(
   ctx: CommandContext,
   positional: string | undefined,
-  side: boolean,
-  dryRun: boolean,
+  flags: TicketFlags,
 ): TicketResolution {
   const pattern = ctx.projectConfig?.config.ticketIdPattern;
   if (positional !== undefined) {
     validateTicketId(positional, pattern);
     return { id: positional };
   }
-  if (side) return { id: dryRun ? peekSideTicket(ctx.cwd) : reserveSideTicket(ctx.cwd) };
-  if (pattern === undefined) throw new CliError("No ticket id given. Pass it.");
+  if (flags.side)
+    return { id: flags["dry-run"] ? peekSideTicket(ctx.cwd) : reserveSideTicket(ctx.cwd) };
+  if (pattern === undefined)
+    return deduceTicketFromExisting(ctx.cwd, { sideAllowed: !flags.catchup });
   const deduced = deduceTicketFromBranch(ctx.cwd, pattern);
   validateTicketId(deduced.id, pattern);
   return deduced;

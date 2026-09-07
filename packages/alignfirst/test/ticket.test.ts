@@ -296,7 +296,31 @@ describe("ticket command", () => {
   it("asks for the id when none is given and no pattern is configured", async () => {
     const cwd = makeProject();
     const result = await runMain(["ticket"], { cwd });
-    expect(result.stderr).toBe("No ticket id given. Pass it.\n");
+    expect(result.stderr).toBe(
+      "No ticket id given. Pass a ticket id, or --side for a new side ticket.\n",
+    );
+  });
+
+  it("deduces the id from an existing ticket named by the branch", async () => {
+    const cwd = makeProject();
+    mkdirSync(join(cwd, ".plans", "78"));
+    mkdirSync(join(cwd, ".plans", "7"));
+    git(cwd, "checkout", "--quiet", "-b", "78/unified-cli");
+    const result = await runMain(["ticket"], { cwd });
+    expect(result.stdout).toContain("- TICKET_ID: `78` (deduced from branch `78/unified-cli`)");
+  });
+
+  it("lists existing tickets when the branch names none of them", async () => {
+    const cwd = makeProject();
+    mkdirSync(join(cwd, ".plans", "78"));
+    writeFileSync(join(cwd, ".plans", "78", "A1-spec.md"), "spec");
+    mkdirSync(join(cwd, ".plans", "_archives", "side-1"), { recursive: true });
+    git(cwd, "checkout", "--quiet", "-b", "781/other");
+    const result = await runMain(["ticket", "--catchup"], { cwd });
+    expect(result.code).toBe(1);
+    expect(result.stderr).toMatch(
+      /^No ticket id given\. Existing tickets:\n {2}78 {6}\d{4}-\S+\n {2}side-1 {2}\d{4}-\S+ \(archived\)\nPass a ticket id\.\n$/u,
+    );
   });
 });
 
