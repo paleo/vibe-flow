@@ -8,12 +8,12 @@ Use spec → plan → execution for most tasks, especially when the design is un
 
 | Protocol | Purpose | Command |
 | --- | --- | --- |
-| Specification (`spec`, `alspec`) | Investigate, discuss, and write a technical specification. | `{{CMD}} guide spec` |
-| Planning (`plan`, `alplan`) | Turn a specification into implementation plans. | `{{CMD}} guide plan` |
-| Align-and-Do (`AAD`, `al`) | Investigate, agree, implement, and summarize a small change. | `{{CMD}} guide aad` |
-| Catch up (`catchup`, `alcatchup`) | Load the task history, then continue or summarize. | `{{CMD}} guide catchup` |
-| Merge (`merge`, `almerge`) | Merge an incoming branch and resolve conflicts. | `{{CMD}} guide merge` |
-| Review (`review`, `alreview`) | Review committed branch changes against a base branch. | `{{CMD}} guide review` |
-| Description (`aldescription`) | Write a concise description of implemented work. | `{{CMD}} guide description` |
+| Specification (`alspec` alias) | Investigate, discuss, and write a technical specification. | `{{CMD}} guide spec` |
+| Planning (`alplan` alias) | Turn a specification into implementation plans. | `{{CMD}} guide plan` |
+| Align-and-Do (`AAD`, `al` aliases) | Investigate, agree, implement, and summarize a small change. | `{{CMD}} guide aad` |
+| Merge (`almerge` alias) | Merge an incoming branch and resolve conflicts. | `{{CMD}} guide merge` |
+| Review (`alreview` alias) | Review committed branch changes against a base branch. | `{{CMD}} guide review` |
+| Description (`aldescription` alias) | Write a concise description of implemented work. | `{{CMD}} guide description` |
+| Catch up (`alcatchup`, `alcatchupaad`, `alcatchupspec` aliases) | Load the ticket history, then continue, start AAD, or start a specification. | `{{CMD}} ticket --catchup` |
 
 For more detail on workflows and the ticket lifecycle, read `{{CMD}} guide overview`.

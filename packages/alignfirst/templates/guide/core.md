@@ -6,7 +6,7 @@ TICKET_DIR holds a ticket's work files and includes a trailing slash. TICKET_ID 
 
 {{TICKET_DETECTION}}
 
-`{{TICKET_CMD}}` prints TICKET_DIR and its entries, creates a missing directory, and restores an archived one. Run it once to load the ticket directory context.
+`{{TICKET_CMD}}` prints TICKET_DIR and its entries, creates a missing directory, and restores an archived one. Run it once to load the ticket directory context, unless `{{CMD}} ticket --catchup` already did.
 
 {{PLANS_STATE}}
 

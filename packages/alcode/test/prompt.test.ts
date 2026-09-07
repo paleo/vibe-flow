@@ -25,9 +25,32 @@ describe("buildPrompt", () => {
     );
   });
 
-  it("builds the catchup protocol prompt", () => {
-    expect(buildPrompt({ protocol: "catchup", ticket: "29", message: "What changed?" })).toBe(
-      "Run `alignfirst guide catchup` and follow the protocol. Ticket ID = 29.\n\nWhat changed?",
+  it("places bounded catchup context before the one selected protocol", () => {
+    const history = "- .plans/29/A1-spec.md (40000 bytes)";
+    const prompt = buildPrompt({
+      protocol: "aad",
+      ticket: "29",
+      message: "Continue the fix",
+      catchupContent: history,
+    });
+    expect(prompt).toContain(`## Ticket history\n\n${history}`);
+    expect(prompt.indexOf(history)).toBeLessThan(prompt.indexOf("Run `alignfirst guide aad`"));
+    expect(prompt).toMatch(/Continue the fix$/);
+    expect(prompt).not.toContain("guide catchup");
+  });
+
+  it.each(["", " \n"])("summarizes catchup when the supplied message is blank", (message) => {
+    expect(buildPrompt({ catchupContent: "History", message })).toContain(
+      "Summarize the ticket history briefly",
     );
+  });
+
+  it("defaults standalone catchup to a short synthesis and honors a supplied question", () => {
+    expect(buildPrompt({ catchupContent: "History" })).toContain(
+      "Summarize the ticket history briefly",
+    );
+    const prompt = buildPrompt({ catchupContent: "History", message: "What remains?" });
+    expect(prompt).toMatch(/What remains\?$/);
+    expect(prompt).not.toContain("Summarize");
   });
 });

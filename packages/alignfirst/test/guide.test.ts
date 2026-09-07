@@ -73,7 +73,7 @@ describe("guide command", () => {
     const unknown = await runMain(["guide", "unknown"], { cwd });
     expect(unknown.code).toBe(1);
     expect(unknown.stderr).toBe(
-      'Unknown protocol "unknown". Protocols: spec, plan, aad, catchup, merge, review, description, or overview.\n',
+      'Unknown protocol "unknown". Protocols: spec, plan, aad, merge, review, description, or overview.\n',
     );
   });
 

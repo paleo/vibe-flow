@@ -137,9 +137,8 @@ function assertSelectedNewCall(mock: CodingAgentMockHandle, agent: CodingAgent):
   assertEqual(calls.length, 1, "new coding-agent execution count");
   const expected =
     agent === "codex"
-      ? ["exec", "--json", "--sandbox", "workspace-write", "--model", "gpt-5.6-terra", NEW_MESSAGE]
+      ? ["exec", "--json", "--sandbox", "workspace-write", "--model", "gpt-5.6-terra", "-"]
       : [
-          NEW_MESSAGE,
           "-p",
           "--output-format",
           "stream-json",
@@ -150,6 +149,7 @@ function assertSelectedNewCall(mock: CodingAgentMockHandle, agent: CodingAgent):
           "sonnet",
         ];
   assertArrayEqual(calls[0]?.argv, expected, "new coding-agent argv");
+  assertEqual(calls[0]?.stdin, NEW_MESSAGE, "new coding-agent stdin");
   if (agent === "codex") assertCodexCatalogOrder(mock, calls[0]);
 }
 
@@ -172,10 +172,9 @@ function assertSelectedResumeCall(
           "gpt-5.6-terra",
           "resume",
           sessionId,
-          RESUME_MESSAGE,
+          "-",
         ]
       : [
-          RESUME_MESSAGE,
           "-p",
           "--output-format",
           "stream-json",
@@ -188,6 +187,7 @@ function assertSelectedResumeCall(
           "sonnet",
         ];
   assertArrayEqual(calls[1]?.argv, expected, "resume coding-agent argv");
+  assertEqual(calls[1]?.stdin, RESUME_MESSAGE, "resume coding-agent stdin");
 }
 
 function assertNoOtherAgentExecutions(mock: CodingAgentMockHandle, agent: CodingAgent): void {

@@ -1,6 +1,6 @@
 # AlignFirst Setup
 
-Install the AlignFirst CLI and its eight stub skills, then configure the consumer repository.
+Install the AlignFirst CLI and its ten stub skills, then configure the consumer repository.
 AlignFirst does not require the standalone docmap package or workspace.
 
 ## Install the CLI
@@ -15,7 +15,7 @@ Add `npm install -g alignfirst` to the README prerequisites so teammates install
 
 ## Install the Skills
 
-The `alignfirst` skill loads the requested protocol or helps choose one. `alspec`, `alplan`, `al`, `almerge`, `alreview`, `aldescription`, and `alcatchup` select individual protocols. Skills reuse guides already in context; each named guide includes shared conventions. Humans invoke them with `/` in Claude Code, GitHub Copilot, and Cursor, or `$` in Codex.
+The `alignfirst` skill loads the requested protocol or helps choose one. `alspec`, `alplan`, `al`, `almerge`, `alreview`, and `aldescription` select individual protocols. `alcatchup` loads ticket history; `alcatchupaad` and `alcatchupspec` load history before starting AAD or specification. Skills reuse guides already in context; each named guide includes shared conventions. Humans invoke them with `/` in Claude Code, GitHub Copilot, and Cursor, or `$` in Codex.
 
 Discover the package without installing it:
 
@@ -29,7 +29,8 @@ For Claude Code:
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent claude-code \
   --skill alignfirst --skill alspec --skill alplan --skill al --skill almerge \
-  --skill alreview --skill aldescription --skill alcatchup </dev/null
+  --skill alreview --skill aldescription --skill alcatchup \
+  --skill alcatchupaad --skill alcatchupspec </dev/null
 ```
 
 For Codex:
@@ -38,7 +39,8 @@ For Codex:
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent codex \
   --skill alignfirst --skill alspec --skill alplan --skill al --skill almerge \
-  --skill alreview --skill aldescription --skill alcatchup </dev/null
+  --skill alreview --skill aldescription --skill alcatchup \
+  --skill alcatchupaad --skill alcatchupspec </dev/null
 ```
 
 For both agents:
@@ -47,7 +49,8 @@ For both agents:
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent claude-code --agent codex \
   --skill alignfirst --skill alspec --skill alplan --skill al --skill almerge \
-  --skill alreview --skill aldescription --skill alcatchup </dev/null
+  --skill alreview --skill aldescription --skill alcatchup \
+  --skill alcatchupaad --skill alcatchupspec </dev/null
 ```
 
 Restart the target agent after installation. Use `npx -y skills update --global --yes` to update

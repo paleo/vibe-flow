@@ -36,10 +36,23 @@ export function reserveSideTicket(command: string[], cwd: string): string {
     throw new Error(result.stderr.trim() || "alignfirst ticket --side failed");
   }
   const report: unknown = JSON.parse(result.stdout);
-  if (!isRecord(report) || typeof report.id !== "string") {
+  if (!isRecord(report) || typeof report.TICKET_ID !== "string") {
     throw new Error("alignfirst ticket --side returned an invalid JSON report");
   }
-  return report.id;
+  return report.TICKET_ID;
+}
+
+export function loadCatchup(
+  command: string[],
+  cwd: string,
+  ticket: string,
+  env: NodeJS.ProcessEnv,
+): string {
+  const result = runAlignfirst(command, ["ticket", ticket, "--catchup"], cwd, env);
+  if (result.status !== 0) {
+    throw new Error(result.stderr.trim() || "alignfirst ticket --catchup failed");
+  }
+  return result.stdout;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

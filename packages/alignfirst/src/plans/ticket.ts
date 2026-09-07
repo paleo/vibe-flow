@@ -9,6 +9,7 @@ import { archivesDir, plansDir } from "./layout.js";
 const FILE_PREFIX = /^([A-Z])(\d+)-/;
 const SIDE_TICKET = /^side-(\d+)$/;
 const PATH_SAFE_TICKET = /^[A-Za-z0-9._-]+$/;
+const ENTRY_ORDER = new Intl.Collator("en", { numeric: true });
 
 export interface ResolvedTicketDir {
   id: string;
@@ -115,7 +116,7 @@ export function listEntries(dir: string): string[] {
   if (!existsSync(dir) || !statSync(dir).isDirectory()) return [];
   return readdirSync(dir, { withFileTypes: true })
     .map((entry) => `${entry.name}${entry.isDirectory() ? "/" : ""}`)
-    .toSorted();
+    .toSorted((left, right) => ENTRY_ORDER.compare(left, right));
 }
 
 export function isPathSafeTicketId(id: string): boolean {

@@ -22,7 +22,7 @@ export function buildCodexArgs(config: RunConfig): string[] {
   }
   if (config.executableModel !== undefined) args.push("--model", config.executableModel);
   if (config.resume !== undefined) args.push("resume", config.resume);
-  args.push(config.prompt);
+  args.push("-");
   return args;
 }
 

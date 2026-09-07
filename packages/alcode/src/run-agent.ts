@@ -60,7 +60,7 @@ export type SpawnAgentProcess = (
   options: {
     cwd: string;
     env: NodeJS.ProcessEnv;
-    stdio: ["ignore", "pipe", "pipe"];
+    stdio: ["pipe", "pipe", "pipe"];
   },
 ) => ChildProcess;
 
@@ -100,7 +100,7 @@ function spawnDirectChild(
   options: {
     cwd: string;
     env: NodeJS.ProcessEnv;
-    stdio: ["ignore", "pipe", "pipe"];
+    stdio: ["pipe", "pipe", "pipe"];
   },
 ): ChildProcess {
   return spawn(command, args, options);
@@ -142,11 +142,12 @@ function spawnAgent(
   const child = spawnProcess(adapter.executable, adapter.buildArgs(config), {
     cwd: config.cwd,
     env: buildAgentEnv(config.env, config.unset),
-    stdio: ["ignore", "pipe", "pipe"],
+    stdio: ["pipe", "pipe", "pipe"],
   });
   const detachChildGuards = guardChildLifecycle(child, config.sessionFilePath, state);
   let buffer = "";
   let stderr = "";
+  let inputError: Error | undefined;
   child.stdout?.setEncoding("utf-8");
   child.stdout?.on("data", (chunk: string) => {
     buffer += chunk;
@@ -166,9 +167,20 @@ function spawnAgent(
     };
     child.on("close", (code) => {
       if (buffer.trim() !== "") emitLine(config, adapter, buffer, state, out);
-      finish({ exitCode: code, stderr });
+      finish({
+        exitCode: inputError === undefined ? code : 1,
+        stderr:
+          inputError === undefined
+            ? stderr
+            : `${stderr}\nCould not send prompt: ${inputError.message}`,
+      });
     });
     child.on("error", (err) => finish({ exitCode: 1, stderr: err.message }));
+    child.stdin?.on("error", (error: Error) => {
+      inputError = error;
+      child.kill("SIGTERM");
+    });
+    child.stdin?.end(config.prompt, "utf8");
   });
 }
 

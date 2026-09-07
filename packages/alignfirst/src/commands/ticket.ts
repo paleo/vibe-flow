@@ -4,6 +4,7 @@ import { parseArgs } from "node:util";
 import { CliError } from "../cli-error.js";
 import type { CommandContext } from "../context.js";
 import { parseCommandArgs } from "../parse-args.js";
+import { renderCatchup } from "../plans/catchup.js";
 import { assertPlansGate } from "../plans/layout.js";
 import {
   deduceTicketFromBranch,
@@ -18,6 +19,11 @@ import {
 const USAGE = `Usage:
   {{FORM}} ticket [<id>] [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
   {{FORM}} ticket --side [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
+  {{FORM}} ticket [<id> | --side] --catchup
+
+--catchup prints the ticket's Markdown files, plans excluded, summaries included.
+Files over 65536 bytes are listed without content. Above 30000 bytes of output, only
+paths and sizes are printed.
 `;
 
 interface TicketOptions {
@@ -28,6 +34,7 @@ interface TicketOptions {
   json: boolean;
   dryRun: boolean;
   side: boolean;
+  catchup: boolean;
 }
 
 interface TicketJsonReport {
@@ -44,6 +51,10 @@ export function runTicket(ctx: CommandContext, args: string[]): number {
   const parsed = parseTicketArgs(ctx, args, usage);
   if (parsed === undefined) return 0;
   const result = resolveTicket(ctx, parsed);
+  if (parsed.catchup) {
+    ctx.stdout.write(renderCatchup(ctx.cwd, result, renderReport(ctx, parsed, result)));
+    return 0;
+  }
   if (parsed.next !== undefined) {
     writeNextReport(ctx, parsed, result, parsed.next);
     return 0;
@@ -73,6 +84,7 @@ function parseTicketArgs(
         json: { type: "boolean", default: false },
         "dry-run": { type: "boolean", default: false },
         side: { type: "boolean", default: false },
+        catchup: { type: "boolean", default: false },
         help: { type: "boolean", short: "h", default: false },
       },
       strict: true,
@@ -88,6 +100,10 @@ function parseTicketArgs(
     throw new CliError(`A ticket id cannot be combined with --side.\n\n${usage}`);
   if (values["new-cycle"] && values.next === undefined)
     throw new CliError(`--new-cycle requires --next.\n\n${usage}`);
+  if (values.catchup && (values.next !== undefined || values.json || values["dry-run"]))
+    throw new CliError(
+      `--catchup cannot be combined with --next, --json, or --dry-run.\n\n${usage}`,
+    );
   if (normalized.filename !== undefined) validateNextFilename(normalized.filename);
   const resolution = resolveTicketId(ctx, positionals[0], values.side, values["dry-run"]);
   return {
@@ -97,6 +113,7 @@ function parseTicketArgs(
     json: values.json,
     dryRun: values["dry-run"],
     side: values.side,
+    catchup: values.catchup,
   };
 }
 

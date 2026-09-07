@@ -7,6 +7,8 @@ export const STUB_SKILLS = [
   "alplan",
   "al",
   "alcatchup",
+  "alcatchupaad",
+  "alcatchupspec",
   "almerge",
   "alreview",
   "aldescription",

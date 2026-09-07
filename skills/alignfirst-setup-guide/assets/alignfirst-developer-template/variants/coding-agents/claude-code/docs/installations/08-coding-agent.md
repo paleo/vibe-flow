@@ -69,7 +69,7 @@ Trusting `~/projects` once covers every project cloned under it; `alcode` starts
 
 ### Skills
 
-**Role: operator**, as the service account, after [Authenticate](#authenticate). Three tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent claude-code` adds the `~/.claude/skills/<name>` symlink that the `claude` CLI reads; the seven command skills go to the `claude-code` tier only and stay outside OpenClaw's allowlist (`agents.defaults.skills` in `seed/common.sh`). `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
+**Role: operator**, as the service account, after [Authenticate](#authenticate). Three tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent claude-code` adds the `~/.claude/skills/<name>` symlink that the `claude` CLI reads; the nine command skills go to the `claude-code` tier only and stay outside OpenClaw's allowlist (`agents.defaults.skills` in `seed/common.sh`). `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
 
 ```sh
 sudo -i -u {{SERVICE_USER}} bash <<'EOS'
@@ -83,7 +83,8 @@ npx -y skills add https://github.com/paleo/skills --global --yes \
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent claude-code \
   --skill al --skill alplan --skill alspec --skill aldescription \
-  --skill alreview --skill alcatchup --skill almerge < /dev/null
+  --skill alreview --skill alcatchup --skill almerge \
+  --skill alcatchupaad --skill alcatchupspec < /dev/null
 EOS
 ```
 
@@ -140,7 +141,7 @@ After the seed and the gateway start (`04-openclaw.md`):
 ```sh
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'alcode --guide | head'      # names claude as the agent
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'alproject --guide --root ~/projects >/dev/null && echo projects-ok'
-sudo -i -u {{SERVICE_USER}} -- bash -lc 'npx -y skills list -g --json'   # 11 skills: 4 shared, 7 commands
+sudo -i -u {{SERVICE_USER}} -- bash -lc 'npx -y skills list -g --json'   # 13 skills: 4 shared, 9 commands
 ```
 
-In an interactive session as the service account (`sudo -i -u {{SERVICE_USER}}`, then `claude` in a project), `/al`, `/alplan`, `/alspec`, `/aldescription`, `/alreview`, `/alcatchup` and `/almerge` are offered. The surface smoke test in `07-channel.md` delegates a read-only run from the channel; its session file under `.plans/**/_alcode/*.md` records `agent: claude`.
+In an interactive session as the service account (`sudo -i -u {{SERVICE_USER}}`, then `claude` in a project), `/al`, `/alplan`, `/alspec`, `/aldescription`, `/alreview`, `/alcatchup`, `/alcatchupaad`, `/alcatchupspec` and `/almerge` are offered. The surface smoke test in `07-channel.md` delegates a read-only run from the channel; its session file under `.plans/**/_alcode/*.md` records `agent: claude`.

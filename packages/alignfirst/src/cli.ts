@@ -72,7 +72,7 @@ function renderHelp(ctx: CommandContext): string {
 
 Usage:
   ${ctx.form} guide [<protocol>]
-  ${ctx.form} ticket [<id>]
+  ${ctx.form} ticket [<id>] [--catchup]
   ${ctx.form} sync [--auto-archive | --no-auto-archive]
   ${ctx.form} plans <command>
   ${ctx.form} docmap [<arguments>]

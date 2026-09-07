@@ -1,6 +1,6 @@
 ---
 name: alignfirst
-description: "Collaborative problem-solving protocols. Read when the user names AlignFirst or a protocol alias: alspec, alplan, AAD, alcatchup, almerge, alreview, or aldescription."
+description: "Collaborative problem-solving protocols. Read when the user names AlignFirst or a protocol alias: alspec, alplan, AAD, alcatchup, alcatchupaad, alcatchupspec, almerge, alreview, or aldescription."
 license: CC0 1.0
 metadata:
   author: Paleo
@@ -8,8 +8,8 @@ metadata:
   repository: https://github.com/paleo/alignfirst
 ---
 
-Follow the requested protocol if its guide is already in context. Otherwise, run `npx -y alignfirst guide <protocol>` and follow it. Each named guide includes the shared conventions.
+Follow the requested protocol if its guide is already in context. Otherwise, run `npx -y alignfirst guide <protocol>` and follow it. Each named guide includes the shared conventions; add `--protocol-only` when they are already in context.
 
-Protocol aliases: `alspec` → `spec`, `alplan` → `plan`, `al` or `AAD` → `aad`, `alcatchup` → `catchup`, `almerge` → `merge`, `alreview` → `review`, `aldescription` → `description`.
+Protocol aliases: `alspec` → `spec`, `alplan` → `plan`, `al` or `AAD` → `aad`, `almerge` → `merge`, `alreview` → `review`, `aldescription` → `description`. The `alcatchup` alias runs `npx -y alignfirst ticket --catchup` and then follows the user's instructions; `alcatchupaad` and `alcatchupspec` run it before the `aad` or `spec` protocol.
 
-When no protocol is specified, run `npx -y alignfirst guide` to choose one. Add `--protocol-only` to a named guide command when the shared conventions are already in context.
+When no protocol is specified, run `npx -y alignfirst guide` to choose one. For workflow explanations, run `npx -y alignfirst guide overview`.

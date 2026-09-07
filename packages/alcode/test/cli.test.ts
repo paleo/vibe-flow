@@ -166,7 +166,7 @@ describe("parseAlcodeArgs", () => {
 describe("validateSessionArgs", () => {
   it("rejects an unknown protocol", () => {
     expect(validate(["new", "--protocol", "bogus", "--ticket", "1"])).toBe(
-      "Error: --protocol must be one of: spec, plan, aad, description, catchup, review, merge.",
+      "Error: --protocol must be one of: spec, plan, aad, description, review, merge.",
     );
   });
 

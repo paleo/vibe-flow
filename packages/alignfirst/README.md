@@ -35,7 +35,7 @@ The guide installs the selected components and configures the repository. Remove
 ## Commands
 
 - `guide` — Print an AlignFirst protocol.
-- `ticket` — Resolve a ticket directory and its next file.
+- `ticket` — Resolve a ticket directory, load its history, or get its next file.
 - `sync` — Synchronize shared plans.
 - `plans` — Set up, check and archive plans.
 - `docmap` — Browse project documentation.
@@ -48,14 +48,15 @@ Run `alignfirst --help` for command usage or `alignfirst guide` to choose a prot
 
 ## Agent skills
 
-Eight optional Agent Skill stubs expose the CLI to GitHub Copilot, Cursor, Claude Code, and Codex. They reuse guides already in context and load missing guides through `npx -y alignfirst guide`.
+Ten optional Agent Skill stubs expose the CLI to GitHub Copilot, Cursor, Claude Code, and Codex. Protocol skills reuse guides already in context and load missing guides through `npx -y alignfirst guide`. Catchup skills load ticket history through `npx -y alignfirst ticket --catchup`.
 
 Install them globally:
 
 ```sh
 npx skills add https://github.com/paleo/alignfirst --global \
   --skill alignfirst --skill al --skill alplan --skill alspec \
-  --skill aldescription --skill alreview --skill alcatchup --skill almerge
+  --skill aldescription --skill alreview --skill alcatchup --skill almerge \
+  --skill alcatchupaad --skill alcatchupspec
 ```
 
 Restart the agent after installation. Claude Code, GitHub Copilot, and Cursor expose skills with `/`; Codex uses `$`.
@@ -73,10 +74,16 @@ These examples use the `/` form. Replace it with `$` in Codex.
 | Review | `/alreview` | Review the current branch against its base. |
 | Merge | `/almerge` | Resolve merge or rebase conflicts. |
 | Catch up | `/alcatchup` | Load the current task history and continue. |
+| Catch up and align | `/alcatchupaad <request>` | Load history, then start AAD. |
+| Catch up and specify | `/alcatchupspec <request>` | Load history, then start specification. |
 
 To implement a plan, start a fresh agent context and ask it to execute the plan file.
 
 AlignFirst stores specifications, plans, and summaries in `.plans/<ticket-id>/`. It normally derives the ticket ID from the request or branch and asks when none is available. Files use a cycle letter and sequence number, such as `A1-spec.md` and `A2-plan.md`.
+
+## Catchup output
+
+`alignfirst ticket [<id>] --catchup` prints the ticket's Markdown files, plans excluded, each wrapped in a `<file path="…">` block. When the history exceeds the output budget, it lists the files with their sizes instead so the agent can read the relevant ones.
 
 ## Updates
 

@@ -25,9 +25,14 @@ alcode new --protocol spec --ticket AB-123 --message "Feature description"
 alcode resume <sessionId> --protocol plan
 alcode new --message "Execute the plan: .plans/AB-123/A2-plan.md"
 alcode new --protocol aad --no-ticket --message "Task description"
+alcode new --ticket AB-123 --catchup --protocol aad --message-file message.md
 alcode status .plans/AB-123/_alcode/20260829-135529.md
 alcode usage
 ```
+
+`--catchup` loads the ticket's history (through `alignfirst ticket --catchup`) before the protocol and message. Alone, it returns a short synthesis.
+
+`--message-file <path>` reads the message from a UTF-8 file, or from stdin with `-`. The prompt reaches the coding agent through stdin.
 
 See `alcode --help` for all commands and options.
 

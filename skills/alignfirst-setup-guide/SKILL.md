@@ -19,8 +19,8 @@ Route by the user's intent. Load only the references needed for that route.
 The **AlignFirst CLI** is the `alignfirst` npm package and bin. It provides `guide`, `ticket`, `sync`,
 `plans`, `docmap`, `conventions`, `context`, `config`, and `doctor`.
 
-The **AlignFirst skills** are eight stubs that run the CLI: `alignfirst`, `alspec`, `alplan`, `al`,
-`almerge`, `alreview`, `aldescription`, and `alcatchup`. The seven command skills keep
+The **AlignFirst skills** are ten stubs that run the CLI: `alignfirst`, `alspec`, `alplan`, `al`,
+`almerge`, `alreview`, `aldescription`, `alcatchup`, `alcatchupaad`, and `alcatchupspec`. The nine command skills keep
 `disable-model-invocation: true`; humans invoke them as `/alspec` in Claude Code, GitHub Copilot,
 Cursor, or `$alspec` in Codex.
 
@@ -49,7 +49,7 @@ Do not present the tooling menu or add unrelated tools on this route.
 When the user asks what the project could adopt, inspect the repository and present these independent
 choices:
 
-- **AlignFirst** installs the CLI and the eight skills for collaborative specification, planning,
+- **AlignFirst** installs the CLI and the ten skills for collaborative specification, planning,
   implementation, merge, review, description, and catch-up workflows. A team plans repository is an
   optional sub-choice.
 - **docmap** makes the repository's `docs/` tree discoverable to agents and humans. It is available
@@ -73,7 +73,7 @@ AlignFirst Developer builds and deploys the teammate itself.
 
 Inspect the repository before changing it. A prepared project has all of these:
 
-1. The AlignFirst CLI as a prerequisite in `README.md`, the eight skills, and a bootstrap line in
+1. The AlignFirst CLI as a prerequisite in `README.md`, the ten skills, and a bootstrap line in
    `AGENTS.md` or `CLAUDE.md`. `.alignfirst.json` is required for an AlignFirst Developer project and
    optional otherwise.
 2. A clean `alproject doctor --root <projects-directory>` result after writing
