@@ -51,9 +51,9 @@ function renderCommits(ctx: CommandContext): string | undefined {
 
 export function commitSubject(commit: CommitConfig): CommitSubject {
   if (commit.ticketReference === "bracketed")
-    return { subject: "`type: [ticketId] summary`", side: "`type: summary` for `side-N`" };
+    return { subject: "`type: [TICKET_ID] summary`", side: "`type: summary` for `side-N`" };
   if (commit.ticketReference === "bracketedHash")
-    return { subject: "`type: [#ticketId] summary`", side: "`type: summary` for `side-N`" };
+    return { subject: "`type: [#TICKET_ID] summary`", side: "`type: summary` for `side-N`" };
   return { subject: "`type: summary`" };
 }
 

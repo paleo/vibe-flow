@@ -2,13 +2,13 @@
 
 ## Pre-requisites
 
-Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
+Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 
 ## Steps
 
 1. Run `{{TICKET_CMD}} --next description.md --new-cycle` to start a new cycle.
-2. Join the reported ticket directory and next filename, then immediately create the description at that path with just the header. Creating the file reserves the filename.
-3. If a previous `*description.md` file exists in the TASK_DIR, find the latest one. Only read `*spec.md` and `*summary.md` files that come *after* it — earlier work is already covered.
+2. Append FILE_NAME to TICKET_DIR, then immediately create the description at that path with just the header. Creating the file reserves the filename.
+3. If a previous `*description.md` file exists in the TICKET_DIR, find the latest one. Only read `*spec.md` and `*summary.md` files that come *after* it — earlier work is already covered.
    Otherwise, read all `*spec.md` and `*summary.md` files.
 4. Write the commit message and description into your file.
 

@@ -203,7 +203,7 @@ describe("guide command", () => {
     );
     const spec = await runMain(["guide", "spec", "--protocol-only"], { cwd });
     expect(spec.stdout).toContain(
-      "(project convention: `type: [#ticketId] summary`; `type: summary` for `side-N`)",
+      "(project convention: `type: [#TICKET_ID] summary`; `type: summary` for `side-N`)",
     );
     const review = await runMain(["guide", "review", "--protocol-only"], { cwd });
     expect(review.stdout).toContain("fall back to `main`, the default branch");

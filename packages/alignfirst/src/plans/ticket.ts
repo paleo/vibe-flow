@@ -88,21 +88,27 @@ function readEntries(dir: string): Dirent[] {
   }
 }
 
-export function nextFilePrefix(entries: readonly string[], newCycle: boolean): string {
+export interface NextFilePosition {
+  cycleLetter: string;
+  fileNumber: number;
+}
+
+export function nextFilePosition(entries: readonly string[], newCycle: boolean): NextFilePosition {
   const prefixes = entries.flatMap((entry) => {
     const match = FILE_PREFIX.exec(entry);
     return match ? [{ cycle: match[1], number: Number(match[2]) }] : [];
   });
-  if (prefixes.length === 0) return "A1";
+  if (prefixes.length === 0) return { cycleLetter: "A", fileNumber: 1 };
   const highestCycle = prefixes.reduce(
     (highest, prefix) => (prefix.cycle > highest ? prefix.cycle : highest),
     "A",
   );
-  if (newCycle) return `${String.fromCharCode(highestCycle.charCodeAt(0) + 1)}1`;
+  if (newCycle)
+    return { cycleLetter: String.fromCharCode(highestCycle.charCodeAt(0) + 1), fileNumber: 1 };
   const highestNumber = Math.max(
     ...prefixes.filter(({ cycle }) => cycle === highestCycle).map(({ number }) => number),
   );
-  return `${highestCycle}${highestNumber + 1}`;
+  return { cycleLetter: highestCycle, fileNumber: highestNumber + 1 };
 }
 
 export function listEntries(dir: string): string[] {

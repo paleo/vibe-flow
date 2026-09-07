@@ -2,14 +2,14 @@
 
 ## Pre-requisites
 
-### Determine TASK_DIR and the spec file
+### Determine TICKET_DIR and the spec file
 
 You need:
 
-- the TASK_DIR and ticket directory context — run `{{TICKET_CMD}}` once (`{{CMD}} ticket --side` when there is no ticket)
-- a **spec file** in the TASK_DIR
+- the TICKET_DIR and ticket directory context — run `{{TICKET_CMD}}` once (`{{CMD}} ticket --side` when there is no external ticket)
+- a **spec file** in the TICKET_DIR
 
-Identify TASK_DIR and the spec file before starting the protocol. If either is missing, STOP AND ASK THE USER.
+Identify TICKET_DIR and the spec file before starting the protocol. If either is missing, STOP AND ASK THE USER.
 
 ## Phases
 
@@ -112,13 +112,13 @@ Example:
 _For all plans (single or specialized)_, add a final step named "Write a Handover Document" with this content:
 
 ```markdown
-Write a **handover document**. This document must contain the list of all files you updated. Also, summarize the changes made in a very concise way. Add only relevant information that will help your teammates understand what's new. Do not mention obvious information. It's not a course or a tutorial, if there is nothing to explain, then do not explain. Write this handover document in `{PLAN_FILE_PATH}.summary.md`. Ignore lint errors (formatting issues) in this file. At the end, give the path of this handover file to the user.
+Write a **handover document**. This document must contain the list of all files you updated. Also, summarize the changes made in a very concise way. Add only relevant information that will help your teammates understand what's new. Do not mention obvious information. It's not a course or a tutorial, if there is nothing to explain, then do not explain. Create its path by replacing the final `.md` in `{PLAN_FILE_PATH}` with `.summary.md`, then write the handover there. Ignore lint errors (formatting issues) in this file. At the end, give the path of this handover file to the user.
 ```
 
 Note:
 
 - This is a regular step, it should be numbered like the other steps. For example, if your plan has 5 steps, this becomes step 6.
-- Replace "{PLAN_FILE_PATH}" with the actual plan file path without extension (e.g., for plan `.plans/123/A2-plan-backend.md`, use `.plans/123/A2-plan-backend`, resulting in `.plans/123/A2-plan-backend.summary.md`).
+- Replace "{PLAN_FILE_PATH}" with the complete plan file path, such as `.plans/123/A2-plan-backend.md`. Its handover path is `.plans/123/A2-plan-backend.summary.md`.
 
 ### 3.5 Common Footer for All Plans
 
@@ -192,7 +192,7 @@ Write a **main plan handover document**. This document should:
    - State "Completed" if the plan was executed successfully
    - Detail any issues encountered during execution
 
-Keep this handover very short. Do not combine or repeat the content of individual handovers. Write this document in `{PLAN_FILE_PATH}.summary.md`. Ignore lint errors (formatting issues) in this file.
+Keep this handover very short. Do not combine or repeat the content of individual handovers. Create its path by replacing the final `.md` in `{PLAN_FILE_PATH}` with `.summary.md`, then write the handover there. Ignore lint errors (formatting issues) in this file.
 
 ---
 
@@ -203,27 +203,27 @@ Do not trust this plan blindly. Be sure you understand the codebase and all spec
 
 Note:
 
-- Replace "{PLAN_FILE_PATH}" with the actual plan file path without extension (e.g., for plan `.plans/123/A2-main-plan.md`, use `.plans/123/A2-main-plan`, resulting in `.plans/123/A2-main-plan.summary.md`)
+- Replace "{PLAN_FILE_PATH}" with the complete plan file path, such as `.plans/123/A2-main-plan.md`. Its handover path is `.plans/123/A2-main-plan.summary.md`.
 
 ## Phase 5. Writing Phase
 
 Write the plan file(s) according to the determined structure:
 
-Continue the current cycle. Immediately before writing each file, run `{{TICKET_CMD}} --next plan.md`, `{{TICKET_CMD}} --next main-plan.md`, or `{{TICKET_CMD}} --next plan-<descriptor>.md`. Join the reported ticket directory and next filename to get its path. Write that file before requesting the next one.
+Continue the current cycle. Immediately before writing each file, run `{{TICKET_CMD}} --next plan.md`, `{{TICKET_CMD}} --next main-plan.md`, or `{{TICKET_CMD}} --next plan-<descriptor>.md`. Append FILE_NAME to TICKET_DIR to get its path. Write that file before requesting the next one.
 
 **Single Plan**:
 
-- **Single plan**: `{TASK_DIR}/{CYCLE_LETTER}{FILE_NUMBER}-plan.md`
+- **Single plan**: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-plan.md`
   - Example: `.plans/123/A2-plan.md`
   - Handover: `.plans/123/A2-plan.summary.md`
   - No main plan needed
 
 **Multiple Plans**:
 
-- **Main plan**: `{TASK_DIR}/{CYCLE_LETTER}{FILE_NUMBER}-main-plan.md`
+- **Main plan**: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-main-plan.md`
   - Example: `.plans/123/A2-main-plan.md`
   - Handover: `.plans/123/A2-main-plan.summary.md` (written after all specialized plans complete)
-- **Specialized plans**: `{TASK_DIR}/{CYCLE_LETTER}{FILE_NUMBER}-plan-{DESCRIPTOR}.md`
+- **Specialized plans**: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-plan-{DESCRIPTOR}.md`
   - Use a descriptive name as `{DESCRIPTOR}` (e.g., work scope, stack area)
   - Example: `.plans/123/A3-plan-api.md`, `.plans/123/A4-plan-ui.md`
   - Handovers: `.plans/123/A3-plan-api.summary.md`, etc.

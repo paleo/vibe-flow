@@ -26,7 +26,7 @@ describe("conventions command", () => {
         plans: { autoArchive: true },
         git: {
           defaultBranch: "main",
-          branchNameTemplate: "{ticketId}/{slug-1-3-words}",
+          branchNameTemplate: "{TICKET_ID}/{slug-1-3-words}",
           commit: { style: "conventionalCommit", ticketReference: "bracketedHash" },
           agentCoauthoring: false,
         },
@@ -35,8 +35,8 @@ describe("conventions command", () => {
     const result = await runMain(["conventions"], { cwd });
     expect(result.stdout).toBe(
       "Ticket IDs: `^\\d+$`; infer a matching ID from the branch. Without an external ticket, use the next `side-N`.\n" +
-        "Branch names: `{ticketId}/{slug-1-3-words}`.\n" +
-        "Commits: `type: [#ticketId] summary`; use `type: summary` for `side-N`. Do not add an agent co-author trailer.\n" +
+        "Branch names: `{TICKET_ID}/{slug-1-3-words}`.\n" +
+        "Commits: `type: [#TICKET_ID] summary`; use `type: summary` for `side-N`. Do not add an agent co-author trailer.\n" +
         "Default branch: main.\n" +
         "Plans: use `.plans`; keep it out of product commits. Automatic archival is enabled.\n" +
         "Searches: exclude `.plans`, `.local` and `.local-wt` from broad codebase searches.\n",

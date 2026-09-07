@@ -14,7 +14,7 @@ import { detectTicketFromBranch, type TicketDetection } from "../plans/ticket.js
 import { PROTOCOLS, type Protocol } from "../protocols.js";
 
 const TICKET_CMD_PLACEHOLDER = "{{TICKET_CMD}}";
-const TICKET_CONTEXT_PLACEHOLDER = "{{TICKET_CONTEXT}}";
+const TICKET_DETECTION_PLACEHOLDER = "{{TICKET_DETECTION}}";
 const PLANS_STATE_PLACEHOLDER = "{{PLANS_STATE}}";
 const COMMIT_RULE_PLACEHOLDER = "{{COMMIT_RULE}}";
 const BASE_BRANCH_RULE_PLACEHOLDER = "{{BASE_BRANCH_RULE}}";
@@ -36,7 +36,7 @@ type ReviewModule = (typeof MODULES)[number];
 
 interface GuidePlaceholders {
   ticketCommand: string;
-  ticketContext: string;
+  ticketDetection: string;
   plansState: string;
   commitRule: string;
   baseBranchRule: string;
@@ -169,14 +169,14 @@ function buildGuidePlaceholders(
   const detection = pattern === undefined ? undefined : detectTicketFromBranch(ctx.cwd, pattern);
   return {
     ticketCommand: detection?.kind === "detected" ? "{{CMD}} ticket" : "{{CMD}} ticket <id>",
-    ticketContext: renderTicketContext(pattern, detection),
+    ticketDetection: renderTicketDetection(pattern, detection),
     plansState: renderPlansState(ctx),
     commitRule: renderCommitRule(ctx),
     baseBranchRule: renderBaseBranchRule(ctx, protocol),
   };
 }
 
-function renderTicketContext(
+function renderTicketDetection(
   pattern: string | undefined,
   detection: TicketDetection | undefined,
 ): string {
@@ -193,7 +193,7 @@ function renderPlansState(ctx: CommandContext): string {
   if (entry === undefined) return `\`\`\`text\n${missingPlansMessage(ctx.form)}\n\`\`\``;
   try {
     return resolvePlansMode(ctx.cwd, ctx.form).kind === "shared"
-      ? "After every change in TASK_DIR, run `{{CMD}} sync`."
+      ? "After every change in TICKET_DIR, run `{{CMD}} sync`."
       : "";
   } catch {
     return "";
@@ -203,7 +203,7 @@ function renderPlansState(ctx: CommandContext): string {
 function renderCommitRule(ctx: CommandContext): string {
   const commit = ctx.projectConfig?.config.git?.commit;
   if (commit === undefined)
-    return "(follow the convention you are aware of, or default to `<type>: [<ticket_id>] very short description`)";
+    return "(follow the convention you are aware of, or default to `<type>: [TICKET_ID] very short description`)";
   const { subject, side } = commitSubject(commit);
   const rule = side === undefined ? subject : `${subject}; ${side}`;
   return `(project convention: ${rule})`;
@@ -228,7 +228,7 @@ function applyPlaceholders(template: string, values: GuidePlaceholders): string 
       values.plansState === "" ? "" : `${values.plansState}\n\n`,
     )
     .replaceAll(TICKET_CMD_PLACEHOLDER, () => values.ticketCommand)
-    .replaceAll(TICKET_CONTEXT_PLACEHOLDER, () => values.ticketContext)
+    .replaceAll(TICKET_DETECTION_PLACEHOLDER, () => values.ticketDetection)
     .replaceAll(PLANS_STATE_PLACEHOLDER, () => values.plansState)
     .replaceAll(COMMIT_RULE_PLACEHOLDER, () => values.commitRule)
     .replaceAll(BASE_BRANCH_RULE_PLACEHOLDER, () => values.baseBranchRule);

@@ -7,7 +7,7 @@ import { parseCommandArgs } from "../parse-args.js";
 import { assertPlansGate } from "../plans/layout.js";
 import {
   deduceTicketFromBranch,
-  nextFilePrefix,
+  nextFilePosition,
   peekSideTicket,
   reserveSideTicket,
   resolveTicketDir,
@@ -31,8 +31,8 @@ interface TicketOptions {
 }
 
 interface TicketJsonReport {
-  id: string;
-  dir: string;
+  TICKET_ID: string;
+  TICKET_DIR: string;
   state: ResolvedTicketDir["state"];
   branch?: string;
   entries: string[];
@@ -179,18 +179,20 @@ function writeNextReport(
   result: ResolvedTicketDir,
   filename: string | true,
 ): void {
-  const dir = `${relative(ctx.cwd, result.dir)}/`;
-  const prefix = nextFilePrefix(result.entries, options.newCycle);
-  const report = filename === true ? { dir, prefix } : { dir, next: `${prefix}-${filename}` };
+  const { cycleLetter, fileNumber } = nextFilePosition(result.entries, options.newCycle);
+  const prefix = `${cycleLetter}${fileNumber}`;
+  const report = {
+    TICKET_DIR: `${relative(ctx.cwd, result.dir)}/`,
+    CYCLE_LETTER: cycleLetter,
+    FILE_NUMBER: fileNumber,
+    ...(filename === true ? { FILE_PREFIX: prefix } : { FILE_NAME: `${prefix}-${filename}` }),
+  };
   if (options.json) {
     ctx.stdout.write(`${JSON.stringify(report, undefined, 2)}\n`);
     return;
   }
-  const nextLine =
-    report.next === undefined
-      ? `- Next file prefix: \`${report.prefix}\``
-      : `- Next file: \`${report.next}\``;
-  ctx.stdout.write(`- Ticket directory: \`${dir}\`\n${nextLine}\n`);
+  const lines = Object.entries(report).map(([name, value]) => `- ${name}: \`${value}\``);
+  ctx.stdout.write(`${lines.join("\n")}\n`);
 }
 
 function jsonReport(
@@ -199,8 +201,8 @@ function jsonReport(
   result: ResolvedTicketDir,
 ): TicketJsonReport {
   return {
-    id: result.id,
-    dir: relative(ctx.cwd, result.dir),
+    TICKET_ID: result.id,
+    TICKET_DIR: `${relative(ctx.cwd, result.dir)}/`,
     state: result.state,
     ...(options.branch === undefined ? {} : { branch: options.branch }),
     entries: result.entries,
@@ -217,8 +219,8 @@ function renderReport(
   const directoryState = renderDirectoryState(result.state, options.dryRun);
   const directory = `${relative(ctx.cwd, result.dir)}/`;
   const lines = [
-    `Ticket ${result.id}${reservation}${deduction}`,
-    `Directory: ${directory}${directoryState}`,
+    `- TICKET_ID: \`${result.id}\`${reservation}${deduction}`,
+    `- TICKET_DIR: \`${directory}\`${directoryState}`,
   ];
   if (result.entries.length === 0) lines.push("Entries: (none)");
   else lines.push("Entries:", ...result.entries.map((entry) => `  ${entry}`));

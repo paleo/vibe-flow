@@ -28,7 +28,7 @@ The channel deliberately leaves some values for this session:
 - A request may need no project. Do not ask for one until the work itself requires project files.
 - Ordinary single-project work still requires PROJECT, PROJECT_PATH, and TICKET_ID. Ask only after the available resource, inventory, request, and ticket integration fail to supply them. An explicit no-ticket request follows Step 4 instead of asking for an external ID.
 
-As soon as PROJECT_PATH and TICKET_ID are known, and before any project work, run `alignfirst sync`, then `alignfirst ticket {TICKET_ID}` from PROJECT_PATH. The second command validates the id and creates or restores TASK_DIR before alcode can create session artifacts. Stop if either command fails. If either value becomes known later in the session, run the preflight then.
+As soon as PROJECT_PATH and TICKET_ID are known, and before any project work, run `alignfirst sync`, then `alignfirst ticket {TICKET_ID}` from PROJECT_PATH. The second command validates the id and creates or restores TICKET_DIR before alcode can create session artifacts. Stop if either command fails. If either value becomes known later in the session, run the preflight then.
 
 Default rule: When the user asks you to handle or implement an existing ticket and a configured account gives you access to its platform, inspect the ticket before workspace setup. If its state is To do or equivalent and its assignee is either empty or your account, ensure it is assigned to your account and move it to In progress or equivalent when that state exists.
 
@@ -90,7 +90,7 @@ Only when the message is unambiguously about chat content ("summarize this threa
 When one project owns a detailed user explanation, preserve it before delegation:
 
 1. Establish TICKET_ID. When project or deployment instructions provide ticket-system access, create a ticket with a very short description in the user's language. When no access is provided, ask the user for the ticket ID.
-2. If this step established TICKET_ID, complete the known-ticket preflight now. Then run `alignfirst ticket {TICKET_ID} --next request.md` and join the reported ticket directory and next filename to get the request-file path, preserving the leading dot.
+2. If this step established TICKET_ID, complete the known-ticket preflight now. Then run `alignfirst ticket {TICKET_ID} --next request.md` and append FILE_NAME to TICKET_DIR to get the request-file path, preserving the leading dot.
 3. Write the complete request text recorded in the starter's request block to that path. Keep its language. You may fix typos; preserve every detail.
 4. Run `alignfirst sync`.
 5. When ticket editing is available, add the request-file path relative to the project to the ticket description.

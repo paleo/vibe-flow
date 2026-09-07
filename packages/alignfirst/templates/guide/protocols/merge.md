@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
+Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 
 ---
 
@@ -20,7 +20,7 @@ Take the time to understand how things work in the incoming branch and in the cu
 
 ## 3. Resolve
 
-Run `{{TICKET_CMD}} --next merge.summary.md` to continue the current cycle. Join the reported ticket directory and next filename, then immediately create the summary at that path. Log each notable resolution in it as you resolve (see step 5 for the expected content).
+Run `{{TICKET_CMD}} --next merge.summary.md` to continue the current cycle. Append FILE_NAME to TICKET_DIR, then immediately create the summary at that path. Log each notable resolution in it as you resolve (see step 5 for the expected content).
 
 Resolve the conflicts properly — preserve both intents whenever possible. Do not blindly accept one side.
 

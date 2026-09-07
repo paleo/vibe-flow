@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
+Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 
 ## Phases
 
@@ -44,7 +44,7 @@ Do not use your question tool. Always ask in plain text. Your questions will be 
 
 ## Phase 3. Specification Phase
 
-After the user approves your proposal, run `{{TICKET_CMD}} --next spec.md --new-cycle` to start a new cycle. Join the reported ticket directory and next filename, then immediately write the specification at that path. Do not overwrite an existing file.
+After the user approves your proposal, run `{{TICKET_CMD}} --next spec.md --new-cycle` to start a new cycle. Append FILE_NAME to TICKET_DIR, then immediately write the specification at that path. Do not overwrite an existing file.
 
 - After the title, include a suggested commit message {{COMMIT_RULE}}. The shorter the better. Then list the required documentation and skills. List each doc file individually — never a folder. Always exclude `alignfirst` from skills. Omit any field with nothing to list. Example:
 

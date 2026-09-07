@@ -101,7 +101,7 @@ Write `.alignfirst.json` with the agreed fields. Never add `cli`:
   "portRange": { "first": 8100, "last": 8299 },
   "git": {
     "defaultBranch": "main",
-    "branchNameTemplate": "{ticketId}/{slug-1-3-words}",
+    "branchNameTemplate": "{TICKET_ID}/{slug-1-3-words}",
     "commit": { "style": "conventionalCommit", "ticketReference": "bracketedHash" },
     "agentCoauthoring": false
   }

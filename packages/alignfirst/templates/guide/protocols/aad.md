@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
+Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 
 ---
 
@@ -37,7 +37,7 @@ Do not use your question tool. Always ask in plain text. Your questions will be 
 
 ## 3. Act
 
-When you and the user agree, run `{{TICKET_CMD}} --next AAD.summary.md` to continue the current cycle. Join the reported ticket directory and next filename, then immediately create the summary file at that path. Do not overwrite an existing file. Start implementing after creating it.
+When you and the user agree, run `{{TICKET_CMD}} --next AAD.summary.md` to continue the current cycle. Append FILE_NAME to TICKET_DIR, then immediately create the summary file at that path. Do not overwrite an existing file. Start implementing after creating it.
 
 Maintain the file as a **live report** while you work.
 

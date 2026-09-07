@@ -22,7 +22,7 @@ describe("project config", () => {
       portRange: { first: 8100, last: 8199 },
       git: {
         defaultBranch: "main",
-        branchNameTemplate: "{ticketId}/{slug}",
+        branchNameTemplate: "{TICKET_ID}/{slug}",
         commit: { style: "conventionalCommit", ticketReference: "bracketedHash" },
         agentCoauthoring: false,
       },
