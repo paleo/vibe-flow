@@ -1,7 +1,7 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { DeliveryReceipt, HandoffRecord } from "../src/types.js";
+import type { DeliveryReceipt, HandoffRecord } from "../src/thread-handoff/types.js";
 
 export function temporaryStateDir(): string {
   return mkdtempSync(join(tmpdir(), "thread-handoff-test-"));

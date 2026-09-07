@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { HandoffError } from "../src/errors.js";
-import { assertSupportedSource, readSourceContext, resolveHandoffRoute } from "../src/routing.js";
-import type { PluginConfiguration, SourceContext } from "../src/types.js";
+import { HandoffError } from "../src/thread-handoff/errors.js";
+import {
+  assertSupportedSource,
+  readSourceContext,
+  resolveHandoffRoute,
+} from "../src/thread-handoff/routing.js";
+import type { PluginConfiguration, SourceContext } from "../src/thread-handoff/types.js";
 
 const configuration: PluginConfiguration = {
   channelSurfaces: { slack: "slack", discord: "discord" },

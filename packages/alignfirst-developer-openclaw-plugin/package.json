@@ -1,8 +1,9 @@
 {
-  "name": "@paleo/openclaw-thread-handoff",
+  "name": "@paleo/alignfirst-developer-openclaw-plugin",
   "version": "0.0.0",
-  "description": "Starts regular OpenClaw thread sessions after confirmed native thread delivery.",
+  "description": "OpenClaw capabilities for AlignFirst Developer.",
   "keywords": [
+    "alignfirst",
     "openclaw",
     "thread",
     "handoff",
@@ -13,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/paleo/alignfirst.git",
-    "directory": "packages/openclaw-thread-handoff"
+    "directory": "packages/alignfirst-developer-openclaw-plugin"
   },
   "engines": {
     "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=25.9.0"

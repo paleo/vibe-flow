@@ -61,7 +61,7 @@ Run it after `08`, as the operator, from the Discord client.
 First verify the effective gateway configuration:
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- openclaw plugins inspect thread-handoff --json --runtime
+sudo -i -u {{SERVICE_USER}} -- openclaw plugins inspect alignfirst-developer --json --runtime
 sudo -i -u {{SERVICE_USER}} -- openclaw config get tools.alsoAllow --json
 sudo -i -u {{SERVICE_USER}} -- openclaw config get \
   'channels.discord.guilds.{{DISCORD_GUILD_ID}}.channels.{{DISCORD_CHANNEL_ID}}.autoThread'

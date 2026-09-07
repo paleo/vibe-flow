@@ -10,7 +10,7 @@ Behaviors that look like bugs and are intentional, with the reason. Read the rel
 
 ## No version manager in the service account's PATH
 
-OpenClaw is installed under one prefix (`~/.npm-system-global/`, fed by `/usr/bin/npm`). A version manager shifts the active prefix: `which openclaw` returns nothing, and `openclaw update` installs the new version into the manager's prefix while the gateway unit keeps running the old one. `openclaw doctor` also flags version-manager Nodes as fragile runtimes. `openclaw update` is the core upgrade path and refreshes official channel plugins; `update-developer.md` separately updates the independent `thread-handoff` plugin. The procedure stays safe only with exactly one `npm` on `PATH`. A project that needs another Node runs it in a container.
+OpenClaw is installed under one prefix (`~/.npm-system-global/`, fed by `/usr/bin/npm`). A version manager shifts the active prefix: `which openclaw` returns nothing, and `openclaw update` installs the new version into the manager's prefix while the gateway unit keeps running the old one. `openclaw doctor` also flags version-manager Nodes as fragile runtimes. `openclaw update` is the core upgrade path and refreshes official channel plugins; `update-developer.md` separately updates the independent `alignfirst-developer` plugin. The procedure stays safe only with exactly one `npm` on `PATH`. A project that needs another Node runs it in a container.
 
 ## Containers are per-user
 

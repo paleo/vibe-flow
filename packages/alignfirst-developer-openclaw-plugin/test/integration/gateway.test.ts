@@ -244,7 +244,7 @@ async function startFixture(surface: Surface, options: FixtureOptions = {}): Pro
   const inspection = await runConfiguredOpenClaw(configPath, stateDir, [
     "plugins",
     "inspect",
-    "thread-handoff",
+    "alignfirst-developer",
     "--json",
     "--runtime",
   ]);
@@ -279,16 +279,16 @@ function buildConfig(params: {
     gateway: { mode: "local", auth: { mode: "none" } },
     update: { checkOnStart: false },
     plugins: {
-      allow: [params.channelId, "thread-handoff"],
+      allow: [params.channelId, "alignfirst-developer"],
       load: {
         paths: [
           resolve(REPO_ROOT, `packages/openclaw-${params.surface}-mock`),
-          resolve(REPO_ROOT, "packages/openclaw-thread-handoff"),
+          resolve(REPO_ROOT, "packages/alignfirst-developer-openclaw-plugin"),
         ],
       },
       entries: {
         [params.channelId]: { enabled: true },
-        "thread-handoff": {
+        "alignfirst-developer": {
           enabled: true,
           config: { channelSurfaces: { [params.channelId]: params.surface } },
         },

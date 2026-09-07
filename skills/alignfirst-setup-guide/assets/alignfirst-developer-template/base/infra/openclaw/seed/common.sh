@@ -174,11 +174,11 @@ configure_common() {
     "[\"$GATEWAY_DASHBOARD_ORIGIN\",\"http://127.0.0.1:18789\"]"
 
   echo "[seed] plugins — explicit allowlist"
-  install_plugin_once @paleo/openclaw-thread-handoff
-  openclaw plugins enable thread-handoff --accept-capabilities
+  install_plugin_once @paleo/alignfirst-developer-openclaw-plugin
+  openclaw plugins enable alignfirst-developer --accept-capabilities
   # A provider served by an additional OpenClaw plugin (a runtime harness, for example) needs
   # `install_plugin_once`, its id appended to `plugins.allow` here and `openclaw plugins enable`;
   # the runbook 04 shows the form.
   set_json plugins.allow \
-    "[\"$surface_plugin_id\",\"$RUNTIME_PROVIDER\",\"browser\",\"thread-handoff\"]"
+    "[\"$surface_plugin_id\",\"$RUNTIME_PROVIDER\",\"browser\",\"alignfirst-developer\"]"
 }

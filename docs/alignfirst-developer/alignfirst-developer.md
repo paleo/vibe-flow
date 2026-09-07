@@ -5,6 +5,8 @@ document is the entry point for working *on* the product in this repository. For
 deployment, use the
 [`alignfirst-setup-guide`](../../skills/alignfirst-setup-guide/references/alignfirst-developer.md).
 
+The [`@paleo/alignfirst-developer-openclaw-plugin`](../../packages/alignfirst-developer-openclaw-plugin/README.md) package supplies the product's OpenClaw capabilities. OpenClaw displays it as **AlignFirst Developer**, with plugin ID `alignfirst-developer`. Its root entry point registers feature modules; the first, `src/thread-handoff/`, owns the `thread_handoff` tool, delivery hook, recovery service and `openclaw thread-handoff` maintenance commands. Additional Developer capabilities can register through the same plugin.
+
 ## Three layers
 
 1. **Reference workspace** —

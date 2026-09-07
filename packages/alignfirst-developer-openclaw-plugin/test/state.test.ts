@@ -1,7 +1,7 @@
 import { chmodSync, statSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
-import { createHandoffStore, resolveDatabasePath } from "../src/state.js";
+import { createHandoffStore, resolveDatabasePath } from "../src/thread-handoff/state.js";
 import { handoff, receipt, temporaryStateDir } from "./helpers.js";
 
 describe("handoff SQLite state", () => {

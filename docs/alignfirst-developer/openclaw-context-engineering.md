@@ -106,7 +106,7 @@ Three viable shapes for handling a Discord thread, given the above:
 2. **Subagent uses `message` with explicit target** (against OpenClaw guidance). Pass the thread channel ID into the subagent's bootstrap; have it call `message` for each progress step. Supports live progress, fragile, fights the system prompt.
 3. **Explicit thread plus targeted regular-session wake — no subagent**. Deliver a native starter only when the channel triage selects project work, then enqueue a system event to the canonical thread session. Channel and thread sessions are siblings, each owning its surface.
 
-**Chosen for AlignFirst Developer:** Path 3. Discord keeps channel `autoThread: false` and uses anchored `message thread-create`. Slack keeps `replyToMode: "off"` and uses `message send` with an explicit root timestamp. `@paleo/openclaw-thread-handoff` observes the confirmed native result, persists a pending handoff in its own SQLite database, and queues a targeted system event plus immediate heartbeat request. This starts the regular canonical thread session without `sessions_send`, a bound subagent, a human nudge, or an official-plugin trust exception.
+**Chosen for AlignFirst Developer:** Path 3. Discord keeps channel `autoThread: false` and uses anchored `message thread-create`. Slack keeps `replyToMode: "off"` and uses `message send` with an explicit root timestamp. `@paleo/alignfirst-developer-openclaw-plugin` observes the confirmed native result, persists a pending handoff in its own SQLite database, and queues a targeted system event plus immediate heartbeat request. This starts the regular canonical thread session without `sessions_send`, a bound subagent, a human nudge, or an official-plugin trust exception.
 
 ### Wiring it up
 

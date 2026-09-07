@@ -1,8 +1,4 @@
-import {
-  buildJsonPluginConfigSchema,
-  definePluginEntry,
-  type OpenClawPluginApi,
-} from "openclaw/plugin-sdk/plugin-entry";
+import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { registerThreadHandoffCli } from "./cli.js";
 import { createReceiptCoordinator } from "./receipts.js";
 import { createHandoffService } from "./service.js";
@@ -10,19 +6,7 @@ import { createHandoffStore, type HandoffStore, resolveDatabasePath } from "./st
 import { createThreadHandoffTool } from "./tool.js";
 import type { PluginConfiguration } from "./types.js";
 
-const configSchema = buildJsonPluginConfigSchema({
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    channelSurfaces: {
-      type: "object",
-      additionalProperties: { enum: ["slack", "discord"] },
-      default: { slack: "slack", discord: "discord" },
-    },
-  },
-});
-
-function registerThreadHandoff(api: OpenClawPluginApi): void {
+export function registerThreadHandoff(api: OpenClawPluginApi): void {
   const configuration = readConfiguration(api.pluginConfig);
   let store: HandoffStore | undefined;
   const getStore = () => {
@@ -86,11 +70,3 @@ function asRecord(value: unknown): Record<string, unknown> | undefined {
     ? (value as Record<string, unknown>)
     : undefined;
 }
-
-export default definePluginEntry({
-  id: "thread-handoff",
-  name: "Thread Handoff",
-  description: "Starts regular thread sessions after confirmed native thread delivery.",
-  configSchema,
-  register: registerThreadHandoff,
-});

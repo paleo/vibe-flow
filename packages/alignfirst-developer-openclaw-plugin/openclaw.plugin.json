@@ -1,7 +1,7 @@
 {
-  "id": "thread-handoff",
-  "name": "Thread Handoff",
-  "description": "Starts regular thread sessions after confirmed native thread delivery.",
+  "id": "alignfirst-developer",
+  "name": "AlignFirst Developer",
+  "description": "OpenClaw capabilities for AlignFirst Developer.",
   "activation": { "onStartup": true },
   "contracts": { "tools": ["thread_handoff"] },
   "configSchema": {

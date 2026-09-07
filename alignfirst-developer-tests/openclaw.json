@@ -4,19 +4,19 @@
     "auth": { "mode": "none" }
   },
   "plugins": {
-    "allow": ["codex", "discord-mock", "slack-mock", "thread-handoff"],
+    "allow": ["codex", "discord-mock", "slack-mock", "alignfirst-developer"],
     "load": {
       "paths": [
         "/opt/openclaw-test/src/node_modules/@paleo/openclaw-discord-mock",
         "/opt/openclaw-test/src/node_modules/@paleo/openclaw-slack-mock",
-        "/opt/openclaw-test/src/node_modules/@paleo/openclaw-thread-handoff"
+        "/opt/openclaw-test/src/node_modules/@paleo/alignfirst-developer-openclaw-plugin"
       ]
     },
     "entries": {
       "codex": { "enabled": true },
       "discord-mock": { "enabled": true },
       "slack-mock": { "enabled": true },
-      "thread-handoff": {
+      "alignfirst-developer": {
         "enabled": true,
         "config": {
           "channelSurfaces": {

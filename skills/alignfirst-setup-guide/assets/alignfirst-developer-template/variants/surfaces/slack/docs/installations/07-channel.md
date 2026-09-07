@@ -131,7 +131,7 @@ Run it after `08`, as the operator, from the Slack client.
 First verify the effective gateway configuration:
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- openclaw plugins inspect thread-handoff --json --runtime
+sudo -i -u {{SERVICE_USER}} -- openclaw plugins inspect alignfirst-developer --json --runtime
 sudo -i -u {{SERVICE_USER}} -- openclaw config get tools.alsoAllow --json
 sudo -i -u {{SERVICE_USER}} -- openclaw config get channels.slack.replyToMode
 sudo -i -u {{SERVICE_USER}} -- openclaw config get channels.slack.channels --json

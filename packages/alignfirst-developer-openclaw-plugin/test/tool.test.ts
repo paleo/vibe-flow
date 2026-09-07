@@ -4,10 +4,10 @@ import type {
   PluginLogger,
 } from "openclaw/plugin-sdk/plugin-entry";
 import { describe, expect, it, vi } from "vitest";
-import type { ReceiptCoordinator } from "../src/receipts.js";
-import { createHandoffService } from "../src/service.js";
-import { createHandoffStore } from "../src/state.js";
-import { createThreadHandoffTool } from "../src/tool.js";
+import type { ReceiptCoordinator } from "../src/thread-handoff/receipts.js";
+import { createHandoffService } from "../src/thread-handoff/service.js";
+import { createHandoffStore } from "../src/thread-handoff/state.js";
+import { createThreadHandoffTool } from "../src/thread-handoff/tool.js";
 import { handoff, receipt, temporaryStateDir } from "./helpers.js";
 
 describe("thread_handoff tool", () => {

@@ -12,7 +12,7 @@ read_when:
 
 Four generic packages drive automated regression tests against an OpenClaw workspace. Only
 `openclaw-test` is the entry point. The AlignFirst Developer consumer additionally loads the
-`openclaw-thread-handoff` gateway plugin; it is not imposed on generic harness consumers.
+`alignfirst-developer-openclaw-plugin` gateway plugin; it is not imposed on generic harness consumers.
 
 | Package | Role |
 | --- | --- |
@@ -20,7 +20,7 @@ Four generic packages drive automated regression tests against an OpenClaw works
 | `@paleo/openclaw-channel-mock-core` | Shared channel library — bus client, action handlers, plugin/setup factories, account helpers. Not consumed directly. |
 | `@paleo/openclaw-discord-mock` | Thin wrapper. Registers as channel `discord-mock`, `surface: "discord"`, `autoThread: false`. |
 | `@paleo/openclaw-slack-mock` | Thin wrapper. Registers as channel `slack-mock`, `surface: "slack"`, `autoThread: true`. |
-| `@paleo/openclaw-thread-handoff` | Consumer gateway plugin. Converts confirmed native starter delivery into a durable targeted wake for the ordinary thread session. |
+| `@paleo/alignfirst-developer-openclaw-plugin` | AlignFirst Developer's OpenClaw capabilities, registered as `alignfirst-developer`. Thread handoff converts confirmed native starter delivery into a durable wake for the ordinary thread session. |
 
 The two wrappers exist side-by-side in one gateway and share a single bus. The runner picks which channel(s) to drive per scenario; `accountId = channelId` keeps per-channel bus state segregated.
 
@@ -188,7 +188,7 @@ final `NO_REPLY`.
 The deterministic external-plugin suite uses the real OpenClaw 2026.9.2 executable, a scripted
 local provider, the synthetic bus, and disposable state. Run it with
 `KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace
-@paleo/openclaw-thread-handoff`. Retained `/tmp/thread-handoff-*` fixtures include gateway and
+@paleo/alignfirst-developer-openclaw-plugin`. Retained `/tmp/thread-handoff-*` fixtures include gateway and
 provider logs plus `<stateDir>/thread-handoff/state.sqlite` (and any WAL/SHM crash files). It covers
 both surfaces, canonical continuation, duplicate starts, and abrupt pending/post-claim restarts.
 

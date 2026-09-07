@@ -1,7 +1,7 @@
 import type { OpenClawPluginApi, PluginLogger } from "openclaw/plugin-sdk/plugin-entry";
 import { describe, expect, it, vi } from "vitest";
-import { buildSeed, createHandoffService } from "../src/service.js";
-import { createHandoffStore } from "../src/state.js";
+import { buildSeed, createHandoffService } from "../src/thread-handoff/service.js";
+import { createHandoffStore } from "../src/thread-handoff/state.js";
 import { handoff, temporaryStateDir } from "./helpers.js";
 
 describe("handoff enqueue and recovery", () => {

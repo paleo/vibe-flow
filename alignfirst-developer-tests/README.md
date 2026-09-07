@@ -96,10 +96,10 @@ npm run e2e -- --model gpt-5.6-terra --channel all --all
 
 **Ticket-id convention:** scenario `A<S>` uses `ABC-0<S>N` (`A1` → `ABC-010`, `A2` → `ABC-020`, …; `A10` → `ABC-0100`). The mechanical mapping is a leak signal: while running `A<S>`, any `ABC-0<X>N` with `X ≠ S` is bleed from another scenario. The test sender is `ROBIN01`, listed in [`workspace/USER.md`](workspace/USER.md). A5's `aurora` is deliberately **not** a fixture name (unknown-project path).
 
-## Vendored `@paleo/openclaw-*` packages
+## Vendored packages
 
-This harness always tests the **local** `@paleo/openclaw-*` sources, never npmjs. It vendors the
-four generic harness packages plus the consumer-specific `@paleo/openclaw-thread-handoff` plugin.
+This harness vendors the **local** sources of the four generic `@paleo/openclaw-*` packages and
+`@paleo/alignfirst-developer-openclaw-plugin`.
 The dependencies are `file:vendor/<pkg>.tgz`; [`scripts/vendor-packages.mjs`](scripts/vendor-packages.mjs)
 builds each package and `npm pack`s it into `vendor/` (gitignored). The Docker build context is this
 directory, so the tarballs must live here.
@@ -111,13 +111,13 @@ resolution.
 
 The plugin is explicitly allowlisted, loaded from its installed package path, and exposes optional
 tool `thread_handoff`. Slack uses `replyToMode: "off"`; Discord remains non-automatic. Both surface
-IDs map to their native receipt contract in `plugins.entries.thread-handoff.config.channelSurfaces`.
+IDs map to their native receipt contract in `plugins.entries.alignfirst-developer.config.channelSurfaces`.
 
 The complementary deterministic suite makes no model calls and runs outside Docker against the
 pinned OpenClaw 2026.9.2 executable:
 
 ```sh
-KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace @paleo/openclaw-thread-handoff --prefix ..
+KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace @paleo/alignfirst-developer-openclaw-plugin --prefix ..
 ```
 
 It retains test-owned gateway logs, scripted-provider requests, configuration, and SQLite restart

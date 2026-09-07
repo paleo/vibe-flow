@@ -1,7 +1,7 @@
 import type { OpenClawPluginToolContext, PluginLogger } from "openclaw/plugin-sdk/plugin-entry";
 import { describe, expect, it, vi } from "vitest";
-import { createReceiptCoordinator } from "../src/receipts.js";
-import { createHandoffStore } from "../src/state.js";
+import { createReceiptCoordinator } from "../src/thread-handoff/receipts.js";
+import { createHandoffStore } from "../src/thread-handoff/state.js";
 import { temporaryStateDir } from "./helpers.js";
 
 describe("native delivery receipts", () => {

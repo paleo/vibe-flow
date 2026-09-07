@@ -1,19 +1,17 @@
-# @paleo/openclaw-thread-handoff
+# @paleo/alignfirst-developer-openclaw-plugin
 
-An OpenClaw gateway plugin that starts a regular channel-thread session after a native message
-action has delivered its visible starter. Delivery evidence and pending handoffs survive gateway
-restart in a plugin-owned SQLite database.
+The OpenClaw gateway plugin for AlignFirst Developer. It currently provides thread handoff: starting a regular channel-thread session after a native message action delivers its visible starter. Delivery evidence and pending handoffs survive gateway restart in a plugin-owned SQLite database.
 
 ## Install and enable
 
 Install the package through OpenClaw's normal external-plugin procedure, enable plugin ID
-`thread-handoff`, and explicitly allow the optional `thread_handoff` tool:
+`alignfirst-developer`, and explicitly allow the optional `thread_handoff` tool:
 
 ```json
 {
   "plugins": {
-    "allow": ["thread-handoff"],
-    "entries": { "thread-handoff": { "enabled": true } }
+    "allow": ["alignfirst-developer"],
+    "entries": { "alignfirst-developer": { "enabled": true } }
   },
   "tools": { "allow": ["thread_handoff"] }
 }
@@ -26,7 +24,7 @@ their IDs to the corresponding native contract:
 {
   "plugins": {
     "entries": {
-      "thread-handoff": {
+      "alignfirst-developer": {
         "enabled": true,
         "config": {
           "channelSurfaces": {
@@ -40,7 +38,7 @@ their IDs to the corresponding native contract:
 }
 ```
 
-## Contract
+## Thread handoff contract
 
 The plugin observes successful native `message` actions but never creates a thread itself.
 
@@ -86,11 +84,13 @@ handoffs, because deleting a claimed record also deletes its duplicate-start pro
 
 ## Development
 
+`src/index.ts` defines the plugin identity and configuration schema. `src/thread-handoff/` owns handoff registration, tools, hooks, recovery and persistence. Additional Developer features can register alongside it through the root entry point.
+
 ```bash
-npm run build --workspace @paleo/openclaw-thread-handoff
-npm test --workspace @paleo/openclaw-thread-handoff
-npm run typecheck --workspace @paleo/openclaw-thread-handoff
-npm run lint --workspace @paleo/openclaw-thread-handoff
+npm run build --workspace @paleo/alignfirst-developer-openclaw-plugin
+npm test --workspace @paleo/alignfirst-developer-openclaw-plugin
+npm run typecheck --workspace @paleo/alignfirst-developer-openclaw-plugin
+npm run lint --workspace @paleo/alignfirst-developer-openclaw-plugin
 ```
 
 The ordinary test command excludes the real-gateway suite. To exercise the package as an external
@@ -98,7 +98,7 @@ plugin against the pinned OpenClaw 2026.9.2 runtime, including Slack/Discord del
 starts, same-session continuation, and abrupt restart recovery:
 
 ```bash
-KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace @paleo/openclaw-thread-handoff
+KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace @paleo/alignfirst-developer-openclaw-plugin
 ```
 
 Retained fixtures are written under `/tmp/thread-handoff-*` with gateway logs, provider requests,
