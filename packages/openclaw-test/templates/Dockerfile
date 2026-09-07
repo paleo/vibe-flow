@@ -38,7 +38,7 @@ RUN npm ci --include=dev && \
 # * Project fixtures baked into the image (typical with a named-volume
 #   /home/claw/projects, then reset/seeded per scenario):
 #     COPY --chown=claw:claw projects-fixture/<name>/ /opt/<consumer>/fixtures/<name>/
-#     RUN cd /opt/<consumer>/fixtures/<name> && pnpm install --frozen-lockfile --prod=false
+#     RUN cd /opt/<consumer>/fixtures/<name> && pnpm install --frozen-lockfile
 #
 # * Skills under /home/claw/.agents/skills/ for the agent to discover
 #   (e.g. installed with the `skills` CLI from any repo or registry):

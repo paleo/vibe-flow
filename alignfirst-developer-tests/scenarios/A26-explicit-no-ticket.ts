@@ -56,9 +56,11 @@ export default async function explicitNoTicket(ctx: ScenarioContext): Promise<vo
   const delegation = await expectCodingDelegation(ctx, codingAgent, {
     ticketId: RESERVED_TICKET_ID,
     rubric:
-      "An AlignFirst coding-protocol delegation for side ticket side-2. It asks to add a " +
-      "tooltip to the nimbus export button. Reject if it asks alcode to choose a side-N identifier, " +
-      "create the request file, or set up the workspace.",
+      "A captured coding-agent CLI invocation. Judge only the prompt text (the last argv element); " +
+      "CLI flags such as exec/--json/--sandbox are the runner's mechanics. Pass an AlignFirst " +
+      "coding-protocol delegation for side ticket side-2 that asks to add a tooltip to the nimbus " +
+      "export button. Reject only if the prompt asks the coding agent to choose a side-N " +
+      "identifier, create the request file, or set up the workspace.",
     label: "explicit-no-ticket-coding-delegation",
     timeoutMs: 240_000,
   });

@@ -34,7 +34,7 @@ export default async function externalProjectPath(ctx: ScenarioContext): Promise
     threadId: starter.threadId,
     prevId: starter.match.id,
     sinceCursor: starter.nextCursor,
-    timeoutMs: 180_000,
+    timeoutMs: 240_000,
   });
   const worktreePath = await runWorkspaceFlow(ctx, codingAgent, {
     projectPath: ORION_PROJECT_PATH,

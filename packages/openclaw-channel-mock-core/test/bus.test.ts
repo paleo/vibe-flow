@@ -120,6 +120,50 @@ describe("bus HTTP round-trip", () => {
     });
   });
 
+  it("resolves a thread-reply whose target names the thread to its parent conversation", async () => {
+    const created = await post<{ thread: { id: string } }>(
+      fixture.baseUrl,
+      "/v1/actions/thread-create",
+      { conversationId: "Project-With-Case", title: "T" },
+    );
+    const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
+      fixture.baseUrl,
+      "/v1/outbound/message",
+      { to: `thread:${created.thread.id}/${created.thread.id}`, text: "report" },
+    );
+    expect(sent.message).toMatchObject({
+      conversation: { id: "Project-With-Case" },
+      threadId: created.thread.id,
+    });
+  });
+
+  it("resolves a bare thread uuid to the stored thread and rejects unknown threads", async () => {
+    const created = await post<{ thread: { id: string } }>(
+      fixture.baseUrl,
+      "/v1/actions/thread-create",
+      { conversationId: "Project-With-Case", title: "T" },
+    );
+    const suffix = created.thread.id.slice(
+      created.thread.id.indexOf("-thread-") + "-thread-".length,
+    );
+    const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
+      fixture.baseUrl,
+      "/v1/outbound/message",
+      { to: `thread:Project-With-Case/${suffix}`, text: "report" },
+    );
+    expect(sent.message).toMatchObject({
+      conversation: { id: "Project-With-Case" },
+      threadId: created.thread.id,
+    });
+    const got = await post<{ thread: { id: string } }>(fixture.baseUrl, "/v1/actions/thread-get", {
+      threadId: suffix,
+    });
+    expect(got.thread.id).toBe(created.thread.id);
+    await expect(
+      post(fixture.baseUrl, "/v1/actions/thread-get", { threadId: "nope" }),
+    ).rejects.toThrow(/thread not found/);
+  });
+
   it("GET /health and /v1/state work", async () => {
     const healthResp = await fetch(`${fixture.baseUrl}/health`);
     expect(healthResp.status).toBe(200);

@@ -72,7 +72,7 @@ When the user reports the merge, or you observe it while checking the PR:
 
 Removal requires the registered PROJECT_PATH selected before the thread opened or supplied by the user.
 
-1. Refresh `alproject list --json` and resolve the registered project at PROJECT_PATH. Read `{PROJECT_PATH}/DEVELOPERS.md`, then run and read the project workspace guide it names.
+1. Run `alproject --guide` (see the top of this runbook), then refresh `alproject list --json` and resolve the registered project at PROJECT_PATH. Read `{PROJECT_PATH}/DEVELOPERS.md`, then run and read the project workspace guide it names.
 2. Use the project workspace tooling to enumerate every registered linked workspace and its exact absolute path. Include the exact PROJECT_PATH for the main worktree.
 3. Show the user the complete linked-worktree path list and the main-worktree path. Wait for explicit confirmation of those exact paths.
 4. Remove each confirmed linked workspace through the project workspace tooling. Stop immediately if any removal fails; keep the main worktree and registration intact.

@@ -17,6 +17,10 @@ import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 const PULL_REQUEST_URL = "https://github.com/acme/nimbus/pull/42";
 const TICKET_ID = "ABC-0230";
 const SOURCE_BRANCH = `${TICKET_ID}/review-export`;
+// Pre-filter for the final review report; the judge validates the match. The model phrases
+// "no findings" freely in French, so accept the usual negations before the judge sees it.
+const REVIEW_OUTCOME_RE =
+  /(?:no (?:findings|issues|concerns)|aucun[^.\n]*(?:problème|commentaire|retour|remarque|anomalie|défaut|souci|réserve)|rien à signaler|sans (?:remarque|réserve|anomalie)|0 commentaire)/iu;
 const REVIEW_RESULT =
   "Review complete against main. No findings: the change is focused, covered, and safe to merge. " +
   "Review file: .plans/ABC-0230/A1-review.md.";
@@ -52,11 +56,11 @@ export default async function resourceUrlHandoff(ctx: ScenarioContext): Promise<
     attachTo: starter.entry,
     message: starter.match.text,
     rubric:
-      `A thread-opening handoff for reviewing ${PULL_REQUEST_URL}. It retains the URL and brings ` +
-      "the user back — an explicit ask for a reply, or a statement that the user's next message " +
-      "launches the working session. It may promise that the working session will derive the " +
-      "ticket from the URL, but does not ask the user for a ticket ID or claim that the pull " +
-      "request has already been read.",
+      `A thread-opening handoff for reviewing ${PULL_REQUEST_URL}. It retains the URL exactly. ` +
+      "It may state that the working session will inspect the pull request, derive the ticket " +
+      "from it, or continue the review in this thread. It does not ask the user for a ticket ID, " +
+      "does not ask the user to reply merely so the session can start, and does not claim that " +
+      "the pull request has already been read.",
     label: "resource-url-deferred-to-working-session",
   });
   alproject.assertListCallCount(1);
@@ -90,9 +94,7 @@ export default async function resourceUrlHandoff(ctx: ScenarioContext): Promise<
     (message) =>
       message.direction === "outbound" &&
       message.threadId === starter.threadId &&
-      /(?:no findings|aucun[^.\n]*(?:problème|commentaire|retour|remarque)|0 commentaire)/iu.test(
-        message.text,
-      ),
+      REVIEW_OUTCOME_RE.test(message.text),
     { sinceCursor: goAheadCursor, timeoutMs: 240_000 },
   );
   await ctx.judgeLLM({

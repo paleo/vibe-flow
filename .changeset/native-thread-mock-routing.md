@@ -4,4 +4,4 @@
 "@paleo/openclaw-discord-mock": patch
 ---
 
-Added configurable Slack thread routing, native starter receipt shapes, and canonical thread-session delivery.
+Added configurable Slack thread routing, native starter receipt shapes, and canonical thread-session delivery. A send whose target names a stored thread now lands in that thread under its parent conversation, with or without an accompanying `threadId`.

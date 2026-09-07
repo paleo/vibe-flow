@@ -199,6 +199,14 @@ export async function createQaBusThread(params: {
   );
 }
 
+export async function getQaBusThread(params: {
+  baseUrl: string;
+  accountId: string;
+  threadId: string;
+}) {
+  return await postJson<{ thread: QaBusThread }>(params.baseUrl, "/v1/actions/thread-get", params);
+}
+
 export async function renameQaBusThread(params: {
   baseUrl: string;
   accountId: string;

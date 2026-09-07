@@ -25,6 +25,7 @@ import type {
   QaBusPollInput,
   QaBusReadMessageInput,
   QaBusReactToMessageInput,
+  QaBusGetThreadInput,
   QaBusRenameThreadInput,
   QaBusSearchMessagesInput,
   QaBusStateSnapshot,
@@ -127,6 +128,17 @@ export function createQaBusState() {
     return message;
   };
 
+  // Stored thread ids are `<conversation>-thread-<uuid>`; agents sometimes pass only the uuid.
+  // Resolve either form to the stored id; anything else (a Slack root id) passes through.
+  function resolveThreadId(raw: string | undefined): string | undefined {
+    if (raw === undefined || threads.has(raw)) return raw;
+    const suffix = `-thread-${raw}`;
+    for (const id of threads.keys()) {
+      if (id.endsWith(suffix)) return id;
+    }
+    return raw;
+  }
+
   return {
     reset() {
       conversations.clear();
@@ -164,14 +176,16 @@ export function createQaBusState() {
       consumeFault("outbound-message");
       const accountId = normalizeAccountId(input.accountId);
       const normalizedTarget = normalizeConversationFromTarget(input.to);
+      // A thread is a channel on Discord: a target naming a stored thread delivers into that
+      // thread under its parent conversation, whether or not a threadId accompanies it.
+      const requestedThreadId = resolveThreadId(normalizedTarget.threadId);
       const storedThread =
-        normalizedTarget.threadId === undefined
-          ? threads.get(normalizedTarget.conversation.id)
-          : undefined;
+        threads.get(resolveThreadId(normalizedTarget.conversation.id) ?? "") ??
+        (requestedThreadId ? threads.get(requestedThreadId) : undefined);
       const conversation = storedThread
         ? ensureConversation({ id: storedThread.conversationId, kind: "channel" })
         : normalizedTarget.conversation;
-      const threadId = storedThread?.id ?? normalizedTarget.threadId;
+      const threadId = storedThread?.id ?? requestedThreadId;
       const message = createMessage({
         direction: "outbound",
         accountId,
@@ -180,7 +194,7 @@ export function createQaBusState() {
         senderName: input.senderName?.trim() || DEFAULT_BOT_NAME,
         text: input.text,
         timestamp: input.timestamp,
-        threadId: input.threadId ?? threadId,
+        threadId: threadId ?? resolveThreadId(input.threadId),
         replyToId: input.replyToId,
         attachments: input.attachments,
         toolCalls: input.toolCalls,
@@ -215,9 +229,16 @@ export function createQaBusState() {
       }
       faults.set(input.operation, input.message?.trim() || `injected ${input.operation} failure`);
     },
+    getThread(input: QaBusGetThreadInput) {
+      const thread = threads.get(resolveThreadId(input.threadId) ?? "");
+      if (!thread) {
+        throw new Error(`test bus thread not found: ${input.threadId}`);
+      }
+      return { ...thread };
+    },
     renameThread(input: QaBusRenameThreadInput) {
       const accountId = normalizeAccountId(input.accountId);
-      const thread = threads.get(input.threadId);
+      const thread = threads.get(resolveThreadId(input.threadId) ?? "");
       if (!thread) {
         throw new Error(`test bus thread not found: ${input.threadId}`);
       }
@@ -271,7 +292,11 @@ export function createQaBusState() {
       return readQaBusMessage({ messages, input });
     },
     searchMessages(input: QaBusSearchMessagesInput) {
-      return searchQaBusMessages({ messages, threads, input });
+      return searchQaBusMessages({
+        messages,
+        threads,
+        input: { ...input, threadId: resolveThreadId(input.threadId) },
+      });
     },
     poll(input: QaBusPollInput = {}) {
       return pollQaBusEvents({ events, cursor, input });

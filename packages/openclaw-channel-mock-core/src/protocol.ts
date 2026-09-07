@@ -124,6 +124,11 @@ export type QaBusRenameThreadInput = {
   title: string;
 };
 
+export type QaBusGetThreadInput = {
+  accountId?: string;
+  threadId: string;
+};
+
 export type QaBusReactToMessageInput = {
   accountId?: string;
   messageId: string;

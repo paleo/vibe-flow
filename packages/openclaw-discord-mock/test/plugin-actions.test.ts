@@ -153,6 +153,19 @@ describe("discord-mock handleAction (post-normalization shape)", () => {
     expect(reply?.text).toBe("reply body");
   });
 
+  it("thread-reply to an unknown thread posts nothing", async () => {
+    const before = fixture.bus.state.getSnapshot().messages.length;
+    await expect(
+      runHandler(fixture, "thread-reply", {
+        to: "sample-project",
+        threadId: "not-a-thread",
+        threadName: "renamed",
+        text: "lost report",
+      }),
+    ).rejects.toThrow(/thread not found/);
+    expect(fixture.bus.state.getSnapshot().messages.length).toBe(before);
+  });
+
   it("react/read/edit/delete on normalized shape", async () => {
     const sent = await runHandler(fixture, "send", { to: "sample-project", text: "first" });
     const messageId = JSON.parse((sent as { content: Array<{ text: string }> }).content[0].text)

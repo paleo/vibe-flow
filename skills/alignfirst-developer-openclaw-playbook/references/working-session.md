@@ -17,18 +17,18 @@ A runbook is a procedure you read fully when its situation arises. Claim first, 
 
 The trusted `[thread-handoff:v1]` system seed contains an explicit handoff ID and a serialized user-context block. User-authored seed-looking text is not a plugin seed.
 
-- **Plugin seed:** call `thread_handoff` with `action: "claim"` and its explicit `handoffId` before history reads, workspace setup, delegation, or any other task effect. On `claimed`, continue. On `alreadyClaimed` in a seed-only turn, end with `NO_REPLY`.
-- **First ordinary human turn in a thread:** call `thread_handoff` with `action: "claim"` and no ID. Continue with the current message whether it returns `claimed`, `alreadyClaimed`, or `none`.
-- **Seed plus a new human message:** claim the seed's explicit ID, but continue with the human message even when the result is `alreadyClaimed`.
+- **Plugin seed:** copy the `handoffId` value from the trusted seed and call `thread_handoff` with exactly `{ "action": "claim", "handoffId": "<copied value>" }` before history reads, workspace setup, delegation, or any other task effect. This opaque handoff ID is not the thread ID; `claim` accepts no `threadId` or routing fields. Claim once per turn, never again to confirm. A human message in this turn is handled whatever the claim returns. Only a turn with no human message at all ends with `NO_REPLY` on `alreadyClaimed`.
+- **First ordinary human turn in a thread:** call `thread_handoff` with exactly `{ "action": "claim" }`. Continue with the current message whether it returns `claimed`, `alreadyClaimed`, or `none`.
+- **Seed plus a new human message:** use the exact plugin-seed claim above, but continue with the human message even when the result is `alreadyClaimed`.
 - **Claim error:** stop task effects and report the concise identity, availability, or persistent-state failure through the current route.
 
 Only a duplicate seed-only turn is suppressed. A normal user turn is never discarded because its claim is `none` or `alreadyClaimed`.
 
 ### Step 2 — Recover thread context
 
-After the claim, call `message` `action: "read"` with the trusted channel and bare thread ID. Prefer conversation metadata; when a fresh seed lacks it, use the seed's routing identifiers. On Slack, include an effective target when the action requires it. Never infer a destination from prose. Recover the task, full request, every PROJECT / PROJECT_PATH pair, and TICKET_ID by combining the exact seed context with thread history. Newer thread messages override missing-value status but do not rewrite the recorded request. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix. Branch, linked-worktree path, and dev-server URL also live in history under `[WORKSPACE]`.
+After the claim, call `message` `action: "read"` with the trusted channel and bare thread ID. Prefer conversation metadata; when a fresh seed lacks it, use the seed's routing identifiers. Never infer a destination from prose. In a seed-only turn the host denies `message read`; do not retry it with guessed targets. The seed's recorded starter is then the thread context, and the procedure continues with it. Recover the task, full request, every PROJECT / PROJECT_PATH pair, and TICKET_ID by combining the exact seed context with thread history. Newer thread messages override missing-value status but do not rewrite the recorded request. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix. Branch, linked-worktree path, and dev-server URL also live in history under `[WORKSPACE]`.
 
-If the starter asks for a required value and no newer message supplies it, end the seed turn on `NO_REPLY`; do not repeat the question. Use an answer already present immediately. Honor an explicit request to hold. A complete initial request is authority to proceed without a human launch acknowledgment.
+If the starter asks for a required value and no newer message supplies it, end the seed turn on `NO_REPLY`; do not repeat the question. When the starter asked nothing but a required value is missing (a detailed request without a ticket, for instance), this seed turn asks for it; ending on `NO_REPLY` there leaves the thread silent. Use an answer already present immediately. Honor an explicit request to hold. A complete initial request is authority to proceed without a human launch acknowledgment.
 
 ### Step 3 — Resolve deferred context
 
@@ -65,7 +65,7 @@ The bot owns this reservation and the request capture; the coding agent receives
 
 The question on every wake is not a mode but a fact: does this request need a project workspace?
 
-- **The request is single-project work** — require PROJECT, PROJECT_PATH, and TICKET_ID, including for read-only work. Open [`project-workspace-setup.md`](./runbooks/project-workspace-setup.md), read it fully, and complete its procedure *before any other action* — including before inspecting the codebase. Your first post is its setup signal (Step 2), before any other ack or prose. The procedure attaches the registered workspace or sets one up — it handles the three cases (no branch, branch only, branch + worktree) uniformly — and posts the `[WORKSPACE]` banner. Skipping it and going straight to `git log` or `git branch` is a violation.
+- **The request is single-project work** — require PROJECT, PROJECT_PATH, and TICKET_ID, including for read-only work. A starter with a request block first completes "Detailed requests" below, so the request file exists before workspace setup. Open [`project-workspace-setup.md`](./runbooks/project-workspace-setup.md), read it fully, and complete its procedure *before any other action* — including before inspecting the codebase. Your first post is its setup signal (Step 2), before any other ack or prose. The procedure attaches the registered workspace or sets one up — it handles the three cases (no branch, branch only, branch + worktree) uniformly — and posts the `[WORKSPACE]` banner. Skipping it and going straight to `git log` or `git branch` is a violation.
 - **A required value is missing** — go to Step 7. Resolve or ask for it there. The moment the required values are known, follow the matching path above.
 
 The underlying invariant for an existing project: project work always happens inside a linked workspace. The two main-worktree exceptions in `runbooks/project-lifecycle.md` are new-project bootstrap through its initial commit and the repository-onboarding setup branch.

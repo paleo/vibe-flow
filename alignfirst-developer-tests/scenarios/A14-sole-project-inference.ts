@@ -30,7 +30,7 @@ export default async function soleProjectInference(ctx: ScenarioContext): Promis
     threadId: starter.threadId,
     prevId: starter.match.id,
     sinceCursor: starter.nextCursor,
-    timeoutMs: 180_000,
+    timeoutMs: 240_000,
   });
   await runWorkspaceFlow(ctx, codingAgent, {
     projectPath: NIMBUS_PROJECT_PATH,

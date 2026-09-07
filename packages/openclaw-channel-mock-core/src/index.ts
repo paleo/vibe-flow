@@ -6,6 +6,7 @@ export {
   editQaBusMessage,
   failNextQaBusOperation,
   getQaBusState,
+  getQaBusThread,
   injectQaBusInboundMessage,
   pollQaBus,
   reactToQaBusMessage,

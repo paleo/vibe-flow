@@ -7,9 +7,10 @@ import {
 } from "./meta-narration.ts";
 
 // OpenClaw-emitted system notices (tool failures `⚠️ 🛠️ … failed`, generation
-// failures `⚠️ Agent couldn't generate a response…`) stream to the channel root
-// and are not model-controllable — exempt from the leak sweep.
-const openclawNoticeRe = /^⚠️/u;
+// failures `⚠️ Agent couldn't generate a response…`, provider failures
+// `LLM request failed: …`) stream to the channel root and are not
+// model-controllable — exempt from the leak sweep.
+const openclawNoticeRe = /^(?:⚠️|LLM request failed\b)/u;
 
 export interface WaitForStarterOptions {
   sinceCursor: number;

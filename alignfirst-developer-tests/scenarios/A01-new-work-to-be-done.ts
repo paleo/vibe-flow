@@ -68,7 +68,7 @@ async function sendTicketAndExpectSetupSignal(ctx: ScenarioContext, starter: Ste
     threadId: starter.threadId,
     prevId: starter.match.id,
     sinceCursor: starter.nextCursor,
-    timeoutMs: 180_000,
+    timeoutMs: 240_000,
   });
 }
 

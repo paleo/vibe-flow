@@ -201,7 +201,7 @@ export interface SetupCodingAgentMockOptions {
    * Delay (ms) before the stream-json (alcode) branch emits its NDJSON. alcode runs its child in
    * the foreground and blocks on it, so this delay is what makes the whole alcode exec long enough
    * for OpenClaw to background it (and the agent to post a "started" ack) before it exits and the
-   * completion wake fires. Default 4000.
+   * completion wake fires. Default 30000.
    */
   streamDelayMs?: number;
   /**
@@ -221,7 +221,9 @@ export function setupCodingAgentMock(
   options: SetupCodingAgentMockOptions = {},
 ): CodingAgentMockHandle {
   const defaultResult = options.defaultResult ?? GENERIC_CODING_RESULT;
-  const streamDelayMs = options.streamDelayMs ?? 4000;
+  // A real run lasts minutes: a status check right after the launch must still see it running,
+  // so the launch turn ends on its ack and the completion wake reaches the same thread.
+  const streamDelayMs = options.streamDelayMs ?? 30_000;
   const codingAgentCalls: CodingAgentCall[] = [];
   const selectedAgent = readConfiguredAgent();
   const codexResponses: CodexResponseVariant[] = [];

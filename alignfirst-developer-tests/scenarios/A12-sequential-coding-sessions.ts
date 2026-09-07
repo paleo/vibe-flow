@@ -4,7 +4,6 @@ import {
   execMatches,
   invokesAlcode,
   invokesCodingAgentDirectly,
-  nthMatchingCall,
 } from "./_lib/agent-tool-calls.ts";
 import {
   waitForBackgroundStartedAck,
@@ -24,10 +23,14 @@ const TICKET_ID = "ABC-0120";
 const PROJECT = "nimbus";
 
 // The delegation launch: an alcode PROTOCOL run. Discriminates against the other alcode execs a
-// turn legitimately makes — the `--openclaw-guide` read, and the wake turn's protocol-less
-// verification run ("Run the project's checks…"), which is foreground and chains no wake.
+// turn legitimately makes — the `--openclaw-guide` read and protocol-less verification runs.
+// A completion-wake turn may also run further protocol runs (review, description) before the
+// next phase starts, so each phase selects the first launch issued after its own inbound.
 const isAlcodeLaunch = (call: AgentToolCall): boolean =>
   invokesAlcode(call) && execMatches(call, /--protocol/);
+
+const launchedSince = (notBefore: string) => (call: AgentToolCall) =>
+  isAlcodeLaunch(call) && call.startedAt !== undefined && call.startedAt >= notBefore;
 
 /**
  * Regression for the heartbeat-cooldown wake gate (incident `.plans/32/from-paleoclaw/
@@ -75,6 +78,7 @@ async function runFirstDelegation(
   ctx: ScenarioContext,
   codingAgent: CodingAgentMockHandle,
 ): Promise<string> {
+  const phase1NotBefore = new Date().toISOString();
   const starter = await bootstrapThreadFromChannel(ctx, {
     text:
       `Nouvelle fonctionnalité à implémenter sur ${PROJECT} : passer le bouton d'export en gras. ` +
@@ -89,6 +93,7 @@ async function runFirstDelegation(
   await expectDelegationChain(ctx, {
     threadId: starter.threadId,
     sinceCursor: phase1Cursor,
+    notBefore: phase1NotBefore,
     launchIndex: 1,
   });
   return starter.threadId;
@@ -99,6 +104,7 @@ async function runFirstDelegation(
  * taken before the inbound.
  */
 async function runSecondDelegation(ctx: ScenarioContext, threadId: string): Promise<void> {
+  const phase2NotBefore = new Date().toISOString();
   const phase2Cursor = await sendInThread(
     ctx,
     threadId,
@@ -109,6 +115,7 @@ async function runSecondDelegation(ctx: ScenarioContext, threadId: string): Prom
   await expectDelegationChain(ctx, {
     threadId,
     sinceCursor: phase2Cursor,
+    notBefore: phase2NotBefore,
     launchIndex: 2,
   });
 }
@@ -117,7 +124,9 @@ interface DelegationChainOptions {
   threadId: string;
   /** Bus cursor taken before this phase's agent activity; every wait of the phase scans from it. */
   sinceCursor: number;
-  /** 1-based rank of this phase's alcode launch among ALL aggregated launch calls. */
+  /** ISO timestamp taken before this phase's inbound; the phase's launch is issued after it. */
+  notBefore: string;
+  /** 1-based rank of this phase; the session-file count must reach it. */
   launchIndex: number;
 }
 
@@ -131,12 +140,12 @@ async function expectDelegationChain(
   ctx: ScenarioContext,
   opts: DelegationChainOptions,
 ): Promise<void> {
-  const { threadId, sinceCursor, launchIndex } = opts;
+  const { threadId, sinceCursor, notBefore, launchIndex } = opts;
 
   // `waitForAgentToolCall` matches against all aggregated calls, so a plain predicate would
-  // re-match phase 1's launch: discriminate by count and take the newest. The coding-agent
-  // subprocess is a cliMock, not an OpenClaw agent tool call.
-  const launch = await ctx.waitForAgentToolCall(nthMatchingCall(isAlcodeLaunch, launchIndex), {
+  // re-match an earlier launch: select the first launch issued after this phase's inbound. The
+  // coding-agent subprocess is a cliMock, not an OpenClaw agent tool call.
+  const launch = await ctx.waitForAgentToolCall(launchedSince(notBefore), {
     label: `agent delegates to the alcode CLI (launch #${launchIndex})`,
     timeoutMs: 180_000,
   });

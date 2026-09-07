@@ -5,6 +5,7 @@ import type { ChannelMockAccountHelpers } from "./accounts.js";
 import {
   buildQaTarget,
   createQaBusThread,
+  getQaBusThread,
   deleteQaBusMessage,
   editQaBusMessage,
   parseQaTarget,
@@ -306,19 +307,25 @@ export function createChannelMockMessageActions(params: {
             throw new Error(`${channelId} thread-reply requires text/message`);
           }
           const { conversationId } = parseQaTarget(destination);
+          // Discord rejects a reply to an unknown thread before anything is posted.
+          const { thread } = await getQaBusThread({
+            baseUrl,
+            accountId: account.accountId,
+            threadId,
+          });
           const { message } = await sendQaBusMessage({
             baseUrl,
             accountId: account.accountId,
-            to: `thread:${conversationId}/${threadId}`,
+            to: `thread:${conversationId}/${thread.id}`,
             text,
             senderId: account.botUserId,
             senderName: account.botDisplayName,
-            threadId,
+            threadId: thread.id,
           });
           const threadRename = await applyThreadRename({
             baseUrl,
             accountId: account.accountId,
-            threadId,
+            threadId: thread.id,
             actionParams,
           });
           return jsonResult({ message, ...threadRename });

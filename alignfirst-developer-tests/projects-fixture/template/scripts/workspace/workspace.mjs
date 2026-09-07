@@ -61,7 +61,7 @@ await runWorkspace({
   },
 
   finalizeWorkspace: async ({ currentWorktree }) => {
-    execSync("pnpm install --frozen-lockfile --prod=false", {
+    execSync("pnpm install --frozen-lockfile", {
       stdio: "inherit",
       cwd: currentWorktree,
     });
