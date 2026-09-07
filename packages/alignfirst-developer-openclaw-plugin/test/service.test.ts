@@ -25,6 +25,9 @@ describe("handoff enqueue and recovery", () => {
     expect(buildSeed(record)).toContain(
       "End silently only when the claim is alreadyClaimed and this turn has no human message.",
     );
+    expect(buildSeed(record)).toContain(
+      "Do not read thread history in this turn: the starterText below is the thread context.",
+    );
     expect(fixture.wake).toHaveBeenCalledWith(
       expect.objectContaining({ agentId: "main", sessionKey: record.targetSessionKey }),
     );

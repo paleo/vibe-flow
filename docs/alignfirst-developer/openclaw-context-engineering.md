@@ -129,7 +129,11 @@ Without `message` in `alsoAllow`, the channel session falls back to raw Discord 
 
 When a fresh thread session activates on Discord, its transcript starts **empty** — Slack can inject a `ThreadHistoryBody` of up to `thread.initialHistoryLimit` (100), but Discord has no equivalent path (the API capability exists in `readMessagesDiscord()`, just not wired into thread-session init).
 
-Workaround: the handoff seed carries an escaped copy of the exact starter and trusted routing identifiers. After claiming it, the thread playbook also calls `message` `action: "read"` so newer human answers and existing workspace state participate. The system prompt's `MESSAGE_TOOL_THREAD_READ_HINT` string (in `src/agents/tools/message-tool.ts`) supports the same read path.
+Workaround: the handoff seed carries an escaped copy of the exact starter and trusted routing identifiers, so the seed turn needs no history read. On a later human turn the thread playbook calls `message` `action: "read"` so newer answers and the `[WORKSPACE]` state participate. The system prompt's `MESSAGE_TOOL_THREAD_READ_HINT` string (in `src/agents/tools/message-tool.ts`) supports the same read path.
+
+### Heartbeat turns deny external-plugin reads
+
+A heartbeat-driven turn, the handoff seed included, forces `requireExplicitMessageTarget` and mints no trusted message-action context (`agent-runner-embedded-candidate.ts`). The host gate in `src/channels/plugins/message-action-dispatch.ts` then rejects every conversation-read action (`read`, `search`, `react`, …) of an **external** channel plugin, whatever target the model passes: `Delegated <channel>:read requires the exact current conversation and account for this plugin.` Bundled Slack and Discord declare `providerOwnedReadGates: true`, skip that gate, and fall back to their own channel allow policy. This is why the seed turn must not read the thread, and why the mock channels cannot show what a real deployment would return there.
 
 ## `expectsCompletionMessage` — let a thread subagent speak for itself
 

@@ -46,11 +46,13 @@ RUN chmod +x /opt/openclaw-test/scripts/*.mjs
 USER claw
 
 # Pin pnpm's content-addressable store outside /home/claw/projects/, which is a
-# docker volume on its own filesystem. Without this, pnpm walks up from a
-# worktree install target and creates /home/claw/projects/.pnpm-store, polluting
-# the project listing the agent grounds project names in. Cost: pnpm falls back
-# to copy instead of hardlinks across filesystems — irrelevant at fixture size.
-RUN printf 'store-dir=/home/claw/.pnpm-store\n' > /home/claw/.pnpmrc && \
+# docker volume on its own filesystem. Without this, pnpm creates a fresh
+# /home/claw/projects/.pnpm-store per cell and re-downloads every fixture
+# dependency (10 s alone, minutes under three parallel cells); with it, the
+# template install below warms the store the fixtures reuse offline. pnpm 12
+# reads this from ~/.config/pnpm/config.yaml, which `pnpm config set` writes.
+# Cost: copy instead of hardlinks across filesystems — irrelevant at fixture size.
+RUN pnpm config set store-dir /home/claw/.pnpm-store --global && \
     mkdir -p /home/claw/.pnpm-store
 
 # The @paleo/openclaw-* packages install from locally-built tarballs under

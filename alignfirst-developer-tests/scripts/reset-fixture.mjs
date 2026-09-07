@@ -41,7 +41,7 @@ async function main() {
   }
   // Wipe everything under the fixture parents and origins unconditionally. The
   // fixture template lives in /opt/alignfirst-developer-tests/fixtures/ and is re-copied below.
-  // pnpm's store is pinned to /home/claw/.pnpm-store via ~/.npmrc, so nothing
+  // pnpm's store is pinned to /home/claw/.pnpm-store by the image's pnpm config, so nothing
   // here is worth keeping.
   for (const parent of [...FIXTURE_PARENTS, ...EMPTY_FIXTURE_PARENTS]) {
     for (const entry of readdirSync(parent)) {

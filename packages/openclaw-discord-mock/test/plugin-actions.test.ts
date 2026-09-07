@@ -153,6 +153,27 @@ describe("discord-mock handleAction (post-normalization shape)", () => {
     expect(reply?.text).toBe("reply body");
   });
 
+  it("thread-reply with only threadId posts to the thread, like Discord", async () => {
+    const thread = fixture.bus.state.createThread({
+      accountId: "default",
+      conversationId: "sample-project",
+      title: "T",
+    });
+    await runHandler(fixture, "thread-reply", { threadId: thread.id, text: "reply body" });
+    const reply = fixture.bus.state.getSnapshot().messages.find((m) => m.threadId === thread.id);
+    expect(reply?.conversation.id).toBe("sample-project");
+    expect(reply?.text).toBe("reply body");
+  });
+
+  it("declares threadId as the thread-reply delivery target alias", () => {
+    const alias = actions.messageActionTargetAliases?.["thread-reply"];
+    expect(alias?.deliveryTargetAliases).toEqual(["threadId"]);
+    expect(alias?.resolveDeliveryTarget?.({ args: { threadId: "t1" } })).toBe("channel:t1");
+    expect(alias?.resolveDeliveryTarget?.({ args: { to: "channel:c1", threadId: "t1" } })).toBe(
+      undefined,
+    );
+  });
+
   it("thread-reply to an unknown thread posts nothing", async () => {
     const before = fixture.bus.state.getSnapshot().messages.length;
     await expect(

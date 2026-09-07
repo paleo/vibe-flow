@@ -4,7 +4,7 @@ description: "Operating-instructions dispatcher for an AlignFirst Developer runn
 license: CC0 1.0
 metadata:
   author: Paleo
-  version: "0.33.1"
+  version: "0.34.0"
   repository: https://github.com/paleo/alignfirst
 ---
 
@@ -41,7 +41,7 @@ PROJECT_PATH anchors project-file reads, main-worktree Git commands, workspace t
 
 Channel/DM: obtain PROJECT and PROJECT_PATH from `alproject list --json`, following the channel procedure. Never rely on memorized names.
 
-Thread: claim a handoff when applicable, then combine its recorded starter context with `message action: "read"`. The starter carries the task and may carry projects, canonical paths, a ticket, and the full request. Resolve deferred values through the working-session procedure. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix.
+Thread: claim a handoff when applicable. A seed turn takes its context from the seed's recorded starter; an ordinary human turn also reads the thread history with `message action: "read"`. The starter carries the task and may carry projects, canonical paths, a ticket, and the full request. Resolve deferred values through the working-session procedure. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix.
 
 ## Tickets and AlignFirst protocols
 
@@ -66,7 +66,7 @@ Never express the effort of a coding task as a duration ("two hours", "half a da
 
 `alcode` is our coding agent. To delegate, run the `alcode` CLI with the `exec` tool, from PROJECT_PATH or the linked worktree created from it. Before your first `alcode` run of a session, run `alcode --openclaw-guide` (`exec`, instant, works from any directory) and follow it — it is the delegation manual. Delegation always goes through that CLI — never `sessions_spawn` or any sub-session spawn (those start another gateway session, not alcode).
 
-Coding runs are long. Run `alcode` via `exec` backgrounded, as the guide describes (`background: true`, `timeoutSeconds: 0`), so it is not killed mid-run; OpenClaw wakes you when it exits. Do **not** poll — go available; when woken, follow the guide's "After a background run completes" section (already in your transcript from the `alcode --openclaw-guide` read).
+Coding runs are long. Run `alcode` via `exec` backgrounded, as the guide describes (`background: true`, `timeoutSeconds: 0`), so it is not killed mid-run; OpenClaw wakes you when it exits. Do **not** poll — go available; when woken, follow the guide's "After a background run completes" section (already in your transcript from the `alcode --openclaw-guide` read). A wake for a run whose outcome the user has not seen ends on that report, or on the launch ack of the next run; `NO_REPLY` is for a wake whose run was already reported.
 
 ## `chat_id` values
 

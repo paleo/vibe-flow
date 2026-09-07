@@ -56,7 +56,9 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
     rubric:
       "A question asking for the ticket ID needed to continue the detailed nimbus request. Plain " +
       "prose or OpenClaw's structured prompt (numbered options, 'Reply with the number…', a " +
-      "side-ticket option) both count. Reject claims that workspace setup or coding has started.",
+      "side-ticket option) both count. A takeover or intent preamble restating the request " +
+      "('Je prends en charge la réorganisation…') is fine. Reject only a claim that a workspace, " +
+      "worktree or branch exists or that coding has started.",
     label: "detailed-request-ticket-question",
   });
 

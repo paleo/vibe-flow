@@ -141,6 +141,19 @@ export function createChannelMockMessageActions(params: {
   const { surface, helpers, channelId } = params;
 
   return {
+    // Mirrors bundled Discord: a bare `threadId` is the delivery target of `thread-reply`, which
+    // satisfies the host's explicit-target requirement in heartbeat-driven turns.
+    ...(surface === "discord"
+      ? {
+          messageActionTargetAliases: {
+            "thread-reply": {
+              aliases: ["threadId"],
+              deliveryTargetAliases: ["threadId"],
+              resolveDeliveryTarget: ({ args }) => resolveThreadReplyDeliveryAlias(args),
+            },
+          },
+        }
+      : {}),
     describeMessageTool: (context) => ({
       actions: listActions({
         surface,
@@ -292,21 +305,16 @@ export function createChannelMockMessageActions(params: {
           return jsonResult({ ok: true, thread });
         }
         case "thread-reply": {
-          const destination = resolveDestination(actionParams);
+          // Real Discord addresses a thread by its own id: `threadId` alone is a complete
+          // destination (see the `thread-reply` delivery alias below).
           const threadId = readStringParam(actionParams, "threadId");
           const text = readSendText(actionParams);
-          if (!destination) {
-            throw new Error(
-              `${channelId} thread-reply requires a destination (to/target/channelId)`,
-            );
-          }
           if (!threadId) {
             throw new Error(`${channelId} thread-reply requires threadId`);
           }
           if (text === undefined) {
             throw new Error(`${channelId} thread-reply requires text/message`);
           }
-          const { conversationId } = parseQaTarget(destination);
           // Discord rejects a reply to an unknown thread before anything is posted.
           const { thread } = await getQaBusThread({
             baseUrl,
@@ -316,7 +324,7 @@ export function createChannelMockMessageActions(params: {
           const { message } = await sendQaBusMessage({
             baseUrl,
             accountId: account.accountId,
-            to: `thread:${conversationId}/${thread.id}`,
+            to: `thread:${thread.conversationId}/${thread.id}`,
             text,
             senderId: account.botUserId,
             senderName: account.botDisplayName,
@@ -437,6 +445,12 @@ export function createChannelMockMessageActions(params: {
       }
     },
   };
+}
+
+function resolveThreadReplyDeliveryAlias(args: Record<string, unknown>): string | undefined {
+  if (resolveDestination(args) !== undefined) return;
+  const threadId = readStringParam(args, "threadId");
+  return threadId ? buildQaTarget({ chatType: "channel", conversationId: threadId }) : undefined;
 }
 
 /**

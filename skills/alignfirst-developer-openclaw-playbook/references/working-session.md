@@ -26,7 +26,12 @@ Only a duplicate seed-only turn is suppressed. A normal user turn is never disca
 
 ### Step 2 — Recover thread context
 
-After the claim, call `message` `action: "read"` with the trusted channel and bare thread ID. Prefer conversation metadata; when a fresh seed lacks it, use the seed's routing identifiers. Never infer a destination from prose. In a seed-only turn the host denies `message read`; do not retry it with guessed targets. The seed's recorded starter is then the thread context, and the procedure continues with it. Recover the task, full request, every PROJECT / PROJECT_PATH pair, and TICKET_ID by combining the exact seed context with thread history. Newer thread messages override missing-value status but do not rewrite the recorded request. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix. Branch, linked-worktree path, and dev-server URL also live in history under `[WORKSPACE]`.
+The context depends on how the turn started:
+
+- **Seed turn** (the trusted `[thread-handoff:v1]` event, with or without a human message): the seed's `starterText` is the thread context. Do not call `message read` in this turn: the thread holds only that starter, and the seed already carries it. A human message in the same turn adds to it.
+- **Ordinary human turn**: call `message` `action: "read"` with the current channel and the bare thread ID from conversation metadata, then combine the history with the transcript.
+
+Recover the task, the full request, every PROJECT / PROJECT_PATH pair, and TICKET_ID from that context. The channel session already consulted the project inventory; run `alproject list --json` again only where a runbook or the multi-project procedure asks for it. Newer thread messages override missing-value status but do not rewrite the recorded request. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix. Branch, linked-worktree path, and dev-server URL also live in history under `[WORKSPACE]`.
 
 If the starter asks for a required value and no newer message supplies it, end the seed turn on `NO_REPLY`; do not repeat the question. When the starter asked nothing but a required value is missing (a detailed request without a ticket, for instance), this seed turn asks for it; ending on `NO_REPLY` there leaves the thread silent. Use an answer already present immediately. Honor an explicit request to hold. A complete initial request is authority to proceed without a human launch acknowledgment.
 
@@ -227,7 +232,7 @@ Either way, the report states the error and your decision.
 
 #### Dev-server log review
 
-After using a dev-server, always inspect the dev-server logs through a separate, no-protocol alcode run with the smallest available model. Give it the log locations. Ask it to identify errors or unusual behavior.
+After using a dev-server, always inspect the dev-server logs through a separate, no-protocol alcode run with the smallest available model. Give it the log locations. Ask it to identify errors or unusual behavior. Launch it as a background run like every alcode run; the manual test's verdict then lands on that run's completion wake.
 
 Clean logs are required for the manual test to pass.
 

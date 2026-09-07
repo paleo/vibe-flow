@@ -51,6 +51,9 @@ export default async function projectCreation(ctx: ScenarioContext): Promise<voi
         throw new Error("project bootstrap started before the side-1 request reservation");
       }
       await copyBootstrapTemplate(scenario);
+      // A verifying bot may ask for the `packageManager` declaration the template omits;
+      // comply, like a real alcode would.
+      if (/\bpackageManager\b/u.test(prompt)) await declarePackageManager(scenario);
       // A bot may delegate the initial commit itself ("create one initial
       // commit with message …", "run git commit -m …"); comply, like a real
       // alcode. The affirmative verb (or a literal `git commit`) guards
@@ -196,12 +199,27 @@ async function commitNovaBootstrap(ctx: ScenarioContext, message: string): Promi
     [
       "sh",
       "-c",
-      `cd "${NOVA_PROJECT_PATH}" && git add -A && ` +
-        `git -c user.email=mock@local -c user.name=mock commit -q -m "${message}"`,
+      // A correction run that changed nothing still succeeds: nothing to commit.
+      `cd "${NOVA_PROJECT_PATH}" && git add -A && (git diff --cached --quiet || ` +
+        `git -c user.email=mock@local -c user.name=mock commit -q -m "${message}")`,
     ],
     { timeoutMs: 30_000 },
   );
   if (result.exitCode !== 0) throw new Error(`bootstrap commit failed: ${result.stderr}`);
+}
+
+async function declarePackageManager(ctx: ScenarioContext): Promise<void> {
+  const result = await ctx.execInGateway(
+    [
+      "node",
+      "-e",
+      'const fs=require("node:fs");const p=process.argv[1];const pkg=JSON.parse(fs.readFileSync(p,"utf8"));' +
+        'pkg.packageManager??="pnpm@12.3.4";fs.writeFileSync(p,JSON.stringify(pkg,null,2)+"\\n");',
+      `${NOVA_PROJECT_PATH}/package.json`,
+    ],
+    { timeoutMs: 30_000 },
+  );
+  if (result.exitCode !== 0) throw new Error(`packageManager declaration failed: ${result.stderr}`);
 }
 
 async function copyBootstrapTemplate(ctx: ScenarioContext): Promise<void> {
