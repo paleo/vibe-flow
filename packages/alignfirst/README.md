@@ -1,6 +1,6 @@
 # alignfirst
 
-The AlignFirst CLI provides collaborative software-development workflows, task files, shared plans, project conventions, documentation discovery, and setup diagnostics.
+The AlignFirst CLI provides collaborative software-development workflows, work files, and documentation discovery. Work files are organized by ticket and kept either git-ignored in the project or synchronized through a team repository.
 
 ## Installation
 
@@ -48,7 +48,7 @@ Run `alignfirst --help` for command usage or `alignfirst guide` to choose a prot
 
 ## Agent skills
 
-Ten optional Agent Skill stubs expose the CLI to GitHub Copilot, Cursor, Claude Code, and Codex. Protocol skills reuse guides already in context and load missing guides through `npx -y alignfirst guide`. Catchup skills load ticket history through `npx -y alignfirst ticket --catchup`.
+Ten optional Agent Skill stubs expose the CLI to Claude Code, Codex, GitHub Copilot, and Cursor. Protocol skills reuse guides already in context and load missing guides through `npx -y alignfirst guide`. Catchup skills load ticket history through `npx -y alignfirst ticket --catchup`.
 
 Install them globally:
 
@@ -59,7 +59,7 @@ npx skills add https://github.com/paleo/alignfirst --global \
   --skill alcatchupaad --skill alcatchupspec
 ```
 
-Restart the agent after installation. Claude Code, GitHub Copilot, and Cursor expose skills with `/`; Codex uses `$`.
+Start a new agent session to load the skills.
 
 ## Workflows
 
@@ -73,9 +73,9 @@ These examples use the `/` form. Replace it with `$` in Codex.
 | Description | `/aldescription` | Summarize the work and propose a commit message. |
 | Review | `/alreview` | Review the current branch against its base. |
 | Merge | `/almerge` | Resolve merge or rebase conflicts. |
-| Catch up | `/alcatchup` | Load the current task history and continue. |
-| Catch up and align | `/alcatchupaad <request>` | Load history, then start AAD. |
-| Catch up and specify | `/alcatchupspec <request>` | Load history, then start specification. |
+| Catch up | `/alcatchup` | Load the current ticket history and continue. |
+| Catch up and AAD | `/alcatchupaad <request>` | Load ticket history, then start AAD. |
+| Catch up and spec | `/alcatchupspec <request>` | Load ticket history, then start specification. |
 
 To implement a plan, start a fresh agent context and ask it to execute the plan file.
 
