@@ -2,7 +2,7 @@
 
 All project documentation lives in the `docs/` directory. The `docmap` CLI lets humans and AI agents discover and read documents without leaving the terminal.
 
-## Browsing with CLI
+## Browsing with the CLI
 
 Targets are positional paths; the CLI classifies each by inspecting the filesystem (directory → list, file → read). Pass several at once. The `docs/` prefix shown in listings is optional on input.
 

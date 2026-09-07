@@ -1,8 +1,8 @@
 # AlignFirst Guide
 
-Follow the requested protocol if its guide is already in context. Otherwise, load it with the command below. Each named guide includes its protocol and shared conventions; add `--protocol-only` when those conventions are already in context.
+Follow the requested protocol if its guide is already in context. Otherwise, load it with the command below. Each named guide includes its protocol and the ticket directory and work file rules; add `--protocol-only` when those rules are already in context.
 
-## Choose a protocol
+## Choose a Protocol
 
 Use spec → plan → execution for most tasks, especially when the design is uncertain. Use AAD for small changes or follow-up work. Execute a written plan in a fresh agent session.
 

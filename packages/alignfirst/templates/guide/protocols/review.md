@@ -1,6 +1,6 @@
-# How to Write a Code Review Report
+# Review Protocol
 
-## Pre-requisites
+## Prerequisites
 
 You need:
 
@@ -37,7 +37,7 @@ Before starting, run `{{TICKET_CMD}} --next review.md --new-cycle` to start a ne
 
 ## Phase 2. Perspective Reviews
 
-**Small diff** (roughly under 100 changed lines, outside generated files and lockfiles): skip the subagents. Execute the perspectives yourself, sequentially — intent, correctness, safety, quality — reading the same files. The rest of the protocol is unchanged.
+**Small diff** (roughly under 100 changed lines, outside generated files and lockfiles): skip the subagents. Execute the perspectives yourself, sequentially — intent, correctness, change safety, code quality — reading the same files. The rest of the protocol is unchanged.
 
 Otherwise, launch four reviewer subagents in parallel:
 
@@ -45,8 +45,8 @@ Otherwise, launch four reviewer subagents in parallel:
 | --- | --- | --- |
 | Intent | `intent` | none |
 | Correctness | `correctness` | from Phase 1 |
-| Change safety | `safety` | from Phase 1 |
-| Quality | `quality` | from Phase 1 |
+| Change Safety | `safety` | from Phase 1 |
+| Code Quality | `quality` | from Phase 1 |
 
 Each subagent prompt must contain:
 

@@ -1,6 +1,6 @@
-# How to Write a Technical Specification
+# Specification Protocol
 
-## Pre-requisites
+## Prerequisites
 
 Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 
@@ -8,13 +8,13 @@ Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory c
 
 When the user asks you for a SPEC (technical specification), you MUST follow this process:
 
-1. **Investigation Phase**: Research the codebase to understand the current implementation and identify the problem
-2. **Discussion Phase**: Collaborate with the user to explore the problem space and potential solutions BEFORE writing the specification file
-3. **Specification Phase**: Only after user approval, write the final specification file
+1. **Investigation**: Research the codebase to understand the current implementation and identify the problem
+2. **Discussion**: Collaborate with the user to explore the problem space and potential solutions BEFORE writing the specification file
+3. **Specification**: Only after user approval, write the final specification file
 
 The discussion phase is MANDATORY. Remember that you are a newcomer to this project while the user has extensive experience with the codebase and will be happy to help guide you.
 
-## Phase 1. Investigation Phase
+## Phase 1. Investigation
 
 Check your context for available **documentation** and **skills**. Read every document and skill relevant to any aspect of the task — this is not optional. For each skill, also **read its relevant references**.
 
@@ -22,7 +22,7 @@ Investigate the codebase yourself, find the relevant source code, think carefull
 
 Always seek a clean break solution by default. Never consider backward compatibility unless explicitly requested.
 
-## Phase 2. Discussion Phase
+## Phase 2. Discussion
 
 Engage in a thorough collaborative discussion covering:
 
@@ -42,7 +42,7 @@ You should ask questions freely to ensure you fully understand:
 
 Do not use your question tool. Always ask in plain text. Your questions will be the opportunity for a real discussion.
 
-## Phase 3. Specification Phase
+## Phase 3. Specification
 
 After the user approves your proposal, run `{{TICKET_CMD}} --next spec.md --new-cycle` to start a new cycle. Append FILE_NAME to TICKET_DIR, then immediately write the specification at that path. Do not overwrite an existing file.
 

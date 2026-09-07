@@ -15,7 +15,7 @@ Add `npm install -g alignfirst` to the README prerequisites so teammates install
 
 ## Install the Skills
 
-The `alignfirst` skill loads the requested protocol or helps choose one. `alspec`, `alplan`, `al`, `almerge`, `alreview`, and `aldescription` select individual protocols. `alcatchup` loads ticket history; `alcatchupaad` and `alcatchupspec` load history before starting AAD or specification. Skills reuse guides already in context; each named guide includes shared conventions. Humans invoke them with `/` in Claude Code, GitHub Copilot, and Cursor, or `$` in Codex.
+The `alignfirst` skill loads the requested protocol or helps choose one. `alspec`, `alplan`, `al`, `almerge`, `alreview`, and `aldescription` select individual protocols. `alcatchup` loads ticket history; `alcatchupaad` and `alcatchupspec` load history before starting AAD or specification. Skills reuse guides already in context; each named guide includes the ticket directory and work file rules. Humans invoke them with `/` in Claude Code, GitHub Copilot, and Cursor, or `$` in Codex.
 
 Discover the package without installing it:
 

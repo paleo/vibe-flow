@@ -1,6 +1,6 @@
 # Align-and-Do Protocol (AAD)
 
-## Pre-requisites
+## Prerequisites
 
 Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 

@@ -36,17 +36,21 @@ Use Spec-Plan-Execute when:
 
 The `alcatchup` alias loads this context, then follows the user's instructions or returns a short synthesis. `alcatchupaad` and `alcatchupspec` load it, then start AAD or a specification.
 
-## Description
+## Standalone Utilities
 
-A standalone utility (`aldescription` alias). It reads specs and summaries that have been generated for a ticket and produces a concise description of what was implemented. Typically used to generate a PR/MR description once the work is done.
+Each utility runs on its own, outside the workflows.
 
-## Code Review
+### Description
 
-A standalone utility (`alreview` alias). It compares the current branch to a base branch (defaults to the repo's default branch) and runs parallel reviewers, each with its own perspective: intent, correctness, change safety, code quality. Ecosystem modules (strict TypeScript, JavaScript, Python) sharpen the language-specific checks. The findings are merged into a concise review report.
+`aldescription` alias. Reads the specs and summaries of a ticket and writes a concise description of the implemented work, typically for a PR or MR.
 
-## Merge
+### Review
 
-A standalone utility (`almerge` alias). After a merge or rebase, the agent investigates both sides, resolves the conflicts (with a special case for lock files), and writes a brief summary of the resolutions.
+`alreview` alias. Compares the current branch to a base branch (the repository's default branch unless another is given) and runs parallel reviewers, each with its own perspective: intent, correctness, change safety, code quality. Ecosystem modules (strict TypeScript, JavaScript, Python) sharpen the language-specific checks. The findings are merged into a concise review report.
+
+### Merge
+
+`almerge` alias. Merges an incoming branch, or resolves the conflicts of a merge or rebase in progress. The agent investigates both sides, resolves each conflict (with a special case for lock files), and writes a brief summary of the resolutions.
 
 ## Typical Lifecycle of a Ticket
 

@@ -1,8 +1,8 @@
-# How to Write Implementation Plans
+# Planning Protocol
 
-## Pre-requisites
+## Prerequisites
 
-### Determine TICKET_DIR and the spec file
+### Determine TICKET_DIR and the Spec File
 
 You need:
 
@@ -17,14 +17,14 @@ Before starting, **read the spec file** and understand it entirely.
 
 In order to generate implementation plans, you MUST follow this process:
 
-1. **Investigation Phase**: Explore the codebase, understand the current implementation, and identify the problem
-2. **Analysis Phase**: Determine the plan structure (single or multiple plans) and identify relevant documentation and skills
-3. **Designing Phase - Implementation Plan(s)**: Design plan(s) based on the analysis - If you discover issues or missing design decisions, STOP AND ASK THE USER
-4. **Designing Phase - Main Plan**: If multiple plans, design a main plan to coordinate them
-5. **Writing Phase**: Write the plan file(s)
-6. **Review Phase**: Critically review and improve the plan(s)
+1. **Investigation**: Explore the codebase, understand the current implementation, and identify the problem
+2. **Analysis**: Determine the plan structure (single or multiple plans) and identify relevant documentation and skills
+3. **Plan Design**: Design plan(s) based on the analysis - If you discover issues or missing design decisions, STOP AND ASK THE USER
+4. **Main Plan Design**: If multiple plans, design a main plan to coordinate them
+5. **Writing**: Write the plan file(s)
+6. **Review**: Critically review and improve the plan(s)
 
-## Phase 1. Investigation Phase
+## Phase 1. Investigation
 
 Check your context for available **documentation** and **skills**. Read every document and skill relevant to any aspect of the task — this is not optional. For each skill, also **read its relevant references**.
 
@@ -34,7 +34,7 @@ Use the SPEC text as a starting point, but do not trust it blindly. Verify the c
 
 For each operation in the spec, search for existing functions that do a similar job.
 
-## Phase 2. Analysis Phase
+## Phase 2. Analysis
 
 Based on your investigation, determine the plan structure:
 
@@ -55,7 +55,7 @@ Identify which **documentation** and **skills** are relevant for the work. Omit 
 - List the documentation and skills that the implementing agent should read and follow. Always exclude `alignfirst` from skills.
 - For complex skills with reference files, identify specific files that should be loaded
 
-## Phase 3. Designing Phase - Implementation Plan Structure
+## Phase 3. Plan Design
 
 Design an implementation plan based on the SPEC. Include all useful information from the spec. If the spec is already detailed enough, you can extract and reuse parts of it. Add implementation details, file paths, and a breakdown into steps that weren't in the spec.
 
@@ -132,7 +132,7 @@ Do not trust this plan blindly. Be sure you understand the codebase and the plan
 **IMPORTANT**: Do NOT use external search tools (Context7, web search, documentation fetching) during implementation unless explicitly allowed in this plan. All context should be provided in this plan or discoverable in the codebase.
 ```
 
-## Phase 4. Designing Phase - Main Plan
+## Phase 4. Main Plan Design
 
 **Create a main plan only when multiple plans are created. Skip this section entirely if not applicable.**
 
@@ -205,7 +205,7 @@ Note:
 
 - Replace "{PLAN_FILE_PATH}" with the complete plan file path, such as `.plans/123/A2-main-plan.md`. Its handover path is `.plans/123/A2-main-plan.summary.md`.
 
-## Phase 5. Writing Phase
+## Phase 5. Writing
 
 Write the plan file(s) according to the determined structure:
 
@@ -236,7 +236,7 @@ Continue the current cycle. Immediately before writing each file, run `{{TICKET_
 
 _Important Note: There will be lint errors in the markdown files you write. Ignore them. NEVER FIX LINT ERRORS (FORMATTING ISSUES) IN THE PLANS._
 
-## Phase 6. Review Phase
+## Phase 6. Review
 
 When you think the plan(s) are complete, read them again with a critical eye and edit them to improve them.
 

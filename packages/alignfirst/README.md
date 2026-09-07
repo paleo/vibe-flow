@@ -44,7 +44,7 @@ The guide installs the selected components and configures the repository. Remove
 - `config` — Report the effective project configuration.
 - `doctor` — Diagnose an AlignFirst setup.
 
-Run `alignfirst --help` for command usage or `alignfirst guide` to choose a protocol. `alignfirst guide <protocol>` prints the selected protocol followed by shared conventions. Add `--protocol-only` when those conventions are already in context.
+Run `alignfirst --help` for command usage or `alignfirst guide` to choose a protocol. `alignfirst guide <protocol>` prints the selected protocol followed by the ticket directory and work file rules. Add `--protocol-only` when those rules are already in context.
 
 ## Agent skills
 

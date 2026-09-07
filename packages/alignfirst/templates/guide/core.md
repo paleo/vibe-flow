@@ -1,6 +1,6 @@
-# Shared Conventions
+# Ticket Directory and Work Files
 
-## Ticket directory
+## Ticket Directory
 
 TICKET_DIR holds a ticket's work files and includes a trailing slash. TICKET_ID is the external ticket ID or `side-N` for work without an external ticket.
 
@@ -12,7 +12,7 @@ TICKET_DIR holds a ticket's work files and includes a trailing slash. TICKET_ID 
 
 When the user says there is no external ticket, run `{{CMD}} ticket --side` and use the returned TICKET_ID in subsequent ticket commands. Reuse an existing `side-N` directory when the user refers to earlier work. Omit the ticket ID from commit messages.
 
-## Work files
+## Work Files
 
 Files use `{CYCLE_LETTER}{FILE_NUMBER}-{FILE_TYPE}.md`. FILE_PREFIX combines the cycle letter and the file number within that cycle. FILE_NAME includes the prefix and extension.
 

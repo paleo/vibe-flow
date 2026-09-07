@@ -1,6 +1,6 @@
-# How to Resolve Merge Conflicts
+# Merge Protocol
 
-## Pre-requisites
+## Prerequisites
 
 Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no external ticket).
 
@@ -8,7 +8,7 @@ Run `{{TICKET_CMD}}` once to identify TICKET_DIR and load the ticket directory c
 
 This protocol applies when a merge or rebase has produced conflicts, or when the user provides an incoming branch to merge. Follow the steps below.
 
-## 1. Check git status
+## 1. Check Git Status
 
 Run `git status` to check for conflicts.
 
@@ -29,7 +29,7 @@ Resolve the conflicts properly — preserve both intents whenever possible. Do n
 1. Accept all the changes from the incoming branch.
 2. After all other conflicts are resolved, run the proper install command so the package manager re-applies the current branch's dependency changes.
 
-## 4. Finalize the merge
+## 4. Finalize the Merge
 
 Finalize the merge using git's default commit message (e.g. `git commit --no-edit`). Do not write your own commit message — git has already prepared the proper merge message.
 
@@ -44,11 +44,11 @@ Example:
 ```markdown
 # Merge Summary - [very short title]
 
-## Notable resolutions
+## Notable Resolutions
 
 - `path/to/file.ts`: [what made it tricky and which choice was made, in one or two sentences]
 
-## Lock file
+## Lock File
 
 [Only if there was a lock file conflict: which lock file, which install command was run]
 ```

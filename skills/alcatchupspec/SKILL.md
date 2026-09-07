@@ -11,4 +11,4 @@ metadata:
 
 Run `npx -y alignfirst ticket --catchup` to load the ticket history. Add the ticket ID before `--catchup` when the user names one, or `--side` when there is no external ticket.
 
-Then follow the `spec` protocol guide if it is already in context. Otherwise, run `npx -y alignfirst guide spec` and follow it; the output includes shared conventions. Do not use your own plan mode.
+Then follow the `spec` protocol guide if it is already in context. Otherwise, run `npx -y alignfirst guide spec` and follow it; the output includes the ticket directory and work file rules. Do not use your own plan mode.

@@ -140,7 +140,7 @@ function renderGuide(ctx: CommandContext, options: GuideOptions): string {
   const [title, ...sections] = protocol.split("\n\n");
   return [
     title,
-    "This guide includes the selected protocol and shared conventions. Read both before starting.",
+    "This guide includes the selected protocol, followed by the ticket directory and work file rules. Read both before starting.",
     ...sections,
     core,
   ].join("\n\n");

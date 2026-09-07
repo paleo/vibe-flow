@@ -13,23 +13,25 @@ afterEach(() => {
 });
 
 describe("guide command", () => {
-  it("renders protocol selection and shared conventions by default", async () => {
+  it("renders protocol selection and the ticket directory section by default", async () => {
     const result = await runMain(["guide"], { cwd: temp() });
     expect(result).toMatchObject({ code: 0, stderr: "" });
     expect(result.stdout).toContain("# AlignFirst Guide");
     expect(result.stdout).toContain("alignfirst guide spec");
-    expect(result.stdout.indexOf("# Shared Conventions")).toBeGreaterThan(
-      result.stdout.indexOf("## Choose a protocol"),
+    expect(result.stdout.indexOf("# Ticket Directory and Work Files")).toBeGreaterThan(
+      result.stdout.indexOf("## Choose a Protocol"),
     );
-    expect(result.stdout).not.toContain("# How to Write a Technical Specification");
+    expect(result.stdout).not.toContain("# Specification Protocol");
     expect(result.stdout.endsWith("\n")).toBe(true);
     expect(result.stdout.endsWith("\n\n")).toBe(false);
   });
 
-  it("renders every complete protocol before shared conventions, without the catalogue", async () => {
+  it("renders every complete protocol before the ticket directory section, without the catalogue", async () => {
     const cwd = temp();
     const selection = await runMain(["guide"], { cwd });
-    const shared = selection.stdout.slice(selection.stdout.indexOf("# Shared Conventions"));
+    const core = selection.stdout.slice(
+      selection.stdout.indexOf("# Ticket Directory and Work Files"),
+    );
     for (const protocol of PROTOCOLS) {
       const combined = await runMain(["guide", protocol], { cwd });
       const protocolOnly = await runMain(["guide", protocol, "--protocol-only"], { cwd });
@@ -38,12 +40,12 @@ describe("guide command", () => {
       const [title, ...sections] = protocolOnly.stdout.trimEnd().split("\n\n");
       expect(combined.stdout.startsWith(`${title}\n\n`)).toBe(true);
       expect(combined.stdout).toContain(
-        "This guide includes the selected protocol and shared conventions. Read both before starting.",
+        "This guide includes the selected protocol, followed by the ticket directory and work file rules. Read both before starting.",
       );
-      expect(combined.stdout.endsWith(`${sections.join("\n\n")}\n\n${shared}`)).toBe(true);
+      expect(combined.stdout.endsWith(`${sections.join("\n\n")}\n\n${core}`)).toBe(true);
       expect(combined.stdout).not.toContain("# AlignFirst Guide");
       expect(combined.stdout).not.toContain("guide overview");
-      expect(protocolOnly.stdout).not.toContain("# Shared Conventions");
+      expect(protocolOnly.stdout).not.toContain("# Ticket Directory and Work Files");
     }
   });
 
@@ -57,7 +59,7 @@ describe("guide command", () => {
     const overview = await runMain(["guide", "overview"], { cwd });
     expect(overview.stdout).toContain("# AlignFirst Overview");
     expect(overview.stdout).not.toContain("# AlignFirst Guide");
-    expect(overview.stdout).not.toContain("# Shared Conventions");
+    expect(overview.stdout).not.toContain("# Ticket Directory and Work Files");
   });
 
   it("rejects invalid protocol selections", async () => {
@@ -102,8 +104,8 @@ describe("guide command", () => {
     expect(typescriptIndex).toBeGreaterThan(perspectiveIndex);
     expect(javascriptIndex).toBeGreaterThan(typescriptIndex);
     expect(result.stdout).not.toContain("# AlignFirst Guide");
-    expect(result.stdout).not.toContain("# Shared Conventions");
-    expect(result.stdout).not.toContain("# How to Write a Code Review Report");
+    expect(result.stdout).not.toContain("# Ticket Directory and Work Files");
+    expect(result.stdout).not.toContain("# Review Protocol");
   });
 
   it("rejects invalid reviewer selections", async () => {
