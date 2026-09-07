@@ -41,9 +41,9 @@ describe("ticket --catchup", () => {
     expect(result.stdout).toContain("Entries:\n");
     expect(result.stdout).not.toContain("excluded");
     expect(result.stdout).not.toContain('path=".plans/78/_alcode');
-    const paths = [...result.stdout.matchAll(/^<file path="\.plans\/78\/(.+)">$/gm)].map(
-      (match) => match[1],
-    );
+    const paths = [
+      ...result.stdout.matchAll(/^<file path="\.plans\/78\/(.+)" modified="[^"]+">$/gm),
+    ].map((match) => match[1]);
     expect(paths).toEqual(included);
     for (const file of included) expect(result.stdout).toContain(`Body: ${file}`);
   });
@@ -64,13 +64,16 @@ describe("ticket --catchup", () => {
     const markdown = await runMain(["ticket", "78"], { cwd });
     const json = await runMain(["ticket", "78", "--json"], { cwd });
 
-    expect(markdown.stdout.split("Entries:\n")[1]).toBe(
-      `${ordered.map((file) => `  ${file}`).join("\n")}\n`,
-    );
-    expect(JSON.parse(json.stdout).entries).toEqual(ordered);
+    const listed = markdown.stdout.split("Entries:\n")[1].trimEnd().split("\n");
+    expect(listed.map((line) => line.split(" ")[2])).toEqual(ordered);
+    expect(listed[0]).toMatch(/^ {2}A1-spec\.md \(7 B, \d{4}-\d\d-\d\dT\d\d:\d\d[+-]\d\d:\d\d\)$/);
+    const entries = JSON.parse(json.stdout).entries;
+    expect(entries.map((entry: { name: string }) => entry.name)).toEqual(ordered);
+    expect(entries[0]).toMatchObject({ name: "A1-spec.md", size: 7 });
+    expect(new Date(entries[0].modifiedAt).getTime()).toBeGreaterThan(0);
   });
 
-  it("switches the whole output to paths and sizes, without printing partial history", async () => {
+  it("switches the whole output to the entry list, without printing partial history", async () => {
     const cwd = project();
     const directory = join(cwd, ".plans", "78");
     mkdirSync(directory);
@@ -80,10 +83,12 @@ describe("ticket --catchup", () => {
     const result = await runMain(["ticket", "78", "--catchup"], { cwd });
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("History too large to print (");
-    expect(result.stdout).toContain("budget 30000). Read the files relevant to the task");
-    expect(result.stdout).toContain("- .plans/78/A9-spec.md (16000 bytes)");
-    expect(result.stdout).toContain("- .plans/78/A10-review.md (16000 bytes)");
+    expect(result.stdout).toContain(
+      "History too large to print (over the 30 KiB budget). Read the relevant files among the entries above",
+    );
+    expect(result.stdout).toContain("  A9-spec.md (15.6 KiB, ");
+    expect(result.stdout).toContain("  A10-review.md (15.6 KiB, ");
+    expect(result.stdout).not.toContain("<file");
     expect(result.stdout.indexOf("A9-spec.md")).toBeLessThan(
       result.stdout.indexOf("A10-review.md"),
     );
@@ -98,16 +103,16 @@ describe("ticket --catchup", () => {
     const file = join(directory, "A1-spec.md");
     writeFileSync(file, "é".repeat(10_000));
     const initial = await runMain(["ticket", "78", "--catchup"], { cwd });
-    const remaining = 30_000 - Buffer.byteLength(initial.stdout);
+    const remaining = 30_720 - Buffer.byteLength(initial.stdout);
     writeFileSync(file, `${"é".repeat(10_000)}${"x".repeat(remaining)}`);
 
     const atLimit = await runMain(["ticket", "78", "--catchup"], { cwd });
-    expect(Buffer.byteLength(atLimit.stdout)).toBe(30_000);
+    expect(Buffer.byteLength(atLimit.stdout)).toBe(30_720);
     expect(atLimit.stdout).toContain("ééé");
 
     writeFileSync(file, `${"é".repeat(10_000)}${"x".repeat(remaining + 1)}`);
     const overLimit = await runMain(["ticket", "78", "--catchup"], { cwd });
-    expect(overLimit.stdout).toContain("History too large to print (30001 bytes");
+    expect(overLimit.stdout).toContain("History too large to print");
     expect(overLimit.stdout).not.toContain("ééé");
   });
 
@@ -121,9 +126,10 @@ describe("ticket --catchup", () => {
 
     const result = await runMain(["ticket", "78", "--catchup"], { cwd });
 
-    expect(result.stdout).toContain(
-      '<file path=".plans/78/A1-evidence.md">\nContent omitted: 65537 bytes, over the 65536-byte limit.\n</file>',
+    expect(result.stdout).toMatch(
+      /<file path="\.plans\/78\/A1-evidence\.md" modified="[^"]+">\nContent omitted: over the 64 KiB limit\.\n<\/file>/,
     );
+    expect(result.stdout).toContain("  A1-evidence.md (64 KiB, ");
     expect(result.stdout).toContain("Small specification");
     expect(result.stdout).not.toContain("xxx");
     expect(result.stdout).not.toContain("History too large");

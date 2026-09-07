@@ -3,6 +3,7 @@ import { parseArgs } from "node:util";
 
 import { CliError } from "../cli-error.js";
 import type { CommandContext } from "../context.js";
+import { formatLocalTimestamp, formatSize } from "../format.js";
 import { parseCommandArgs } from "../parse-args.js";
 import { renderCatchup } from "../plans/catchup.js";
 import { assertPlansGate } from "../plans/layout.js";
@@ -13,6 +14,7 @@ import {
   reserveSideTicket,
   resolveTicketDir,
   type ResolvedTicketDir,
+  type TicketEntry,
   validateTicketId,
 } from "../plans/ticket.js";
 
@@ -22,8 +24,8 @@ const USAGE = `Usage:
   {{FORM}} ticket [<id> | --side] --catchup
 
 --catchup prints the ticket's Markdown files, plans excluded, summaries included.
-Files over 65536 bytes are listed without content. Above 30000 bytes of output, only
-paths and sizes are printed.
+Files over 64 KiB are listed without content. Above 30 KiB of output, only the entry
+list is printed.
 `;
 
 interface TicketOptions {
@@ -42,7 +44,13 @@ interface TicketJsonReport {
   TICKET_DIR: string;
   state: ResolvedTicketDir["state"];
   branch?: string;
-  entries: string[];
+  entries: TicketJsonEntry[];
+}
+
+interface TicketJsonEntry {
+  name: string;
+  size?: number;
+  modifiedAt: string;
 }
 
 export function runTicket(ctx: CommandContext, args: string[]): number {
@@ -196,7 +204,8 @@ function writeNextReport(
   result: ResolvedTicketDir,
   filename: string | true,
 ): void {
-  const { cycleLetter, fileNumber } = nextFilePosition(result.entries, options.newCycle);
+  const names = result.entries.map((entry) => entry.name);
+  const { cycleLetter, fileNumber } = nextFilePosition(names, options.newCycle);
   const prefix = `${cycleLetter}${fileNumber}`;
   const report = {
     TICKET_DIR: `${relative(ctx.cwd, result.dir)}/`,
@@ -222,7 +231,10 @@ function jsonReport(
     TICKET_DIR: `${relative(ctx.cwd, result.dir)}/`,
     state: result.state,
     ...(options.branch === undefined ? {} : { branch: options.branch }),
-    entries: result.entries,
+    entries: result.entries.map((entry) => ({
+      ...entry,
+      modifiedAt: entry.modifiedAt.toISOString(),
+    })),
   };
 }
 
@@ -240,8 +252,13 @@ function renderReport(
     `- TICKET_DIR: \`${directory}\`${directoryState}`,
   ];
   if (result.entries.length === 0) lines.push("Entries: (none)");
-  else lines.push("Entries:", ...result.entries.map((entry) => `  ${entry}`));
+  else lines.push("Entries:", ...result.entries.map((entry) => `  ${renderEntry(entry)}`));
   return `${lines.join("\n")}\n`;
+}
+
+function renderEntry(entry: TicketEntry): string {
+  if (entry.size === undefined) return entry.name;
+  return `${entry.name} (${formatSize(entry.size)}, ${formatLocalTimestamp(entry.modifiedAt)})`;
 }
 
 function renderDirectoryState(state: ResolvedTicketDir["state"], dryRun: boolean): string {

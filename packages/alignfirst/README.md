@@ -83,7 +83,7 @@ AlignFirst stores specifications, plans, and summaries in `.plans/<ticket-id>/`.
 
 ## Catchup output
 
-`alignfirst ticket [<id>] --catchup` prints the ticket's Markdown files, plans excluded, each wrapped in a `<file path="…">` block. When the history exceeds the output budget, it lists the files with their sizes instead so the agent can read the relevant ones.
+`alignfirst ticket [<id>] --catchup` prints the ticket's Markdown files, plans excluded, each in a `<file>` block carrying its path and modification time. When the history exceeds the output budget, only the entry list is printed so the agent can read the relevant files.
 
 ## Updates
 

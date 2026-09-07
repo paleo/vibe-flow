@@ -1,5 +1,14 @@
-import { type Dirent, existsSync, mkdirSync, readdirSync, renameSync, statSync } from "node:fs";
-import { join } from "node:path";
+import {
+  type Dirent,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  renameSync,
+  type Stats,
+  statSync,
+} from "node:fs";
+import { basename, join } from "node:path";
 
 import { CliError } from "../cli-error.js";
 import { isNodeError } from "../errors.js";
@@ -15,7 +24,14 @@ export interface ResolvedTicketDir {
   id: string;
   dir: string;
   state: "existing" | "created" | "restored";
-  entries: string[];
+  entries: TicketEntry[];
+}
+
+/** `name` ends with a slash for a directory, which has no `size`. */
+export interface TicketEntry {
+  name: string;
+  size?: number;
+  modifiedAt: Date;
 }
 
 export interface ResolveTicketOptions {
@@ -112,11 +128,25 @@ export function nextFilePosition(entries: readonly string[], newCycle: boolean):
   return { cycleLetter: highestCycle, fileNumber: highestNumber + 1 };
 }
 
-export function listEntries(dir: string): string[] {
+export function listEntries(dir: string): TicketEntry[] {
   if (!existsSync(dir) || !statSync(dir).isDirectory()) return [];
-  return readdirSync(dir, { withFileTypes: true })
-    .map((entry) => `${entry.name}${entry.isDirectory() ? "/" : ""}`)
-    .toSorted((left, right) => ENTRY_ORDER.compare(left, right));
+  return readdirSync(dir)
+    .map((name) => describeEntry(join(dir, name)))
+    .toSorted((left, right) => ENTRY_ORDER.compare(left.name, right.name));
+}
+
+function describeEntry(path: string): TicketEntry {
+  const stat = statOrLink(path);
+  if (stat.isDirectory()) return { name: `${basename(path)}/`, modifiedAt: stat.mtime };
+  return { name: basename(path), size: stat.size, modifiedAt: stat.mtime };
+}
+
+function statOrLink(path: string): Stats {
+  try {
+    return statSync(path);
+  } catch {
+    return lstatSync(path);
+  }
 }
 
 export function isPathSafeTicketId(id: string): boolean {

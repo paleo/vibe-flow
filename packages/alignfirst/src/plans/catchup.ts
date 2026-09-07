@@ -1,81 +1,71 @@
-import { readFileSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { CliError } from "../cli-error.js";
-import type { ResolvedTicketDir } from "./ticket.js";
+import { formatLocalTimestamp, formatSize } from "../format.js";
+import type { ResolvedTicketDir, TicketEntry } from "./ticket.js";
 
-const MAX_FILE_BYTES = 65_536;
-const MAX_OUTPUT_BYTES = 30_000;
+const MAX_FILE_BYTES = 64 * 1024;
+const MAX_OUTPUT_BYTES = 30 * 1024;
 const PLAN_FILE = /^[A-Z]\d+-(?:main-plan|plan-.*)\.md$/;
+const OMISSION_NOTICE = `Content omitted: over the ${formatSize(MAX_FILE_BYTES)} limit.`;
+const TOO_LARGE_NOTICE = `History too large to print (over the ${formatSize(MAX_OUTPUT_BYTES)} budget). Read the relevant files among the entries above rather than all of them.`;
 
 interface CatchupFile {
   path: string;
   size: number;
+  modified: string;
 }
 
 export function renderCatchup(cwd: string, ticket: ResolvedTicketDir, report: string): string {
-  const files = ticket.entries
-    .filter(isCatchupFile)
-    .flatMap((entry) => describeFile(cwd, join(ticket.dir, entry)));
+  const files = ticket.entries.flatMap((entry) => catchupFile(cwd, ticket.dir, entry));
   if (files.length === 0) return `${report}\nNo Markdown files to load.\n`;
   const outputBytes = files.reduce(
     (total, file) => total + sectionBytes(file),
     Buffer.byteLength(report) + 1,
   );
-  if (outputBytes > MAX_OUTPUT_BYTES) return renderInventory(report, files, outputBytes);
+  if (outputBytes > MAX_OUTPUT_BYTES) return `${report}\n${TOO_LARGE_NOTICE}\n`;
   return `${report}\n${files.map((file) => renderSection(cwd, file)).join("")}`;
 }
 
-function isCatchupFile(entry: string): boolean {
-  return entry.endsWith(".md") && (entry.endsWith(".summary.md") || !PLAN_FILE.test(entry));
+function catchupFile(cwd: string, dir: string, entry: TicketEntry): CatchupFile[] {
+  if (entry.size === undefined || !isHistoryFile(entry.name)) return [];
+  return [
+    {
+      path: relative(cwd, join(dir, entry.name)),
+      size: entry.size,
+      modified: formatLocalTimestamp(entry.modifiedAt),
+    },
+  ];
 }
 
-function describeFile(cwd: string, path: string): CatchupFile[] {
-  try {
-    const stat = statSync(path);
-    return stat.isFile() ? [{ path: relative(cwd, path), size: stat.size }] : [];
-  } catch (error) {
-    throw fileError(path, error);
-  }
-}
-
-function fileError(path: string, error: unknown): CliError {
-  const detail = error instanceof Error ? error.message : String(error);
-  return new CliError(`Cannot load catchup file ${path}: ${detail}`);
+function isHistoryFile(name: string): boolean {
+  return name.endsWith(".md") && (name.endsWith(".summary.md") || !PLAN_FILE.test(name));
 }
 
 function sectionBytes(file: CatchupFile): number {
-  const body = isOversized(file) ? Buffer.byteLength(omissionNotice(file)) : file.size;
-  return Buffer.byteLength(wrapSection(file.path, "")) + body;
+  const body = isOversized(file) ? Buffer.byteLength(OMISSION_NOTICE) : file.size;
+  return Buffer.byteLength(wrapSection(file, "")) + body;
 }
 
 function isOversized(file: CatchupFile): boolean {
   return file.size > MAX_FILE_BYTES;
 }
 
-function omissionNotice(file: CatchupFile): string {
-  return `Content omitted: ${file.size} bytes, over the ${MAX_FILE_BYTES}-byte limit.`;
-}
-
-function wrapSection(path: string, body: string): string {
-  return `<file path="${path}">\n${body}\n</file>\n\n`;
-}
-
-function renderInventory(report: string, files: CatchupFile[], outputBytes: number): string {
-  const notice = `History too large to print (${outputBytes} bytes, budget ${MAX_OUTPUT_BYTES}). Read the files relevant to the task rather than all of them.`;
-  const entries = files.map((file) => `- ${file.path} (${file.size} bytes)`);
-  return `${report}\n${notice}\n\n${entries.join("\n")}\n`;
+function wrapSection(file: CatchupFile, body: string): string {
+  return `<file path="${file.path}" modified="${file.modified}">\n${body}\n</file>\n\n`;
 }
 
 function renderSection(cwd: string, file: CatchupFile): string {
-  const body = isOversized(file) ? omissionNotice(file) : readBody(cwd, file);
-  return wrapSection(file.path, body.replace(/\n+$/, ""));
+  const body = isOversized(file) ? OMISSION_NOTICE : readBody(cwd, file);
+  return wrapSection(file, body.replace(/\n+$/, ""));
 }
 
 function readBody(cwd: string, file: CatchupFile): string {
   try {
     return readFileSync(join(cwd, file.path), "utf-8");
   } catch (error) {
-    throw fileError(file.path, error);
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new CliError(`Cannot load catchup file ${file.path}: ${detail}`);
   }
 }
