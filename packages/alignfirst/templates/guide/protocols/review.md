@@ -4,11 +4,10 @@
 
 You need:
 
-- the TASK_DIR — run `{{TICKET_CMD}}` (`{{CMD}} ticket --side` when there is no ticket)
-- the CYCLE_LETTER and FILE_NUMBER — start a new cycle: `{{TICKET_CMD}} --next review.md --new-cycle` prints the file to create
+- the TASK_DIR and ticket directory context — run `{{TICKET_CMD}}` once (`{{CMD}} ticket --side` when there is no ticket)
 - {{BASE_BRANCH_RULE}}
 
-Identify and state these values before starting the protocol.
+Identify TASK_DIR and the base branch before starting the protocol.
 
 ## Overview
 
@@ -16,7 +15,7 @@ We need a code review for this branch, compared to the base branch. A code revie
 
 You are the orchestrator: you scope the work, run one reviewer subagent per perspective, then merge their findings into a single report. Reviewers work with fresh eyes — they derive intent from the code and the diff. Neither you nor the reviewers read specs, plans, summaries, or any file content in TASK_DIR.
 
-Before starting, create your report as a new file `{CYCLE_LETTER}1-review.md` in the TASK_DIR, containing just the header — this reserves the filename. Write the report into it at the end.
+Before starting, run `{{TICKET_CMD}} --next review.md --new-cycle` to start a new cycle. Join the reported ticket directory and next filename, then immediately create the report at that path with just the header. Creating the file reserves the filename. Write the report into it at the end.
 
 ## Phase 1. Scoping
 

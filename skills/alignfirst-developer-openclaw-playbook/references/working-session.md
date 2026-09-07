@@ -90,7 +90,7 @@ Only when the message is unambiguously about chat content ("summarize this threa
 When one project owns a detailed user explanation, preserve it before delegation:
 
 1. Establish TICKET_ID. When project or deployment instructions provide ticket-system access, create a ticket with a very short description in the user's language. When no access is provided, ask the user for the ticket ID.
-2. If this step established TICKET_ID, complete the known-ticket preflight now. Then run `alignfirst ticket {TICKET_ID} --next request.md` and retain the reported next-file path.
+2. If this step established TICKET_ID, complete the known-ticket preflight now. Then run `alignfirst ticket {TICKET_ID} --next request.md` and join the reported ticket directory and next filename to get the request-file path, preserving the leading dot.
 3. Write the complete request text recorded in the starter's request block to that path. Keep its language. You may fix typos; preserve every detail.
 4. Run `alignfirst sync`.
 5. When ticket editing is available, add the request-file path relative to the project to the ticket description.

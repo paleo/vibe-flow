@@ -2,17 +2,12 @@
 
 ## Pre-requisites
 
-You need:
-
-- the TASK_DIR — run `{{TICKET_CMD}}` (`{{CMD}} ticket --side` when there is no ticket)
-- the CYCLE_LETTER and FILE_NUMBER — start a new cycle: `{{TICKET_CMD}} --next description.md --new-cycle` prints the file to create
-
-Identify and state these values before starting the protocol.
+Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
 
 ## Steps
 
-1. Find the current ticket plan directory.
-2. Create your description as a new file `{CYCLE_LETTER}1-description.md` with the next cycle letter, containing just the header — this reserves the filename.
+1. Run `{{TICKET_CMD}} --next description.md --new-cycle` to start a new cycle.
+2. Join the reported ticket directory and next filename, then immediately create the description at that path with just the header. Creating the file reserves the filename.
 3. If a previous `*description.md` file exists in the TASK_DIR, find the latest one. Only read `*spec.md` and `*summary.md` files that come *after* it — earlier work is already covered.
    Otherwise, read all `*spec.md` and `*summary.md` files.
 4. Write the commit message and description into your file.

@@ -2,15 +2,14 @@
 
 ## Pre-requisites
 
-### Determine TASK_DIR, CYCLE_LETTER, and FILE_NUMBER
+### Determine TASK_DIR and the spec file
 
 You need:
 
-- the TASK_DIR — run `{{TICKET_CMD}}` (`{{CMD}} ticket --side` when there is no ticket)
-- the CYCLE_LETTER and FILE_NUMBER — continue the current cycle: `{{TICKET_CMD}} --next plan.md` or `{{TICKET_CMD}} --next main-plan.md` prints the file to create
+- the TASK_DIR and ticket directory context — run `{{TICKET_CMD}}` once (`{{CMD}} ticket --side` when there is no ticket)
 - a **spec file** in the TASK_DIR
 
-Identify and state these values before starting the protocol. If any of these pieces of information is missing, STOP AND ASK THE USER.
+Identify TASK_DIR and the spec file before starting the protocol. If either is missing, STOP AND ASK THE USER.
 
 ## Phases
 
@@ -210,7 +209,7 @@ Note:
 
 Write the plan file(s) according to the determined structure:
 
-Use `{{TICKET_CMD}} --next plan.md`, `{{TICKET_CMD}} --next main-plan.md`, or `{{TICKET_CMD}} --next plan-<descriptor>.md` to get the next number. Run one command per file.
+Continue the current cycle. Immediately before writing each file, run `{{TICKET_CMD}} --next plan.md`, `{{TICKET_CMD}} --next main-plan.md`, or `{{TICKET_CMD}} --next plan-<descriptor>.md`. Join the reported ticket directory and next filename to get its path. Write that file before requesting the next one.
 
 **Single Plan**:
 
@@ -231,7 +230,6 @@ Use `{{TICKET_CMD}} --next plan.md`, `{{TICKET_CMD}} --next main-plan.md`, or `{
 
 **Important**:
 
-- Increment FILE_NUMBER for each plan file
 - Use lowercase, hyphenated descriptors for plan names (work scope descriptor)
 - When multiple plans are created, the main plan should be written first and have the lowest FILE_NUMBER
 - Be careful never to overwrite an existing file

@@ -17,8 +17,8 @@ describe("ticket command", () => {
     const created = await runMain(["ticket", "78"], { cwd });
     expect(created.stdout).toContain("Directory: .plans/78/ (created)");
     writeFileSync(join(cwd, ".plans", "78", "A1-request.md"), "request");
-    expect((await runMain(["ticket", "78", "--next", "spec.md"], { cwd })).stdout).toContain(
-      "Next file: .plans/78/A2-spec.md",
+    expect((await runMain(["ticket", "78", "--next", "spec.md"], { cwd })).stdout).toBe(
+      "- Ticket directory: `.plans/78/`\n- Next file: `A2-spec.md`\n",
     );
     mkdirSync(join(cwd, ".plans", "_archives"));
     mkdirSync(join(cwd, ".plans", "_archives", "99"));
@@ -35,7 +35,7 @@ describe("ticket command", () => {
       ["ticket", "78", "--next", "notes.txt", "--new-cycle", "--dry-run"],
       { cwd },
     );
-    expect(next.stdout).toContain(".plans/78/B1-notes.txt");
+    expect(next.stdout).toBe("- Ticket directory: `.plans/78/`\n- Next file: `B1-notes.txt`\n");
     const missing = await runMain(["ticket", "79", "--dry-run"], { cwd });
     expect(missing.stdout).toContain("would be created");
     expect(existsSync(join(cwd, ".plans", "79"))).toBe(false);
@@ -51,9 +51,94 @@ describe("ticket command", () => {
       cwd,
     });
 
-    expect(result.stdout).toContain("Next file: .plans/99/C5-AAD.summary.md");
+    expect(result.stdout).toBe(
+      "- Ticket directory: `.plans/99/`\n- Next file: `C5-AAD.summary.md`\n",
+    );
     expect(existsSync(join(cwd, ".plans", "99"))).toBe(false);
     expect(existsSync(archive)).toBe(true);
+  });
+
+  it("prints prefixes without reserving numbers and advances after a file is written", async () => {
+    const cwd = makeProject();
+    const first = await runMain(["ticket", "78", "--next"], { cwd });
+    expect(first).toMatchObject({ code: 0, stderr: "" });
+    expect(first.stdout).toBe("- Ticket directory: `.plans/78/`\n- Next file prefix: `A1`\n");
+    expect((await runMain(["ticket", "78", "--next"], { cwd })).stdout).toBe(first.stdout);
+    expect((await runMain(["ticket", "78", "--next", "spec.md"], { cwd })).stdout).toContain(
+      "- Next file: `A1-spec.md`",
+    );
+    writeFileSync(join(cwd, ".plans", "78", "A1-spec.md"), "spec");
+    expect((await runMain(["ticket", "78", "--next"], { cwd })).stdout).toContain(
+      "- Next file prefix: `A2`",
+    );
+  });
+
+  it("emits the same compact information in JSON for either next form", async () => {
+    const cwd = makeProject();
+    mkdirSync(join(cwd, ".plans", "78"));
+    writeFileSync(join(cwd, ".plans", "78", "A1-request.md"), "request");
+    const prefix = await runMain(["ticket", "78", "--next", "--json"], { cwd });
+    expect(prefix.code).toBe(0);
+    expect(JSON.parse(prefix.stdout)).toEqual({ dir: ".plans/78/", prefix: "A2" });
+    const filename = await runMain(["ticket", "78", "--next", "spec.md", "--json"], { cwd });
+    expect(filename.code).toBe(0);
+    expect(JSON.parse(filename.stdout)).toEqual({ dir: ".plans/78/", next: "A2-spec.md" });
+  });
+
+  it("accepts bare --next with cycle and dry-run flags and an explicit ticket after --", async () => {
+    const cwd = makeProject();
+    const archive = join(cwd, ".plans", "_archives", "78");
+    mkdirSync(archive, { recursive: true });
+    writeFileSync(join(archive, "C4-plan.md"), "plan");
+    const result = await runMain(
+      ["ticket", "--next", "--new-cycle", "--dry-run", "--json", "--", "78"],
+      { cwd },
+    );
+    expect(result.code).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual({ dir: ".plans/78/", prefix: "D1" });
+    expect(existsSync(join(cwd, ".plans", "78"))).toBe(false);
+    expect(existsSync(archive)).toBe(true);
+  });
+
+  it("supports inline filenames and rejects explicitly empty filenames", async () => {
+    const cwd = makeProject();
+    const invalid = await runMain(["ticket", "78", "--next="], { cwd });
+    expect(invalid.code).toBe(1);
+    expect(invalid.stderr).toContain("--next must be a non-empty single path segment.");
+    expect(existsSync(join(cwd, ".plans", "78"))).toBe(false);
+    const result = await runMain(["ticket", "78", "--next=spec.md"], { cwd });
+    expect(result.code).toBe(0);
+    expect(result.stdout).toBe("- Ticket directory: `.plans/78/`\n- Next file: `A1-spec.md`\n");
+  });
+
+  it("keeps argument validation for bare --next", async () => {
+    const cwd = makeProject();
+    for (const args of [
+      ["ticket", "78", "--next", "--unknown"],
+      ["ticket", "78", "--new-cycle"],
+      ["ticket", "78", "--next", "spec.md", "extra"],
+      ["ticket", "78", "--side", "--next"],
+    ]) {
+      expect((await runMain(args, { cwd })).code, args.join(" ")).toBe(1);
+    }
+    expect(existsSync(join(cwd, ".plans", "78"))).toBe(false);
+  });
+
+  it("previews side-ticket prefixes and creates side tickets with named output", async () => {
+    const cwd = makeProject();
+    const preview = await runMain(["ticket", "--side", "--next", "--dry-run", "--json"], {
+      cwd,
+    });
+    expect(preview.code).toBe(0);
+    expect(JSON.parse(preview.stdout)).toEqual({ dir: ".plans/side-1/", prefix: "A1" });
+    expect(existsSync(join(cwd, ".plans", "side-1"))).toBe(false);
+    const created = await runMain(["ticket", "--side", "--next", "request.md", "--json"], {
+      cwd,
+    });
+    expect(created.code).toBe(0);
+    expect(JSON.parse(created.stdout)).toEqual({ dir: ".plans/side-1/", next: "A1-request.md" });
+    expect(existsSync(join(cwd, ".plans", "side-1"))).toBe(true);
+    expect(existsSync(join(cwd, ".plans", "side-1", "A1-request.md"))).toBe(false);
   });
 
   it("rejects unsafe --next filenames before creating the ticket", async () => {
@@ -93,15 +178,18 @@ describe("ticket command", () => {
       join(cwd, ".alignfirst.json"),
       JSON.stringify({ schemaVersion: 1, ticketIdPattern: "^\\d+$" }),
     );
-    const result = await runMain(["ticket", "--json", "--next", "spec.md"], { cwd });
+    const result = await runMain(["ticket", "--json"], { cwd });
     expect(JSON.parse(result.stdout)).toEqual({
       id: "78",
       dir: ".plans/78",
       state: "created",
       branch: "78/unified-cli",
       entries: [],
-      next: ".plans/78/A1-spec.md",
     });
+    const next = await runMain(["ticket", "--json", "--next", "spec.md"], { cwd });
+    expect(JSON.parse(next.stdout)).toEqual({ dir: ".plans/78/", next: "A1-spec.md" });
+    const prefix = await runMain(["ticket", "--json", "--next"], { cwd });
+    expect(JSON.parse(prefix.stdout)).toEqual({ dir: ".plans/78/", prefix: "A1" });
   });
 
   it("requires the plans gate and validates configured ids", async () => {

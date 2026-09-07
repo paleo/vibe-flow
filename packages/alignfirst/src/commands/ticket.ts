@@ -7,7 +7,7 @@ import { parseCommandArgs } from "../parse-args.js";
 import { assertPlansGate } from "../plans/layout.js";
 import {
   deduceTicketFromBranch,
-  nextFileName,
+  nextFilePrefix,
   peekSideTicket,
   reserveSideTicket,
   resolveTicketDir,
@@ -16,14 +16,14 @@ import {
 } from "../plans/ticket.js";
 
 const USAGE = `Usage:
-  {{FORM}} ticket [<id>] [--next <filename>] [--new-cycle] [--json] [--dry-run]
-  {{FORM}} ticket --side [--json] [--dry-run]
+  {{FORM}} ticket [<id>] [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
+  {{FORM}} ticket --side [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
 `;
 
 interface TicketOptions {
   id: string;
   branch?: string;
-  next?: string;
+  next?: string | true;
   newCycle: boolean;
   json: boolean;
   dryRun: boolean;
@@ -36,7 +36,6 @@ interface TicketJsonReport {
   state: ResolvedTicketDir["state"];
   branch?: string;
   entries: string[];
-  next?: string;
 }
 
 export function runTicket(ctx: CommandContext, args: string[]): number {
@@ -45,13 +44,13 @@ export function runTicket(ctx: CommandContext, args: string[]): number {
   const parsed = parseTicketArgs(ctx, args, usage);
   if (parsed === undefined) return 0;
   const result = resolveTicket(ctx, parsed);
-  const next =
-    parsed.next === undefined
-      ? undefined
-      : nextFileName(result.entries, parsed.next, parsed.newCycle);
+  if (parsed.next !== undefined) {
+    writeNextReport(ctx, parsed, result, parsed.next);
+    return 0;
+  }
   if (parsed.json)
-    ctx.stdout.write(`${JSON.stringify(jsonReport(ctx, parsed, result, next), undefined, 2)}\n`);
-  else ctx.stdout.write(renderReport(ctx, parsed, result, next));
+    ctx.stdout.write(`${JSON.stringify(jsonReport(ctx, parsed, result), undefined, 2)}\n`);
+  else ctx.stdout.write(renderReport(ctx, parsed, result));
   return 0;
 }
 
@@ -64,11 +63,12 @@ function parseTicketArgs(
   args: string[],
   usage: string,
 ): TicketOptions | undefined {
+  const normalized = normalizeNextArgs(args);
   const { values, positionals } = parseCommandArgs(usage, () =>
     parseArgs({
-      args,
+      args: normalized.args,
       options: {
-        next: { type: "string" },
+        next: { type: "boolean" },
         "new-cycle": { type: "boolean", default: false },
         json: { type: "boolean", default: false },
         "dry-run": { type: "boolean", default: false },
@@ -88,16 +88,46 @@ function parseTicketArgs(
     throw new CliError(`A ticket id cannot be combined with --side.\n\n${usage}`);
   if (values["new-cycle"] && values.next === undefined)
     throw new CliError(`--new-cycle requires --next.\n\n${usage}`);
-  if (values.next !== undefined) validateNextFilename(values.next);
+  if (normalized.filename !== undefined) validateNextFilename(normalized.filename);
   const resolution = resolveTicketId(ctx, positionals[0], values.side, values["dry-run"]);
   return {
     ...resolution,
-    next: values.next,
+    next: values.next === undefined ? undefined : (normalized.filename ?? true),
     newCycle: values["new-cycle"],
     json: values.json,
     dryRun: values["dry-run"],
     side: values.side,
   };
+}
+
+interface NormalizedNextArgs {
+  args: string[];
+  filename?: string;
+}
+
+function normalizeNextArgs(args: string[]): NormalizedNextArgs {
+  const normalized: NormalizedNextArgs = { args: [] };
+  for (let index = 0; index < args.length; ++index) {
+    const arg = args[index];
+    if (arg === "--") {
+      normalized.args.push(...args.slice(index));
+      break;
+    }
+    if (arg.startsWith("--next=")) {
+      normalized.filename = arg.slice("--next=".length);
+      normalized.args.push("--next");
+      continue;
+    }
+    normalized.args.push(arg);
+    if (arg !== "--next") continue;
+    const following = args[index + 1];
+    delete normalized.filename;
+    if (following !== undefined && !following.startsWith("-")) {
+      normalized.filename = following;
+      ++index;
+    }
+  }
+  return normalized;
 }
 
 function validateNextFilename(filename: string): void {
@@ -143,11 +173,30 @@ function resolveTicket(ctx: CommandContext, options: TicketOptions): ResolvedTic
   return resolveTicketDir(ctx.cwd, options.id, { dryRun: options.dryRun });
 }
 
+function writeNextReport(
+  ctx: CommandContext,
+  options: TicketOptions,
+  result: ResolvedTicketDir,
+  filename: string | true,
+): void {
+  const dir = `${relative(ctx.cwd, result.dir)}/`;
+  const prefix = nextFilePrefix(result.entries, options.newCycle);
+  const report = filename === true ? { dir, prefix } : { dir, next: `${prefix}-${filename}` };
+  if (options.json) {
+    ctx.stdout.write(`${JSON.stringify(report, undefined, 2)}\n`);
+    return;
+  }
+  const nextLine =
+    report.next === undefined
+      ? `- Next file prefix: \`${report.prefix}\``
+      : `- Next file: \`${report.next}\``;
+  ctx.stdout.write(`- Ticket directory: \`${dir}\`\n${nextLine}\n`);
+}
+
 function jsonReport(
   ctx: CommandContext,
   options: TicketOptions,
   result: ResolvedTicketDir,
-  next: string | undefined,
 ): TicketJsonReport {
   return {
     id: result.id,
@@ -155,7 +204,6 @@ function jsonReport(
     state: result.state,
     ...(options.branch === undefined ? {} : { branch: options.branch }),
     entries: result.entries,
-    ...(next === undefined ? {} : { next: relative(ctx.cwd, join(result.dir, next)) }),
   };
 }
 
@@ -163,7 +211,6 @@ function renderReport(
   ctx: CommandContext,
   options: TicketOptions,
   result: ResolvedTicketDir,
-  next: string | undefined,
 ): string {
   const reservation = options.side && options.dryRun ? " (would be reserved)" : "";
   const deduction = options.branch === undefined ? "" : ` (deduced from branch ${options.branch})`;
@@ -175,7 +222,6 @@ function renderReport(
   ];
   if (result.entries.length === 0) lines.push("Entries: (none)");
   else lines.push("Entries:", ...result.entries.map((entry) => `  ${entry}`));
-  if (next !== undefined) lines.push(`Next file: ${relative(ctx.cwd, join(result.dir, next))}`);
   return `${lines.join("\n")}\n`;
 }
 

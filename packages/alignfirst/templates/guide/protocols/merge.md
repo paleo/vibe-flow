@@ -2,12 +2,7 @@
 
 ## Pre-requisites
 
-You need:
-
-- the TASK_DIR — run `{{TICKET_CMD}}` (`{{CMD}} ticket --side` when there is no ticket)
-- the CYCLE_LETTER and FILE_NUMBER — continue the current cycle: `{{TICKET_CMD}} --next merge.summary.md` prints the file to create
-
-Identify and state these values before starting the protocol.
+Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
 
 ---
 
@@ -25,7 +20,7 @@ Take the time to understand how things work in the incoming branch and in the cu
 
 ## 3. Resolve
 
-Create the summary file now: a new file `{CYCLE_LETTER}{FILE_NUMBER}-merge.summary.md` in the TASK_DIR. Log each notable resolution in it as you resolve (see step 5 for the expected content).
+Run `{{TICKET_CMD}} --next merge.summary.md` to continue the current cycle. Join the reported ticket directory and next filename, then immediately create the summary at that path. Log each notable resolution in it as you resolve (see step 5 for the expected content).
 
 Resolve the conflicts properly — preserve both intents whenever possible. Do not blindly accept one side.
 

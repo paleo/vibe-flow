@@ -2,12 +2,7 @@
 
 ## Pre-requisites
 
-You need:
-
-- the TASK_DIR — run `{{TICKET_CMD}}` (`{{CMD}} ticket --side` when there is no ticket)
-- the CYCLE_LETTER and FILE_NUMBER — start a new cycle: `{{TICKET_CMD}} --next spec.md --new-cycle` prints the file to create
-
-Identify and state these values before starting the protocol.
+Run `{{TICKET_CMD}}` once to identify TASK_DIR and load the ticket directory context (`{{CMD}} ticket --side` when there is no ticket).
 
 ## Phases
 
@@ -49,7 +44,7 @@ Do not use your question tool. Always ask in plain text. Your questions will be 
 
 ## Phase 3. Specification Phase
 
-After the user approves your proposal, write the specification in a markdown file in TASK_DIR. Compose the filename with the current CYCLE_LETTER and the next FILE_NUMBER, e.g. `A1-spec.md`. Do not overwrite an existing file.
+After the user approves your proposal, run `{{TICKET_CMD}} --next spec.md --new-cycle` to start a new cycle. Join the reported ticket directory and next filename, then immediately write the specification at that path. Do not overwrite an existing file.
 
 - After the title, include a suggested commit message {{COMMIT_RULE}}. The shorter the better. Then list the required documentation and skills. List each doc file individually — never a folder. Always exclude `alignfirst` from skills. Omit any field with nothing to list. Example:
 
