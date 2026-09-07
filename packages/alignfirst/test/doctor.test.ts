@@ -1,4 +1,4 @@
-import { chmodSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
@@ -16,12 +16,15 @@ describe("doctor command", () => {
     const cwd = temp();
     const result = await runMain(["doctor"], { cwd, env: { PATH: "" }, home: cwd });
     expect(result.code).toBe(0);
-    for (const section of ["CLI", "Config", "Git", "Plans", "Docmap", "Skills", "Companion"])
+    for (const section of ["CLI", ".alignfirst.json", "Git", "Plans", "Docmap", "Skills"])
       expect(result.stdout).toContain(`] ${section}:`);
-    expect(result.stdout).toContain("[ok] Config: none");
+    expect(result.stdout).toContain("[ok] .alignfirst.json: none");
     expect(result.stdout).toContain("[warn] Git: default branch unresolved");
     expect(result.stdout).toContain("[ok] Docmap: docs/ none");
-    expect(result.stdout).toContain("[warn] Companion: alcode not installed");
+    expect(result.stdout).toContain("[ok] Skills: alignfirst none");
+    expect(result.stdout).toContain("[ok] Skills: no command skill installed");
+    expect(result.stdout).not.toContain("missing");
+    expect(result.stdout).not.toContain("alcode");
   });
 
   it("reports an excluded CLI range without failing", async () => {
@@ -32,7 +35,8 @@ describe("doctor command", () => {
     );
     const result = await runMain(["doctor"], { cwd, env: { PATH: "" }, home: cwd });
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("[error] Config: does not satisfy >=1.0.0");
+    expect(result.stdout).toContain("[ok] .alignfirst.json: present");
+    expect(result.stdout).toContain("[error] .alignfirst.json: does not satisfy >=1.0.0");
   });
 
   it("continues after an invalid project config", async () => {
@@ -40,7 +44,7 @@ describe("doctor command", () => {
     writeFileSync(join(cwd, ".alignfirst.json"), "{");
     const result = await runMain(["doctor"], { cwd, env: { PATH: "" }, home: cwd });
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("[error] Config: Invalid");
+    expect(result.stdout).toContain("[error] .alignfirst.json: Invalid");
     expect(result.stdout).toContain("] Plans:");
   });
 
@@ -66,15 +70,18 @@ describe("doctor command", () => {
     expect(current.stdout).toContain("[ok] Skills: alignfirst 4.0.0");
   });
 
-  it("reports the alcode version", async () => {
+  it("warns about missing command skills only once one is installed", async () => {
     const cwd = temp();
-    const bin = join(cwd, "bin");
-    mkdirSync(bin);
-    const alcode = join(bin, "alcode");
-    writeFileSync(alcode, "#!/bin/sh\necho 0.13.0\n");
-    chmodSync(alcode, 0o755);
-    const result = await runMain(["doctor"], { cwd, env: { PATH: bin }, home: cwd });
-    expect(result.stdout).toContain(`[ok] Companion: alcode 0.13.0 (${alcode})`);
+    const skillDir = join(cwd, ".agents", "skills", "alspec");
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(skillDir, "SKILL.md"), '---\nmetadata:\n  version: "4.0.0"\n---\n');
+    const result = await runMain(["doctor"], { cwd, env: { PATH: "" }, home: cwd });
+    expect(result.stdout).toContain("[ok] Skills: alignfirst none");
+    expect(result.stdout).toContain(
+      `[ok] Skills: alspec 4.0.0 (${join(cwd, ".agents", "skills")})`,
+    );
+    expect(result.stdout).toContain("[warn] Skills: alplan missing");
+    expect(result.stdout).not.toContain("no command skill installed");
   });
 });
 

@@ -38,7 +38,7 @@ describe("ticket --catchup", () => {
 
     expect(result).toMatchObject({ code: 0, stderr: "" });
     expect(result.stdout).toContain("- TICKET_DIR: `.plans/78/`");
-    expect(result.stdout).toContain("Entries:\n");
+    expect(result.stdout).toContain("- Entries:\n");
     expect(result.stdout).not.toContain("excluded");
     expect(result.stdout).not.toContain('path=".plans/78/_alcode');
     const paths = [
@@ -64,9 +64,11 @@ describe("ticket --catchup", () => {
     const markdown = await runMain(["ticket", "78"], { cwd });
     const json = await runMain(["ticket", "78", "--json"], { cwd });
 
-    const listed = markdown.stdout.split("Entries:\n")[1].trimEnd().split("\n");
-    expect(listed.map((line) => line.split(" ")[2])).toEqual(ordered);
-    expect(listed[0]).toMatch(/^ {2}A1-spec\.md \(7 B, \d{4}-\d\d-\d\dT\d\d:\d\d[+-]\d\d:\d\d\)$/);
+    const listed = markdown.stdout.split("- Entries:\n")[1].trimEnd().split("\n");
+    expect(listed.map((line) => line.split(" ")[3].slice(1, -1))).toEqual(ordered);
+    expect(listed[0]).toMatch(
+      /^ {2}- `A1-spec\.md` \(7 B, \d{4}-\d\d-\d\dT\d\d:\d\d[+-]\d\d:\d\d\)$/,
+    );
     const entries = JSON.parse(json.stdout).entries;
     expect(entries.map((entry: { name: string }) => entry.name)).toEqual(ordered);
     expect(entries[0]).toMatchObject({ name: "A1-spec.md", size: 7 });
@@ -86,8 +88,8 @@ describe("ticket --catchup", () => {
     expect(result.stdout).toContain(
       "History too large to print (over the 30 KiB budget). Read the relevant files among the entries above",
     );
-    expect(result.stdout).toContain("  A9-spec.md (15.6 KiB, ");
-    expect(result.stdout).toContain("  A10-review.md (15.6 KiB, ");
+    expect(result.stdout).toContain("  - `A9-spec.md` (15.6 KiB, ");
+    expect(result.stdout).toContain("  - `A10-review.md` (15.6 KiB, ");
     expect(result.stdout).not.toContain("<file");
     expect(result.stdout.indexOf("A9-spec.md")).toBeLessThan(
       result.stdout.indexOf("A10-review.md"),
@@ -129,7 +131,7 @@ describe("ticket --catchup", () => {
     expect(result.stdout).toMatch(
       /<file path="\.plans\/78\/A1-evidence\.md" modified="[^"]+">\nContent omitted: over the 64 KiB limit\.\n<\/file>/,
     );
-    expect(result.stdout).toContain("  A1-evidence.md (64 KiB, ");
+    expect(result.stdout).toContain("  - `A1-evidence.md` (64 KiB, ");
     expect(result.stdout).toContain("Small specification");
     expect(result.stdout).not.toContain("xxx");
     expect(result.stdout).not.toContain("History too large");

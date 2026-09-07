@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
@@ -9,12 +8,15 @@ import semver from "semver";
 import type { CommandContext } from "../context.js";
 import { resolveDefaultBranch } from "../default-branch.js";
 import { errorMessage } from "../errors.js";
-import { findExecutable } from "../executables.js";
 import { parseBareCommandArgs } from "../parse-args.js";
 import { resolvePlansMode } from "../plans/mode.js";
 import { findStoppedRebase } from "../plans/rebase.js";
-import { resolveProjectConfig, type ResolvedProjectConfig } from "../project-config.js";
-import { findInstalledSkill, STUB_SKILLS } from "../skills.js";
+import {
+  PROJECT_CONFIG_FILENAME,
+  resolveProjectConfig,
+  type ResolvedProjectConfig,
+} from "../project-config.js";
+import { COMMAND_SKILLS, findInstalledSkill, type InstalledSkill } from "../skills.js";
 import { cliRangeResult } from "../version-guard.js";
 
 interface DoctorLine {
@@ -27,7 +29,7 @@ export function runDoctor(ctx: CommandContext, args: string[]): number {
   if (parseBareCommandArgs(ctx, args, usage)) return 0;
   writeSection(ctx, "CLI", () => inspectCli(ctx));
   let resolved: ResolvedProjectConfig | undefined;
-  writeSection(ctx, "Config", () => {
+  writeSection(ctx, PROJECT_CONFIG_FILENAME, () => {
     resolved = resolveProjectConfig(ctx.cwd);
     return inspectConfig(ctx, resolved);
   });
@@ -35,7 +37,6 @@ export function runDoctor(ctx: CommandContext, args: string[]): number {
   writeSection(ctx, "Plans", () => inspectPlans(ctx));
   writeSection(ctx, "Docmap", () => inspectDocmap(ctx));
   writeSection(ctx, "Skills", () => inspectSkills(ctx));
-  writeSection(ctx, "Companion", () => inspectCompanion(ctx));
   return 0;
 }
 
@@ -67,7 +68,7 @@ function inspectConfig(
   ctx: CommandContext,
   resolved: ResolvedProjectConfig | undefined,
 ): DoctorLine[] {
-  const lines: DoctorLine[] = [{ level: "ok", text: resolved?.source ?? "none" }];
+  const lines: DoctorLine[] = [{ level: "ok", text: resolved === undefined ? "none" : "present" }];
   const result = cliRangeResult(resolved?.config, ctx.version);
   if (result === undefined) {
     lines.push({ level: "ok", text: "no cli range" });
@@ -125,42 +126,37 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function inspectSkills(ctx: CommandContext): DoctorLine[] {
-  return STUB_SKILLS.map((name) => {
-    const installed = findInstalledSkill(ctx.home, name);
-    if (installed === undefined) return { level: "warn", text: `${name} missing` };
-    const version = installed.version ?? "unknown";
-    const parsed = semver.parse(installed.version);
-    if (parsed === null || parsed.major < 4)
-      return {
-        level: "warn",
-        text: `${name} ${version} predates v4; update: npx -y skills update --global --yes`,
-      };
-    return { level: "ok", text: `${name} ${version} (${installed.root})` };
-  });
+  const alignfirst = findInstalledSkill(ctx.home, "alignfirst");
+  const alignfirstLine: DoctorLine =
+    alignfirst === undefined
+      ? { level: "ok", text: "alignfirst none" }
+      : describeInstalledSkill("alignfirst", alignfirst);
+  const commands = COMMAND_SKILLS.map((name) => ({
+    name,
+    installed: findInstalledSkill(ctx.home, name),
+  }));
+  if (commands.every(({ installed }) => installed === undefined))
+    return [alignfirstLine, { level: "ok", text: "no command skill installed" }];
+  return [alignfirstLine, ...commands.map(describeCommandSkill)];
 }
 
-function inspectCompanion(ctx: CommandContext): DoctorLine[] {
-  const executable = findExecutable(ctx.env, "alcode");
-  if (executable === undefined)
-    return [
-      {
-        level: "warn",
-        text: "alcode not installed (optional; npm install -g @paleo/alcode)",
-      },
-    ];
-  try {
-    const version = execFileSync(executable, ["--version"], {
-      encoding: "utf-8",
-      env: ctx.env,
-    }).trim();
-    return [{ level: "ok", text: `alcode ${version} (${executable})` }];
-  } catch (error) {
-    return [{ level: "error", text: `alcode ${executable}: ${commandError(error)}` }];
-  }
+interface CommandSkill {
+  name: string;
+  installed: InstalledSkill | undefined;
 }
 
-function commandError(error: unknown): string {
-  if (isRecord(error) && typeof error.stderr === "string" && error.stderr !== "")
-    return firstLine(error.stderr);
-  return firstLine(errorMessage(error));
+function describeCommandSkill({ name, installed }: CommandSkill): DoctorLine {
+  if (installed === undefined) return { level: "warn", text: `${name} missing` };
+  return describeInstalledSkill(name, installed);
+}
+
+function describeInstalledSkill(name: string, installed: InstalledSkill): DoctorLine {
+  const version = installed.version ?? "unknown";
+  const parsed = semver.parse(installed.version);
+  if (parsed === null || parsed.major < 4)
+    return {
+      level: "warn",
+      text: `${name} ${version} predates v4; update: npx -y skills update --global --yes`,
+    };
+  return { level: "ok", text: `${name} ${version} (${installed.root})` };
 }

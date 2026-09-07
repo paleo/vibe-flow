@@ -178,10 +178,7 @@ function resolveTicketId(
     return { id: positional };
   }
   if (side) return { id: dryRun ? peekSideTicket(ctx.cwd) : reserveSideTicket(ctx.cwd) };
-  if (pattern === undefined)
-    throw new CliError(
-      "No ticket id given. Pass it.\nSetting ticketIdPattern in .alignfirst.json enables deduction from the current branch.",
-    );
+  if (pattern === undefined) throw new CliError("No ticket id given. Pass it.");
   const deduced = deduceTicketFromBranch(ctx.cwd, pattern);
   validateTicketId(deduced.id, pattern);
   return deduced;
@@ -244,21 +241,23 @@ function renderReport(
   result: ResolvedTicketDir,
 ): string {
   const reservation = options.side && options.dryRun ? " (would be reserved)" : "";
-  const deduction = options.branch === undefined ? "" : ` (deduced from branch ${options.branch})`;
+  const deduction =
+    options.branch === undefined ? "" : ` (deduced from branch \`${options.branch}\`)`;
   const directoryState = renderDirectoryState(result.state, options.dryRun);
   const directory = `${relative(ctx.cwd, result.dir)}/`;
   const lines = [
     `- TICKET_ID: \`${result.id}\`${reservation}${deduction}`,
     `- TICKET_DIR: \`${directory}\`${directoryState}`,
   ];
-  if (result.entries.length === 0) lines.push("Entries: (none)");
-  else lines.push("Entries:", ...result.entries.map((entry) => `  ${renderEntry(entry)}`));
+  if (result.entries.length === 0) lines.push("- Entries: (none)");
+  else lines.push("- Entries:", ...result.entries.map((entry) => `  - ${renderEntry(entry)}`));
   return `${lines.join("\n")}\n`;
 }
 
 function renderEntry(entry: TicketEntry): string {
-  if (entry.size === undefined) return entry.name;
-  return `${entry.name} (${formatSize(entry.size)}, ${formatLocalTimestamp(entry.modifiedAt)})`;
+  const name = `\`${entry.name}\``;
+  if (entry.size === undefined) return name;
+  return `${name} (${formatSize(entry.size)}, ${formatLocalTimestamp(entry.modifiedAt)})`;
 }
 
 function renderDirectoryState(state: ResolvedTicketDir["state"], dryRun: boolean): string {

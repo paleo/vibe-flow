@@ -293,11 +293,10 @@ describe("ticket command", () => {
     expect((await runMain(["ticket", "side-2"], { cwd })).code).toBe(0);
   });
 
-  it("explains how to enable branch deduction when no id or pattern is given", async () => {
+  it("asks for the id when none is given and no pattern is configured", async () => {
     const cwd = makeProject();
     const result = await runMain(["ticket"], { cwd });
-    expect(result.stderr).toContain("No ticket id given. Pass it.");
-    expect(result.stderr).toContain("Setting ticketIdPattern");
+    expect(result.stderr).toBe("No ticket id given. Pass it.\n");
   });
 });
 
