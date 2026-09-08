@@ -6,7 +6,6 @@ import { runDocmap } from "./docmap.js";
 export function runContext(ctx: CommandContext, args: string[]): number {
   const usage = `Usage: ${ctx.form} context\n`;
   if (parseBareCommandArgs(ctx, args, usage)) return 0;
-  ctx.stdout.write(renderConventions(ctx));
-  ctx.stdout.write("\n");
+  ctx.stdout.write(`# Project Conventions\n\n${renderConventions(ctx)}\n# Docmap Usage\n\n`);
   return runDocmap(ctx, []);
 }

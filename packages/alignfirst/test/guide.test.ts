@@ -190,7 +190,7 @@ describe("guide command", () => {
     const cwd = temp();
     const unconfigured = await runMain(["guide"], { cwd });
     expect(unconfigured.stdout).toContain("No .plans/ directory in the current directory.");
-    expect(unconfigured.stdout).toContain("## Project conventions");
+    expect(unconfigured.stdout).toContain("## Project Conventions");
 
     mkdirSync(join(cwd, ".plans"));
     writeFileSync(
@@ -211,7 +211,7 @@ describe("guide command", () => {
     expect(review.stdout).toContain("fall back to `main`, the default branch");
     const merge = await runMain(["guide", "merge", "--protocol-only"], { cwd });
     expect(merge.stdout).toContain("otherwise merge `main`, the default branch");
-    expect((await runMain(["guide"], { cwd })).stdout).not.toContain("## Project conventions");
+    expect((await runMain(["guide"], { cwd })).stdout).not.toContain("## Project Conventions");
   });
 });
 

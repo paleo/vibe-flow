@@ -12,14 +12,18 @@ afterEach(() => {
 });
 
 describe("context command", () => {
-  it("prints conventions, one blank line, then the documentation map", async () => {
+  it("prints titled conventions and docmap sections, then the documentation map", async () => {
     const cwd = temp();
     mkdirSync(join(cwd, "docs"));
     writeFileSync(join(cwd, "docs", "topic.md"), "---\ntitle: Topic\n---\n\n# Topic\n");
     const result = await runMain(["context"], { cwd });
     expect(result.code).toBe(0);
+    expect(result.stdout.startsWith("# Project Conventions\n\nTicket IDs:")).toBe(true);
     expect(result.stdout).toContain(
-      "Default branch: unresolved; ask before default-branch operations.\n\ndocmap — browse",
+      "Default branch: unresolved; ask before default-branch operations.\n\n# Docmap Usage\n\ndocmap — browse",
+    );
+    expect(result.stdout.indexOf("# Documentation")).toBeGreaterThan(
+      result.stdout.indexOf("# Docmap Usage"),
     );
     expect(result.stdout).toContain("`docs/topic.md` — Topic");
   });

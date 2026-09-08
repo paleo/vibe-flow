@@ -158,7 +158,7 @@ function renderReviewerGuide(perspective: Perspective, modules: ReviewModule[]):
 function renderCoreGuide(ctx: CommandContext, placeholders: GuidePlaceholders): string {
   const core = applyPlaceholders(readGuideTemplate("core.md"), placeholders);
   if (ctx.projectConfig !== undefined) return core;
-  return `${core.trimEnd()}\n\n## Project conventions\n\n${renderConventions(ctx).trimEnd()}`;
+  return `${core.trimEnd()}\n\n## Project Conventions\n\n${renderConventions(ctx).trimEnd()}`;
 }
 
 function buildGuidePlaceholders(
