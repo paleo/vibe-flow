@@ -142,10 +142,13 @@ describe("discord-mock handleAction (post-normalization shape)", () => {
       conversationId: "sample-project",
       title: "Original topic",
     });
-    await runHandler(fixture, "send", {
+    const result = (await runHandler(fixture, "send", {
       to: `channel:${thread.id}`,
       text: "work started",
       threadName: "Updated topic",
+    })) as { content: Array<{ text: string }> };
+    expect(JSON.parse(result.content[0].text)).toMatchObject({
+      threadRename: { ok: true, channelId: thread.id, name: "Updated topic" },
     });
     const snapshot = fixture.bus.state.getSnapshot();
     expect(snapshot.messages).toHaveLength(1);

@@ -157,7 +157,13 @@ export async function handleInbound(params: {
 }) {
   const runtime = params.getRuntime();
   const inbound = params.message;
-  const target = buildQaTarget({
+  const busTarget = buildQaTarget({
+    chatType: inbound.conversation.kind,
+    conversationId: inbound.conversation.id,
+    threadId: inbound.threadId,
+  });
+  const envelopeTarget = buildInboundEnvelopeTarget({
+    surface: params.surface,
     chatType: inbound.conversation.kind,
     conversationId: inbound.conversation.id,
     threadId: inbound.threadId,
@@ -195,7 +201,7 @@ export async function handleInbound(params: {
     ? resolveGroupConfig({
         account: params.account,
         conversationId: inbound.conversation.id,
-        target,
+        target: envelopeTarget,
       })
     : undefined;
   const access = await resolveStableChannelMessageIngress({
@@ -264,8 +270,8 @@ export async function handleInbound(params: {
     BodyForAgent: inbound.text,
     RawBody: inbound.text,
     CommandBody: inbound.text,
-    From: target,
-    To: target,
+    From: envelopeTarget,
+    To: envelopeTarget,
     SessionKey: sessionKey,
     AccountId: route.accountId ?? params.account.accountId,
     ChatType: inbound.conversation.kind === "direct" ? "direct" : "group",
@@ -298,7 +304,7 @@ export async function handleInbound(params: {
     ReplyToMode: params.surface === "slack" ? replyToMode : undefined,
     Timestamp: inbound.timestamp,
     OriginatingChannel: params.channelId,
-    OriginatingTo: target,
+    OriginatingTo: envelopeTarget,
     CommandAuthorized: true,
     ...mediaPayload,
   });
@@ -318,7 +324,7 @@ export async function handleInbound(params: {
       deliver: buildDeliveryCallback({
         account: params.account,
         inbound,
-        target,
+        target: busTarget,
         toolCalls,
         autoThreadId,
       }),
@@ -353,6 +359,18 @@ export async function handleInbound(params: {
       },
     },
   });
+}
+
+export function buildInboundEnvelopeTarget(params: {
+  surface: ChannelSurface;
+  chatType: "direct" | "channel" | "group";
+  conversationId: string;
+  threadId?: string;
+}): string {
+  if (params.surface === "discord" && params.threadId !== undefined) {
+    return buildQaTarget({ chatType: "channel", conversationId: params.threadId });
+  }
+  return buildQaTarget(params);
 }
 
 /**

@@ -273,7 +273,7 @@ function assertCreationCalls(calls: AgentToolCall[]): void {
   assertAgentCommandOrder(
     calls,
     /alproject\s+--guide\b/,
-    /git\s+init\b/,
+    /\bgit\b[^\n;&|]*\binit\b/,
     "alproject guide must precede git initialization",
   );
   const commands = calls

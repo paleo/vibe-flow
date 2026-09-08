@@ -10,6 +10,7 @@ import {
   extractCodingPrompt,
   isAlignfirstWrapperCall,
   isCodingProtocolPrompt,
+  isLogReviewPrompt,
   pushMockFixtureBranch,
   type PushFixtureContext,
   renderCodingAgentCall,
@@ -78,7 +79,29 @@ test("rejects argv prompts and model-catalog calls as wrapper executions", () =>
   assert.equal(extractCodingPrompt({ ...call, argv: ["debug", "models", "--bundled"] }), undefined);
 });
 
-for (const prompt of [PUBLISH_REQUEST, `${PROMPT}\n\nCommit and push the completed change.`]) {
+test("recognizes log-review prompts with prose and file paths", () => {
+  assert.equal(
+    isLogReviewPrompt(
+      "Inspect the dev-server logs under .local-wt/logs after manual testing. Report errors.",
+    ),
+    true,
+  );
+  assert.equal(
+    isLogReviewPrompt(
+      "Read .local-wt/logs/dev-server.log now. Return a verdict about errors or warnings.",
+    ),
+    true,
+  );
+  assert.equal(isLogReviewPrompt("Inspect the export button implementation."), false);
+});
+
+for (const prompt of [
+  PUBLISH_REQUEST,
+  `${PROMPT}\n\nCommit and push the completed change.`,
+  "Could you push the existing branch to origin?",
+  "Commit all changes, then push to origin.",
+  "Pousse la branche existante vers origin.",
+]) {
   test("explicit publication pushes the existing fixture commit without changing it", async (t) => {
     const fixture = createPushFixture(t);
     const before = fixture.git(["rev-parse", "HEAD"]);
@@ -106,6 +129,8 @@ test("push mock ignores prohibitions, references, and historical publication ins
     "Commit and push the change. Do not push until approved.",
     "Explain how to commit and push the change.",
     "The documentation mentions `git push origin HEAD`.",
+    "Publish the npm package.",
+    "The docs say: push the branch after approval.",
     "Verify the existing remote branch without pushing.",
     `${PUBLISH_REQUEST}\n\n## Current instruction\n\nSummarize the earlier work.`,
   ]) {

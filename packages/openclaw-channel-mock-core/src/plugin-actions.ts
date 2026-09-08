@@ -459,18 +459,23 @@ async function applyThreadRename(params: {
   threadId: string | undefined;
   actionParams: Record<string, unknown>;
 }): Promise<
-  { threadRename?: { ok: true; threadId: string; title: string } } | { warning: string }
+  { threadRename?: { ok: true; channelId: string; name: string } } | { warning: string }
 > {
   const title = readStringParam(params.actionParams, "threadName");
   if (!title) return {};
   if (!params.threadId) {
     return { warning: "threadName was ignored because the send target is not a thread." };
   }
-  const { thread } = await renameQaBusThread({
-    baseUrl: params.baseUrl,
-    accountId: params.accountId,
-    threadId: params.threadId,
-    title,
-  });
-  return { threadRename: { ok: true, threadId: thread.id, title: thread.title } };
+  try {
+    const { thread } = await renameQaBusThread({
+      baseUrl: params.baseUrl,
+      accountId: params.accountId,
+      threadId: params.threadId,
+      title,
+    });
+    return { threadRename: { ok: true, channelId: thread.id, name: thread.title } };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { warning: `Discord message was sent, but thread rename failed: ${message}` };
+  }
 }

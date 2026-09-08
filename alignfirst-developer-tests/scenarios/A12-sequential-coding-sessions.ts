@@ -121,15 +121,14 @@ interface DelegationChainOptions {
   sinceCursor: number;
   /** ISO timestamp taken before this phase's inbound; the phase's launch is issued after it. */
   notBefore: string;
-  /** 1-based rank of this phase; the session-file count must reach it. */
+  /** 1-based rank used in assertion labels. */
   launchIndex: number;
 }
 
 /**
  * One delegation's full chain: the alcode launch exec (with the chained `openclaw system event`
  * wake — the guide-driven mechanism this scenario pins), the started ack, the `status: succeeded`
- * session file (`minCount = launchIndex`: both runs share `.plans/<ticket>/_alcode/`, so an
- * earlier file matches immediately), and the completion report in the work thread.
+ * session file started by this phase, and the completion report in the work thread.
  */
 async function expectDelegationChain(
   ctx: ScenarioContext,
@@ -159,6 +158,10 @@ async function expectDelegationChain(
     `launch #${launchIndex}: chains an \`openclaw system event\` wake`,
   );
   ctx.assertRegex(command, /--session-key/, `launch #${launchIndex}: wake targets a --session-key`);
+  const launchStartedAt = launch.startedAt;
+  if (launchStartedAt === undefined) {
+    throw new Error(`alcode launch #${launchIndex} has no start timestamp`);
+  }
 
   // The started ack: a batch judge over the thread's outbounds (see `waitForBackgroundStartedAck`).
   // Tolerant of phrasing/language and of interleaved reasoning narration — the message that tells
@@ -174,7 +177,7 @@ async function expectDelegationChain(
   const sessionFilePath = await waitForCodingSessionSucceeded(ctx, {
     ticketId: TICKET_ID,
     timeoutMs: 120_000,
-    minCount: launchIndex,
+    notBefore: launchStartedAt,
   });
   ctx.log(`coding-session file #${launchIndex} succeeded: ${sessionFilePath}`);
 

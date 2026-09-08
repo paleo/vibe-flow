@@ -154,7 +154,7 @@ Both channels register together on every gateway boot. The runner selects which 
   plus later replies through one thread session keyed by the root message ID. `"off"` keeps roots
   in the channel session and routes only explicit replies through a thread session.
 
-Inbound metadata claims `Provider` / `Surface` / `OriginatingChannel` = the registered channel id, so the SDK routes tool-schema discovery back to the right plugin. `chat_id` envelope shape is **not** rewritten — scenarios assert on `conversation.id` / `threadId`, not envelope formatting.
+Inbound metadata claims `Provider` / `Surface` / `OriginatingChannel` = the registered channel id, so the SDK routes tool-schema discovery back to the right plugin. Envelope targets follow the native surface: a Discord thread is `channel:<thread-id>`, while a Slack thread is `thread:<channel-id>/<thread-ts>`. The bus keeps its own composite thread target so scenario traffic remains attributable to the parent conversation.
 
 The mocks are external plugins, so the host's exact-current gate applies to their conversation-read actions. In a heartbeat turn, the handoff seed included, that gate denies `read` for any target; bundled Slack and Discord skip it through `providerOwnedReadGates` (see "Heartbeat turns deny external-plugin reads" in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md)). The playbook keeps the thread read out of the seed turn for that reason; do not chase a mock fix.
 

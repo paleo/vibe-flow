@@ -155,10 +155,9 @@ async function judgeMatches(
  * wake rides on. `find` (not a shell glob) so an absent match in any single project dir does not
  * error; alcode writes under `<project>/.plans/<ticket>/_alcode/<stamp>.md` (or
  * `.plans/_alcode/` without a ticket), and worktree `.plans` symlinks back to the main
- * project so either path resolves. Sequential delegations of one ticket share the `_alcode/`
- * dir, so an earlier run's file matches immediately: `minCount` (default 1) requires that many
- * distinct succeeded files. Returns the newest matching session file path (the stamp in the file
- * name sorts chronologically).
+ * project so either path resolves. `notBefore` correlates a session to a known launch and excludes
+ * earlier auxiliary runs. Without it, `minCount` (default 1) requires that many distinct succeeded
+ * files and the newest is returned.
  */
 export async function waitForCodingSessionSucceeded(
   ctx: ScenarioContext,
@@ -172,9 +171,12 @@ export async function waitForCodingSessionSucceeded(
     allowNoTicketDir?: boolean;
     timeoutMs: number;
     minCount?: number;
+    /** Only accept a session whose recorded start is at or after this ISO timestamp. */
+    notBefore?: string;
   },
 ): Promise<string> {
   const minCount = opts.minCount ?? 1;
+  const sessionStarts = new Map<string, string>();
   const sessionsDirs = [
     ...(opts.ticketId ? [`.plans/${opts.ticketId}/_alcode`] : []),
     ...(opts.ticketId === undefined || opts.allowNoTicketDir ? [".plans/_alcode"] : []),
@@ -203,18 +205,57 @@ export async function waitForCodingSessionSucceeded(
   while (Date.now() < deadline) {
     const r = await ctx.execInGateway(findArgs, { timeoutMs: 15_000 });
     const hits = r.stdout.trim().split("\n").filter(Boolean);
-    const newest = hits.sort().at(-1);
-    if (hits.length >= minCount && newest !== undefined) {
-      await assertSessionAgent(ctx, newest);
-      return newest;
+    const matchingHits =
+      opts.notBefore === undefined
+        ? hits
+        : await sessionsStartedAtOrAfter(ctx, hits, opts.notBefore, sessionStarts);
+    const selected = opts.notBefore === undefined ? matchingHits.sort().at(-1) : matchingHits.at(0);
+    if (matchingHits.length >= minCount && selected !== undefined) {
+      await assertSessionAgent(ctx, selected);
+      return selected;
     }
     lastStderr = r.stderr.trim();
     await delay(3_000);
   }
   throw new Error(
-    `fewer than ${minCount} alcode coding-session file(s) under ${sessionsDirs.join(" or ")} reached ` +
-      `"status: succeeded" within ${opts.timeoutMs}ms${lastStderr ? ` (last stderr: ${lastStderr})` : ""}`,
+    `fewer than ${minCount} matching alcode coding-session file(s) under ${sessionsDirs.join(" or ")} ` +
+      `reached "status: succeeded" within ${opts.timeoutMs}ms${lastStderr ? ` (last stderr: ${lastStderr})` : ""}`,
   );
+}
+
+async function sessionsStartedAtOrAfter(
+  ctx: ScenarioContext,
+  paths: string[],
+  notBefore: string,
+  cache: Map<string, string>,
+): Promise<string[]> {
+  const threshold = Date.parse(notBefore);
+  if (!Number.isFinite(threshold)) throw new Error(`invalid session cutoff: ${notBefore}`);
+  const records = await Promise.all(
+    paths.map(async (path) => ({ path, startedAt: await readSessionStart(ctx, path, cache) })),
+  );
+  return records
+    .filter(({ startedAt }) => Date.parse(startedAt) >= threshold)
+    .sort((left, right) => left.startedAt.localeCompare(right.startedAt))
+    .map(({ path }) => path);
+}
+
+async function readSessionStart(
+  ctx: ScenarioContext,
+  path: string,
+  cache: Map<string, string>,
+): Promise<string> {
+  const cached = cache.get(path);
+  if (cached !== undefined) return cached;
+  const result = await ctx.execInGateway(["grep", "-m", "1", "^startedAt:", path]);
+  if (result.exitCode !== 0) throw new Error(`session ${path} has no startedAt frontmatter`);
+  const raw = result.stdout.slice("startedAt:".length).trim();
+  const value: unknown = raw.startsWith('"') ? JSON.parse(raw) : raw;
+  if (typeof value !== "string" || !Number.isFinite(Date.parse(value))) {
+    throw new Error(`session ${path} has invalid startedAt frontmatter`);
+  }
+  cache.set(path, value);
+  return value;
 }
 
 async function assertSessionAgent(ctx: ScenarioContext, path: string): Promise<void> {

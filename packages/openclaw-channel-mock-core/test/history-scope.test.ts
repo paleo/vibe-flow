@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resolveHistoryScope } from "../src/plugin-actions.js";
 import { createChannelMockAccountHelpers } from "../src/accounts.js";
-import { resolveInboundSessionKey } from "../src/inbound.js";
+import { buildInboundEnvelopeTarget, resolveInboundSessionKey } from "../src/inbound.js";
 
 describe("resolveHistoryScope", () => {
   it("parses a composite thread target passed as threadId (envelope chat_id shape)", () => {
@@ -104,5 +104,29 @@ describe("Slack session routing", () => {
     };
     expect(helpers.resolveAccount({ cfg, accountId: "Team-A" }).config.replyToMode).toBe("off");
     expect(helpers.resolveAccount({ cfg, accountId: "Team-B" }).config.replyToMode).toBe("all");
+  });
+});
+
+describe("inbound envelope targets", () => {
+  it("addresses a Discord thread as its native channel", () => {
+    expect(
+      buildInboundEnvelopeTarget({
+        surface: "discord",
+        chatType: "channel",
+        conversationId: "parent-channel",
+        threadId: "thread-channel",
+      }),
+    ).toBe("channel:thread-channel");
+  });
+
+  it("keeps Slack's channel and thread target", () => {
+    expect(
+      buildInboundEnvelopeTarget({
+        surface: "slack",
+        chatType: "channel",
+        conversationId: "channel-1",
+        threadId: "thread-1",
+      }),
+    ).toBe("thread:channel-1/thread-1");
   });
 });

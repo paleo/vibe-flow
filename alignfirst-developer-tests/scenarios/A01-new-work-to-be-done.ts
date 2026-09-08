@@ -96,8 +96,15 @@ async function expectThreadRenamedWithTicket(
   await ctx.waitForAgentToolCall(
     (call) => {
       if (call.toolName !== "message") return false;
-      const name = (call.input as { threadName?: unknown } | undefined)?.threadName;
-      return typeof name === "string" && renameRe.test(name);
+      const input = call.input as
+        | { action?: unknown; target?: unknown; threadName?: unknown }
+        | undefined;
+      return (
+        input?.action === "send" &&
+        input.target === `channel:${threadId}` &&
+        typeof input.threadName === "string" &&
+        renameRe.test(input.threadName)
+      );
     },
     { label: "agent renames the thread with the ticket", timeoutMs: 120_000 },
   );
