@@ -63,6 +63,7 @@ export type QaBusThread = {
   title: string;
   createdAt: number;
   createdBy: string;
+  parentMessageId?: string;
 };
 
 export type QaBusEvent =
@@ -113,6 +114,7 @@ export type QaBusCreateThreadInput = {
   conversationId: string;
   title: string;
   createdBy?: string;
+  parentMessageId?: string;
   timestamp?: number;
 };
 
@@ -120,6 +122,11 @@ export type QaBusRenameThreadInput = {
   accountId?: string;
   threadId: string;
   title: string;
+};
+
+export type QaBusGetThreadInput = {
+  accountId?: string;
+  threadId: string;
 };
 
 export type QaBusReactToMessageInput = {
@@ -166,6 +173,15 @@ export type QaBusPollInput = {
 export type QaBusPollResult = {
   cursor: number;
   events: QaBusEvent[];
+};
+
+export type QaBusFaultOperation = "outbound-message" | "thread-create";
+
+export type QaBusFailNextInput = {
+  operation: QaBusFaultOperation;
+  message?: string;
+  /** Fail only an `outbound-message` that carries a thread target; others pass untouched. */
+  threadOnly?: boolean;
 };
 
 export type QaBusStateSnapshot = {

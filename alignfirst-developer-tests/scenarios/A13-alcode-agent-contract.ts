@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import type { ScenarioContext } from "@paleo/openclaw-test";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
@@ -55,6 +56,8 @@ export default async function alcodeAgentContract(ctx: ScenarioContext): Promise
   assertEqual(requiredFrontmatter(resumedSession, "sessionId"), sessionId, "resumed session id");
   assertEqual(requiredFrontmatter(resumedSession, "ticket"), TICKET_ID, "resumed ticket");
   assertSelectedResumeCall(mock, agent, sessionId);
+
+  await assertLiveCatchup(ctx, mock, agent);
 
   if (agent === "codex") await assertCodexFailures(ctx, mock);
 
@@ -206,6 +209,44 @@ function assertCodexCatalogOrder(mock: CodingAgentMockHandle, firstExec: CodingA
   const execIndex = mock.codingAgentCalls.indexOf(firstExec);
   if (catalogIndex === -1 || catalogIndex >= execIndex) {
     throw new Error("Codex bundled catalog was not queried before the first exec");
+  }
+}
+
+async function assertLiveCatchup(
+  ctx: ScenarioContext,
+  mock: CodingAgentMockHandle,
+  agent: CodingAgent,
+): Promise<void> {
+  const history = "Preserve the export keyboard behavior.";
+  await writeFile(`${PROJECT_DIR}/.plans/${TICKET_ID}/A1-request.md`, `# Request\n\n${history}\n`);
+  const model = agent === "codex" ? "terra" : "sonnet";
+  const run = await runAlcode(ctx, [
+    "new",
+    "--ticket",
+    TICKET_ID,
+    "--catchup",
+    "--protocol",
+    "aad",
+    "--message",
+    NEW_MESSAGE,
+    "--model",
+    model,
+  ]);
+  assertEqual(run.exitCode, 0, "live AlignFirst catchup exit code");
+  assertSucceededSession(await readSession(ctx, run.stdout), agent, model);
+  const call = executionCalls(mock, agent).at(-1);
+  if (call === undefined) throw new Error("catchup did not launch the coding agent");
+  for (const text of [
+    "## Ticket history",
+    history,
+    "## Current instruction",
+    "Run `alignfirst guide aad` and follow the protocol.",
+    `Ticket ID = ${TICKET_ID}.`,
+    NEW_MESSAGE,
+  ]) {
+    if (!call.stdin.includes(text)) {
+      throw new Error(`catchup prompt omitted ${JSON.stringify(text)}`);
+    }
   }
 }
 

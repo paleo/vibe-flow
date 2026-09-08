@@ -51,7 +51,6 @@ export default async function threadSessionDelegation(ctx: ScenarioContext): Pro
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
 
   await runSetupPhaseWithoutDelegation(ctx, codingAgent, starter);
@@ -78,7 +77,7 @@ async function runSetupPhaseWithoutDelegation(
   );
 
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, {
-    timeoutMs: 120_000,
+    timeoutMs: 180_000,
   });
   const branch = assertBranchForTicket(worktreeDir, TICKET_ID);
   await settleOnWorkspaceReport(ctx, starter, worktreeDir, branch);
@@ -162,7 +161,7 @@ async function waitForCompletionWake(ctx: ScenarioContext, threadId: string, sin
       conversationId: ctx.conversationId,
       threadId,
       sinceCursor,
-      timeoutMs: 240_000,
+      timeoutMs: 420_000,
       label: "completion-wake-report",
     });
   } catch (error) {

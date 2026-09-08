@@ -14,14 +14,13 @@ const DUPLICATE_PATH = `${EXTERNAL_PROJECT_PARENT}/${PROJECT}`;
 export default async function duplicateProjectName(ctx: ScenarioContext): Promise<void> {
   await resetFixtures(ctx);
   await seedDuplicateProject(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Sur ${PROJECT}, ticket ${TICKET_ID}, passe le bouton d'export en gras.`,
     project: PROJECT,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   ctx.assertRegex(
     starter.match.text,

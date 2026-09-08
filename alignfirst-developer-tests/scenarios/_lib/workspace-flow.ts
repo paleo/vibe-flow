@@ -9,7 +9,8 @@ import type { Step } from "./types.ts";
 // also the workspace name) plus the branch and a bootstrap-status keyword. These
 // are language-invariant tokens, asserted deterministically when the agent posts
 // the block.
-const bootstrapStatusRe = /\b(ready|running|in[\s-]?progress|failed|ok|prêt|prête|en cours|échou)/i;
+const bootstrapStatusRe =
+  /(?:\b(?:ready|running|in[\s-]?progress|failed|ok|prêt|prête|en cours)|échou)/i;
 
 export interface WorkspaceFlowOptions {
   projectPath: string;
@@ -103,13 +104,22 @@ export async function settleOnWorkspaceReport(
   const locatorRe = new RegExp(escapeRegExp(dirName), "i");
   const deadline = Date.now() + budgetMs;
   let cursor = prevStep.nextCursor;
+  // The acknowledgment itself is often the report (the end-of-turn message carries the banner).
+  const isReport = (text: string) =>
+    locatorRe.test(text) && (/\[WORKSPACE\]/.test(text) || branchRe.test(text));
+  if (isReport(prevStep.match.text)) {
+    ctx.log("workspace report carried by the acknowledgment");
+    ctx.assertRegex(prevStep.match.text, branchRe, "workspace-report: branch name");
+    ctx.assertRegex(prevStep.match.text, bootstrapStatusRe, "workspace-report: workspace status");
+    return;
+  }
 
   while (Date.now() < deadline) {
     const { messages, nextCursor } = await ctx.poll({ sinceCursor: cursor, timeoutMs: 2_000 });
     cursor = nextCursor;
     for (const m of messages) {
       if (m.direction !== "outbound" || m.threadId !== prevStep.threadId) continue;
-      if (m.id === prevStep.match.id || !locatorRe.test(m.text)) continue;
+      if (m.id === prevStep.match.id || !isReport(m.text)) continue;
       if (await isMetaNarration(ctx, m.text)) continue;
       ctx.log(`workspace report received: ${JSON.stringify(m.text.slice(0, 160))}`);
       ctx.assertRegex(m.text, locatorRe, "workspace-report: worktree locator (workspace name)");

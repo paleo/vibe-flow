@@ -1,11 +1,14 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
+import { getQaBusThread } from "@paleo/openclaw-channel-mock-core";
 import { NEW_WORK_QUESTION_RUBRIC } from "./_lib/common-constants.ts";
 import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
+import { assertNoLiteralNoReply } from "./_lib/outbound.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { waitForSetupAck } from "./_lib/setup-ack.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
 import type { Step } from "./_lib/types.ts";
 import { runWorkspaceFlow } from "./_lib/workspace-flow.ts";
@@ -26,11 +29,11 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
   const codingAgent = setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
+  const startCursor = await ctx.getCursor();
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: "Nous avons un travail à faire sur nimbus.",
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
 
   // The starter is the channel session's only post, so the ask for the ticket
@@ -42,13 +45,16 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
     label: "starter-work-question",
   });
 
-  const ack = await sendTicketAndExpectSetupSignal(ctx, starter);
+  // The starter asked for the ticket, so the seed turn has nothing to say.
+  const quietCursor = await expectSilentSeedTurn(ctx, starter);
+  const ack = await sendTicketAndExpectSetupSignal(ctx, starter, quietCursor);
   await runWorkspaceFlow(ctx, codingAgent, {
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  await expectThreadRenamedWithTicket(ctx);
+  await expectThreadRenamedWithTicket(ctx, starter.threadId);
+  await assertNoLiteralNoReply(ctx, startCursor);
   await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.log({ attachTo: ack.entry, label: "setup signal received" });
@@ -56,7 +62,11 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
   ctx.log("PASS");
 }
 
-async function sendTicketAndExpectSetupSignal(ctx: ScenarioContext, starter: Step): Promise<Step> {
+async function sendTicketAndExpectSetupSignal(
+  ctx: ScenarioContext,
+  starter: Step,
+  sinceCursor: number,
+): Promise<Step> {
   await sendInThread(
     ctx,
     starter.threadId,
@@ -66,8 +76,8 @@ async function sendTicketAndExpectSetupSignal(ctx: ScenarioContext, starter: Ste
   return await waitForSetupAck(ctx, {
     threadId: starter.threadId,
     prevId: starter.match.id,
-    sinceCursor: starter.nextCursor,
-    timeoutMs: 180_000,
+    sinceCursor,
+    timeoutMs: 240_000,
   });
 }
 
@@ -77,15 +87,31 @@ async function sendTicketAndExpectSetupSignal(ctx: ScenarioContext, starter: Ste
  * which on Discord means a `message` call carrying `threadName` (there is no
  * rename action). Slack threads have no name, so this is Discord-only.
  */
-async function expectThreadRenamedWithTicket(ctx: ScenarioContext): Promise<void> {
+async function expectThreadRenamedWithTicket(
+  ctx: ScenarioContext,
+  threadId: string,
+): Promise<void> {
   if (ctx.channel !== "discord-mock") return;
   const renameRe = new RegExp(`\\b${TICKET_ID}\\b`);
   await ctx.waitForAgentToolCall(
     (call) => {
       if (call.toolName !== "message") return false;
-      const name = (call.input as { threadName?: unknown } | undefined)?.threadName;
-      return typeof name === "string" && renameRe.test(name);
+      const input = call.input as
+        | { action?: unknown; target?: unknown; threadName?: unknown }
+        | undefined;
+      return (
+        input?.action === "send" &&
+        input.target === `channel:${threadId}` &&
+        typeof input.threadName === "string" &&
+        renameRe.test(input.threadName)
+      );
     },
     { label: "agent renames the thread with the ticket", timeoutMs: 120_000 },
   );
+  const { thread } = await getQaBusThread({
+    baseUrl: ctx.busUrl,
+    accountId: ctx.accountId,
+    threadId,
+  });
+  ctx.assertRegex(thread.title, renameRe, "thread title contains the supplied ticket");
 }

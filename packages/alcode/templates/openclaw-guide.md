@@ -15,7 +15,7 @@ Under OpenClaw, background it through the `exec` tool:
 
   `alcode <command> <options> ; openclaw system event --text "alcode run finished — read its session file and report to the user" --mode now --session-key <KEY>`
 
-  Chain with `;` (never `&&`) so a failed run wakes you too. The wake may reach you as a bare heartbeat with the text dropped, and OpenClaw's own `Exec completed` notice may lag behind it — never wait for either text.
+  Chain with `;` (never `&&`) so a failed run wakes you too, and keep the `;` on the same line as the `alcode` command: a line that starts with `;` is a shell syntax error, the wake command never runs, and the run's completion is lost. The wake may reach you as a bare heartbeat with the text dropped, and OpenClaw's own `Exec completed` notice may lag behind it — never wait for either text.
 - Pass `background: true` and `timeoutSeconds: 0` (no kill timer). Never rely on the auto-yield or a finite timeout.
 - Set the exec `workdir` to the project root as an **absolute** path (`~` is not expanded there), or `cd` into the project inside the command itself.
 - The session-file path comes from the run's first stdout line (`Session file: …`), available via `process log <id>`. The stamp in the file name is the run's start time; it cannot be derived from the clock.

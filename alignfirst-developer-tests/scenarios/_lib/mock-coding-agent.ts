@@ -34,9 +34,19 @@ const TOOLTIP_VERIFY_RESULT =
   'Verified. Started the dev server cleanly (no errors in the logs) and checked the home page: the export button shows the "Exporter les données" tooltip on hover. No regressions found.';
 const GENERIC_VERIFY_RESULT =
   "Verified. Started the dev server cleanly (no errors in the logs) and manually checked the change: it behaves as described. No regressions found.";
+const LOG_REVIEW_RESULT =
+  "Reviewed .local-wt/logs/dev-server.log. No errors, warnings, or unusual behavior found.";
 
 const VERIFICATION_INTENT_RE =
   /(manual(?:ly)?\s+(?:test|verify|check)|\b(?:test|verify)\b[\s\S]*\b(?:change|button|page|fix|feature)\b)/i;
+const LOG_REVIEW_INTENT_RE =
+  /\b(?:inspect|review|check|read|analy[sz]e)\b[\s\S]{0,160}\b(?:logs?|journal)\b|\b(?:logs?|journal)\b[\s\S]{0,160}\b(?:errors?|warnings?|unusual)\b/iu;
+const PUSH_REQUEST_RE =
+  /(?:^|[;:,]\s*)(?:(?:please\s+)?(?:(?:can|could|would)\s+you\s+)?(?:push|poussez?|publiez?)\b[^.!?\n]{0,160}\b(?:branch|branche|commit|changes?|origin|upstream)\b|(?:please\s+)?publish\b[^.!?\n]{0,160}\b(?:branch|commit|changes?|origin|upstream)\b|run\s+`?git\s+push\b|commit\b[^.!?\n]{0,120}\b(?:and|then|\+)\s*,?\s*(?:push|publish)\b)/iu;
+const PUSH_PROHIBITION_RE =
+  /\b(?:do\s+not|don't|never|without)\s+(?:(?:run|a|any|git)\s+|`)*(?:push|publish)(?:ing)?\b/iu;
+const PUSH_REFERENCE_RE =
+  /\b(?:explain|describe|documentation|docs?|example|mentions?|says?|after\s+(?:approval|confirmation)|until\s+(?:approved|confirmed))\b/iu;
 
 // Pick the result that matches the task described in the coding-protocol prompt,
 // mirroring how a real coding agent reports the change it actually made. Tooltip
@@ -203,7 +213,7 @@ export interface SetupCodingAgentMockOptions {
    * Delay (ms) before the stream-json (alcode) branch emits its NDJSON. alcode runs its child in
    * the foreground and blocks on it, so this delay is what makes the whole alcode exec long enough
    * for OpenClaw to background it (and the agent to post a "started" ack) before it exits and the
-   * completion wake fires. Default 4000.
+   * completion wake fires. Default 30000.
    */
   streamDelayMs?: number;
   /**
@@ -223,7 +233,9 @@ export function setupCodingAgentMock(
   options: SetupCodingAgentMockOptions = {},
 ): CodingAgentMockHandle {
   const defaultResult = options.defaultResult ?? GENERIC_CODING_RESULT;
-  const streamDelayMs = options.streamDelayMs ?? 4000;
+  // A real run lasts minutes: a status check right after the launch must still see it running,
+  // so the launch turn ends on its ack and the completion wake reaches the same thread.
+  const streamDelayMs = options.streamDelayMs ?? 30_000;
   const codingAgentCalls: CodingAgentCall[] = [];
   const selectedAgent = readConfiguredAgent();
   const codexResponses: CodexResponseVariant[] = [];
@@ -262,12 +274,22 @@ export function setupCodingAgentMock(
           return 1;
         }
         const hooked = await options.onPrompt?.(ctx, cwd, prompt);
+        const pushResult =
+          hooked === undefined && !isCodingProtocolPrompt(prompt)
+            ? await pushMockFixtureBranch(ctx, cwd, prompt)
+            : undefined;
         let resultText: string;
         if (hooked !== undefined) {
           resultText = hooked;
         } else if (isCodingProtocolPrompt(prompt)) {
           resultText = codingResultFor(prompt);
           await commitMockCodingChange(ctx, cwd, prompt, stderr);
+          const published = await pushMockFixtureBranch(ctx, cwd, prompt);
+          if (published !== undefined) resultText += ` ${published}`;
+        } else if (pushResult !== undefined) {
+          resultText = pushResult;
+        } else if (isLogReviewPrompt(prompt)) {
+          resultText = LOG_REVIEW_RESULT;
         } else if (VERIFICATION_INTENT_RE.test(prompt)) {
           resultText = verificationResultFor(prompt);
         } else if (looksLikeWorktreeList(prompt)) {
@@ -417,6 +439,10 @@ export function setupCodingAgentMock(
   };
 }
 
+export function isLogReviewPrompt(prompt: string): boolean {
+  return LOG_REVIEW_INTENT_RE.test(prompt);
+}
+
 function readConfiguredAgent(): CodingAgent {
   const agent = process.env.ALIGNFIRST_CODE_AGENT;
   if (agent === "claude" || agent === "codex") return agent;
@@ -557,12 +583,70 @@ async function commitMockCodingChange(
   }
 }
 
-function isFixtureWorktreePath(path: string): boolean {
+export interface PushFixtureContext extends Pick<ScenarioContext, "execInGateway"> {}
+
+export async function pushMockFixtureBranch(
+  ctx: PushFixtureContext,
+  cwd: string,
+  prompt: string,
+): Promise<string | undefined> {
+  const instruction = prompt.split("\n\n## Current instruction\n\n").at(-1);
+  if (instruction === undefined || !requestsFixturePush(instruction)) return;
+  const projectPath = fixtureProjectForWorktree(cwd);
+  if (projectPath === undefined) {
+    throw new Error(`mock-coding-agent: refusing to push outside a fixture worktree: ${cwd}`);
+  }
+  const commonDir = await runFixtureGit(ctx, cwd, ["rev-parse", "--git-common-dir"]);
+  if (commonDir !== `${projectPath}/.git`) {
+    throw new Error(`mock-coding-agent: unexpected fixture Git directory: ${commonDir}`);
+  }
+  const origin = await runFixtureGit(ctx, cwd, ["remote", "get-url", "--push", "origin"]);
+  const expectedOrigin = `/home/claw/.fixture-origins/${basename(projectPath)}.git`;
+  if (origin !== expectedOrigin) {
+    throw new Error(`mock-coding-agent: refusing to push to non-fixture origin: ${origin}`);
+  }
+  const branch = await runFixtureGit(ctx, cwd, ["symbolic-ref", "--short", "HEAD"]);
+  if (!/^(?:ABC-\d+|side-\d+)\/.+/u.test(branch)) {
+    throw new Error(`mock-coding-agent: refusing to push non-ticket branch: ${branch}`);
+  }
+  await runFixtureGit(ctx, cwd, ["push", "--set-upstream", "origin", "HEAD"]);
+  return `Published the existing commit on ${branch} to origin; upstream tracking is configured.`;
+}
+
+function requestsFixturePush(instruction: string): boolean {
+  if (PUSH_PROHIBITION_RE.test(instruction)) return false;
+  return instruction
+    .split(/\r?\n+|(?<=[.!?])\s+/u)
+    .some((sentence) => !PUSH_REFERENCE_RE.test(sentence) && PUSH_REQUEST_RE.test(sentence));
+}
+
+async function runFixtureGit(
+  ctx: PushFixtureContext,
+  cwd: string,
+  args: string[],
+): Promise<string> {
+  const result = await ctx.execInGateway(["git", "-C", cwd, ...args], { timeoutMs: 30_000 });
+  if (result.exitCode !== 0) {
+    throw new Error(
+      `mock-coding-agent: git ${args.join(" ")} failed (exit ${result.exitCode}): ${result.stderr}`,
+    );
+  }
+  return result.stdout.trim();
+}
+
+function fixtureProjectForWorktree(path: string): string | undefined {
   const normalizedPath = path.replace(/\/$/, "");
-  return FIXTURE_PROJECT_PATHS.some((projectPath) => {
-    const prefix = `${dirname(projectPath)}/${basename(projectPath)}-`;
-    return normalizedPath.startsWith(prefix);
+  return FIXTURE_PROJECT_PATHS.find((projectPath) => {
+    const prefix = `${basename(projectPath)}-`;
+    return (
+      dirname(normalizedPath) === dirname(projectPath) &&
+      basename(normalizedPath).startsWith(prefix)
+    );
   });
+}
+
+function isFixtureWorktreePath(path: string): boolean {
+  return fixtureProjectForWorktree(path) !== undefined;
 }
 
 /** Recognize the active instruction after optional catchup history. */

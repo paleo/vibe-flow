@@ -5,7 +5,7 @@ import { expectCodingDelegation, setupCodingAgentMock } from "./_lib/mock-coding
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { waitForReport } from "./_lib/outbound.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
-import { waitForFile } from "./_lib/request-file.ts";
+import { waitForCapturedRequest } from "./_lib/request-file.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
 
@@ -26,7 +26,6 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
     project: "nimbus",
     projectPath: NIMBUS_PROJECT_PATH,
     request: REQUEST,
-    codingAgent,
   });
 
   await ctx.judgeLLM({
@@ -34,14 +33,13 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
     message: starter.match.text,
     rubric:
       "A thread-opening handoff for the detailed French nimbus request. It preserves all three " +
-      "requirements in their original language. It defers ticket creation or collection to the " +
-      "working session, brings the user back (an explicit ask for a reply, or a statement that " +
-      "the user's next message launches the working session), and claims no work has started.",
+      "requirements in their original language and defers ticket collection to the working " +
+      "session without asking for a content-free activation message.",
     label: "detailed-request-preserved",
   });
   await waitForProjectListing(ctx, "channel session lists the projects");
 
-  const firstWakeCursor = await sendInThread(ctx, starter.threadId, "Vas-y.");
+  const firstWakeCursor = starter.nextCursor;
   const ticketQuestion = await waitForReport(
     ctx,
     (message) =>
@@ -56,16 +54,15 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
     rubric:
       "A question asking for the ticket ID needed to continue the detailed nimbus request. Plain " +
       "prose or OpenClaw's structured prompt (numbered options, 'Reply with the number…', a " +
-      "side-ticket option) both count. Reject claims that workspace setup or coding has started.",
+      "side-ticket option) both count. A takeover or intent preamble restating the request " +
+      "('Je prends en charge la réorganisation…') is fine. Reject only a claim that a workspace, " +
+      "worktree or branch exists or that coding has started.",
     label: "detailed-request-ticket-question",
   });
 
   await sendInThread(ctx, starter.threadId, `Utilise le ticket ${TICKET_ID}.`);
   const requestPath = `${NIMBUS_PROJECT_PATH}/.plans/${TICKET_ID}/A1-request.md`;
-  const requestFile = await waitForFile(requestPath, 120_000);
-  if (!requestFile.includes(REQUEST)) {
-    throw new Error(`captured request omitted details: ${JSON.stringify(requestFile)}`);
-  }
+  await waitForCapturedRequest(requestPath, REQUEST, 120_000);
 
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, {
     timeoutMs: 180_000,

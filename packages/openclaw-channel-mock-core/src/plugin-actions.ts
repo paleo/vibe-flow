@@ -5,6 +5,7 @@ import type { ChannelMockAccountHelpers } from "./accounts.js";
 import {
   buildQaTarget,
   createQaBusThread,
+  getQaBusThread,
   deleteQaBusMessage,
   editQaBusMessage,
   parseQaTarget,
@@ -33,9 +34,7 @@ function listActions(params: {
   const account = helpers.resolveAccount({ cfg, accountId });
   const isSlack = surface === "slack";
   const actions = new Set<ChannelMessageActionName>();
-  if (!isSlack) {
-    actions.add("send");
-  }
+  actions.add("send");
   if (account.config.actions?.messages !== false) {
     actions.add("read");
     actions.add("edit");
@@ -57,9 +56,9 @@ function listActions(params: {
 
 function readSendText(params: Record<string, unknown>) {
   return (
-    readStringParam(params, "message", { allowEmpty: true }) ??
-    readStringParam(params, "text", { allowEmpty: true }) ??
-    readStringParam(params, "content", { allowEmpty: true })
+    readStringParam(params, "message", { allowEmpty: true, trim: false }) ??
+    readStringParam(params, "text", { allowEmpty: true, trim: false }) ??
+    readStringParam(params, "content", { allowEmpty: true, trim: false })
   );
 }
 
@@ -128,7 +127,6 @@ function resolveDestination(params: Record<string, unknown>): string | undefined
 }
 
 const SLACK_DISABLED_ACTIONS = new Set([
-  "send",
   "sendMessage",
   "thread-create",
   "thread-reply",
@@ -143,6 +141,19 @@ export function createChannelMockMessageActions(params: {
   const { surface, helpers, channelId } = params;
 
   return {
+    // Mirrors bundled Discord: a bare `threadId` is the delivery target of `thread-reply`, which
+    // satisfies the host's explicit-target requirement in heartbeat-driven turns.
+    ...(surface === "discord"
+      ? {
+          messageActionTargetAliases: {
+            "thread-reply": {
+              aliases: ["threadId"],
+              deliveryTargetAliases: ["threadId"],
+              resolveDeliveryTarget: ({ args }) => resolveThreadReplyDeliveryAlias(args),
+            },
+          },
+        }
+      : {}),
     describeMessageTool: (context) => ({
       actions: listActions({
         surface,
@@ -230,9 +241,20 @@ export function createChannelMockMessageActions(params: {
           const threadRename = await applyThreadRename({
             baseUrl,
             accountId: account.accountId,
-            threadId,
+            threadId: message.threadId,
             actionParams,
           });
+          if (surface === "slack") {
+            return jsonResult({
+              ok: true,
+              result: {
+                messageId: message.id,
+                channelId: parsed.conversationId,
+                ...(threadId ? { threadTs: threadId } : {}),
+              },
+              ...threadRename,
+            });
+          }
           return jsonResult({ message, ...threadRename });
         }
         case "thread-create": {
@@ -255,55 +277,60 @@ export function createChannelMockMessageActions(params: {
             conversationId,
             title,
             createdBy: account.botUserId,
+            parentMessageId: readStringParam(actionParams, "messageId"),
           });
           const body = readSendText(actionParams);
           const target = `thread:${conversationId}/${thread.id}`;
           if (body !== undefined && body.trim() !== "") {
-            const { message } = await sendQaBusMessage({
-              baseUrl,
-              accountId: account.accountId,
-              to: target,
-              text: body,
-              senderId: account.botUserId,
-              senderName: account.botDisplayName,
-              threadId: thread.id,
-            });
-            return jsonResult({ thread, threadId: thread.id, target, message });
+            try {
+              await sendQaBusMessage({
+                baseUrl,
+                accountId: account.accountId,
+                to: target,
+                text: body,
+                senderId: account.botUserId,
+                senderName: account.botDisplayName,
+                threadId: thread.id,
+              });
+            } catch (error) {
+              return jsonResult({
+                ok: true,
+                partial: true,
+                thread,
+                warning: "Discord thread was created, but its initial message was not delivered.",
+                initialMessageError: error instanceof Error ? error.message : String(error),
+              });
+            }
           }
-          return jsonResult({ thread, threadId: thread.id, target });
+          return jsonResult({ ok: true, thread });
         }
         case "thread-reply": {
-          const destination = resolveDestination(actionParams);
+          // Real Discord addresses a thread by its own id: `threadId` alone is a complete
+          // destination (see the `thread-reply` delivery alias below).
           const threadId = readStringParam(actionParams, "threadId");
           const text = readSendText(actionParams);
-          if (!destination) {
-            throw new Error(
-              `${channelId} thread-reply requires a destination (to/target/channelId)`,
-            );
-          }
           if (!threadId) {
             throw new Error(`${channelId} thread-reply requires threadId`);
           }
           if (text === undefined) {
             throw new Error(`${channelId} thread-reply requires text/message`);
           }
-          const { conversationId } = parseQaTarget(destination);
+          // Discord rejects a reply to an unknown thread before anything is posted.
+          const { thread } = await getQaBusThread({
+            baseUrl,
+            accountId: account.accountId,
+            threadId,
+          });
           const { message } = await sendQaBusMessage({
             baseUrl,
             accountId: account.accountId,
-            to: `thread:${conversationId}/${threadId}`,
+            to: `thread:${thread.conversationId}/${thread.id}`,
             text,
             senderId: account.botUserId,
             senderName: account.botDisplayName,
-            threadId,
+            threadId: thread.id,
           });
-          const threadRename = await applyThreadRename({
-            baseUrl,
-            accountId: account.accountId,
-            threadId,
-            actionParams,
-          });
-          return jsonResult({ message, ...threadRename });
+          return jsonResult({ message });
         }
         case "react": {
           const messageId = readStringParam(actionParams, "messageId");
@@ -414,6 +441,12 @@ export function createChannelMockMessageActions(params: {
   };
 }
 
+function resolveThreadReplyDeliveryAlias(args: Record<string, unknown>): string | undefined {
+  if (resolveDestination(args) !== undefined) return;
+  const threadId = readStringParam(args, "threadId");
+  return threadId ? buildQaTarget({ chatType: "channel", conversationId: threadId }) : undefined;
+}
+
 /**
  * Real Discord has no rename-only action: an existing thread is renamed by a
  * `threadName` param riding on the send that posts into it
@@ -426,18 +459,23 @@ async function applyThreadRename(params: {
   threadId: string | undefined;
   actionParams: Record<string, unknown>;
 }): Promise<
-  { threadRename?: { ok: true; threadId: string; title: string } } | { warning: string }
+  { threadRename?: { ok: true; channelId: string; name: string } } | { warning: string }
 > {
   const title = readStringParam(params.actionParams, "threadName");
   if (!title) return {};
   if (!params.threadId) {
     return { warning: "threadName was ignored because the send target is not a thread." };
   }
-  const { thread } = await renameQaBusThread({
-    baseUrl: params.baseUrl,
-    accountId: params.accountId,
-    threadId: params.threadId,
-    title,
-  });
-  return { threadRename: { ok: true, threadId: thread.id, title: thread.title } };
+  try {
+    const { thread } = await renameQaBusThread({
+      baseUrl: params.baseUrl,
+      accountId: params.accountId,
+      threadId: params.threadId,
+      title,
+    });
+    return { threadRename: { ok: true, channelId: thread.id, name: thread.title } };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { warning: `Discord message was sent, but thread rename failed: ${message}` };
+  }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Build and pack the local @paleo/openclaw-* workspace packages into ./vendor/*.tgz.
+// Build and pack the local harness and Developer plugin workspace packages into ./vendor/*.tgz.
 //
 // alignfirst-developer-tests is a standalone consumer (not a root workspace member) whose
 // Docker image installs these packages via `npm ci` at build time. Pulling them
@@ -26,6 +26,10 @@ const PACKAGES = [
   { name: "@paleo/openclaw-channel-mock-core", tarball: "openclaw-channel-mock-core.tgz" },
   { name: "@paleo/openclaw-discord-mock", tarball: "openclaw-discord-mock.tgz" },
   { name: "@paleo/openclaw-slack-mock", tarball: "openclaw-slack-mock.tgz" },
+  {
+    name: "@paleo/alignfirst-developer-openclaw-plugin",
+    tarball: "alignfirst-developer-openclaw-plugin.tgz",
+  },
   { name: "@paleo/openclaw-test", tarball: "openclaw-test.tgz" },
 ];
 

@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
@@ -361,9 +361,15 @@ describe("ticket command", () => {
 
   it("lists existing tickets when the branch names none of them", async () => {
     const cwd = makeProject();
+    const activeFile = join(cwd, ".plans", "78", "A1-spec.md");
+    const archivedDir = join(cwd, ".plans", "_archives", "side-1");
+    const activeDate = new Date("2026-01-02T00:00:00Z");
+    const archivedDate = new Date("2026-01-01T00:00:00Z");
     mkdirSync(join(cwd, ".plans", "78"));
-    writeFileSync(join(cwd, ".plans", "78", "A1-spec.md"), "spec");
-    mkdirSync(join(cwd, ".plans", "_archives", "side-1"), { recursive: true });
+    writeFileSync(activeFile, "spec");
+    mkdirSync(archivedDir, { recursive: true });
+    utimesSync(activeFile, activeDate, activeDate);
+    utimesSync(archivedDir, archivedDate, archivedDate);
     git(cwd, "checkout", "--quiet", "-b", "781/other");
     const result = await runMain(["ticket", "--catchup"], { cwd });
     expect(result.code).toBe(1);

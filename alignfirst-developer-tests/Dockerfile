@@ -44,11 +44,13 @@ RUN chmod +x /opt/openclaw-test/scripts/*.mjs
 USER claw
 
 # Pin pnpm's content-addressable store outside /home/claw/projects/, which is a
-# docker volume on its own filesystem. Without this, pnpm walks up from a
-# worktree install target and creates /home/claw/projects/.pnpm-store, polluting
-# the project listing the agent grounds project names in. Cost: pnpm falls back
-# to copy instead of hardlinks across filesystems — irrelevant at fixture size.
-RUN printf 'store-dir=/home/claw/.pnpm-store\n' > /home/claw/.pnpmrc && \
+# docker volume on its own filesystem. Without this, pnpm creates a fresh
+# /home/claw/projects/.pnpm-store per cell and re-downloads every fixture
+# dependency (10 s alone, minutes under three parallel cells); with it, the
+# template install below warms the store the fixtures reuse offline. pnpm 12
+# reads this from ~/.config/pnpm/config.yaml, which `pnpm config set` writes.
+# Cost: copy instead of hardlinks across filesystems — irrelevant at fixture size.
+RUN pnpm config set store-dir /home/claw/.pnpm-store --global && \
     mkdir -p /home/claw/.pnpm-store
 
 # The @paleo/openclaw-* packages install from locally-built tarballs under
@@ -67,13 +69,13 @@ COPY --chown=claw:claw openclaw.json /home/claw/.openclaw/openclaw.json
 RUN npm ci --include=dev && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins install --force --accept-capabilities \
-        npm:@openclaw/codex@2026.8.2 && \
+        npm:@openclaw/codex@2026.9.2 && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins install --force --accept-capabilities \
-        npm:@openclaw/zai-provider@2026.8.2 && \
+        npm:@openclaw/zai-provider@2026.9.2 && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins install --force --accept-capabilities \
-        npm:@openclaw/perplexity-plugin@2026.8.2 && \
+        npm:@openclaw/perplexity-plugin@2026.9.2 && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins registry --refresh && \
     npm cache clean --force
@@ -83,7 +85,7 @@ RUN npm ci --include=dev && \
 # lumen, and external-team project orion with per-name patches.
 COPY --chown=claw:claw projects-fixture/template/ /opt/alignfirst-developer-tests/fixtures/template/
 RUN cd /opt/alignfirst-developer-tests/fixtures/template && \
-    pnpm install --frozen-lockfile --prod=false
+    pnpm install --frozen-lockfile
 
 # Install AlignFirst skills under /home/claw/.agents/skills/ (the path OpenClaw scans).
 RUN npx -y skills add https://github.com/paleo/alignfirst --global --yes \

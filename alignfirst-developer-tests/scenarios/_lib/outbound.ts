@@ -1,4 +1,9 @@
-import type { AgentToolCall, ScenarioContext, WaitForOutboundResult } from "@paleo/openclaw-test";
+import type {
+  AgentToolCall,
+  BusMessage,
+  ScenarioContext,
+  WaitForOutboundResult,
+} from "@paleo/openclaw-test";
 import { inputOf } from "./agent-tool-calls.ts";
 import {
   isMetaNarration,
@@ -7,9 +12,14 @@ import {
 } from "./meta-narration.ts";
 
 // OpenClaw-emitted system notices (tool failures `⚠️ 🛠️ … failed`, generation
-// failures `⚠️ Agent couldn't generate a response…`) stream to the channel root
-// and are not model-controllable — exempt from the leak sweep.
-const openclawNoticeRe = /^⚠️/u;
+// failures `⚠️ Agent couldn't generate a response…`, provider failures
+// `LLM request failed: …`) stream to the channel root and are not
+// model-controllable — exempt from the leak sweep.
+const openclawNoticeRe = /^(?:⚠️|LLM request failed\b)/u;
+
+export function isOpenclawNotice(text: string): boolean {
+  return openclawNoticeRe.test(text);
+}
 
 export interface WaitForStarterOptions {
   sinceCursor: number;
@@ -124,7 +134,7 @@ export async function assertNoChannelRootLeak(
     cursor = nextCursor;
     for (const m of messages) {
       if (m.direction !== "outbound" || m.conversation.id !== ctx.conversationId) continue;
-      if (m.threadId !== undefined || openclawNoticeRe.test(m.text)) continue;
+      if (m.threadId !== undefined || isOpenclawNotice(m.text)) continue;
       if (await isMetaNarration(ctx, m.text)) {
         ++tolerated;
         ctx.log(`channel-root narration tolerated: ${JSON.stringify(m.text.slice(0, 80))}`);
@@ -140,6 +150,37 @@ export async function assertNoChannelRootLeak(
       ? "no channel-root post — OK"
       : `no substantive channel-root post — OK (${tolerated} narration tolerated)`,
   );
+}
+
+/**
+ * `NO_REPLY` suppresses delivery only when it is the whole answer. A turn that ends on
+ * "Message posted. NO_REPLY" posts that text verbatim (Sonnet A20 Discord, 2026-09-07, after a
+ * rename post). Sweep every outbound of the conversation since `sinceCursor` for the literal token.
+ */
+export async function assertNoLiteralNoReply(
+  ctx: ScenarioContext,
+  sinceCursor: number,
+): Promise<void> {
+  const leaks: BusMessage[] = [];
+  let cursor = sinceCursor;
+  // A poll page is capped by the bus; walk every page since the cursor.
+  while (true) {
+    const { messages, nextCursor } = await ctx.poll({ sinceCursor: cursor, timeoutMs: 1_000 });
+    if (messages.length === 0) break;
+    cursor = nextCursor;
+    for (const m of messages) {
+      if (
+        m.direction === "outbound" &&
+        m.conversation.id === ctx.conversationId &&
+        /\bNO_REPLY\b/u.test(m.text)
+      ) {
+        leaks.push(m);
+      }
+    }
+  }
+  for (const m of leaks)
+    ctx.log(`literal NO_REPLY posted: ${JSON.stringify(m.text.slice(0, 120))}`);
+  ctx.assertLength(leaks, 0, "no literal NO_REPLY reached the user");
 }
 
 // The message-tool actions that post content (vs `read`, rename, reactions…).

@@ -100,11 +100,122 @@ describe("bus HTTP round-trip", () => {
     expect(search.messages.map((m) => m.text)).toEqual(["thread message"]);
   });
 
+  it("retains a Discord thread anchor and resolves a thread channel send to its parent", async () => {
+    const created = await post<{
+      thread: { id: string; conversationId: string; parentMessageId?: string };
+    }>(fixture.baseUrl, "/v1/actions/thread-create", {
+      conversationId: "Project-With-Case",
+      title: "T",
+      parentMessageId: "anchor-1",
+    });
+    expect(created.thread.parentMessageId).toBe("anchor-1");
+    const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
+      fixture.baseUrl,
+      "/v1/outbound/message",
+      { to: `channel:${created.thread.id}`, text: "wake" },
+    );
+    expect(sent.message).toMatchObject({
+      conversation: { id: "Project-With-Case" },
+      threadId: created.thread.id,
+    });
+  });
+
+  it("resolves a thread-reply whose target names the thread to its parent conversation", async () => {
+    const created = await post<{ thread: { id: string } }>(
+      fixture.baseUrl,
+      "/v1/actions/thread-create",
+      { conversationId: "Project-With-Case", title: "T" },
+    );
+    const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
+      fixture.baseUrl,
+      "/v1/outbound/message",
+      { to: `thread:${created.thread.id}/${created.thread.id}`, text: "report" },
+    );
+    expect(sent.message).toMatchObject({
+      conversation: { id: "Project-With-Case" },
+      threadId: created.thread.id,
+    });
+  });
+
+  it("resolves a bare thread uuid to the stored thread and rejects unknown threads", async () => {
+    const created = await post<{ thread: { id: string } }>(
+      fixture.baseUrl,
+      "/v1/actions/thread-create",
+      { conversationId: "Project-With-Case", title: "T" },
+    );
+    const suffix = created.thread.id.slice(
+      created.thread.id.indexOf("-thread-") + "-thread-".length,
+    );
+    const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
+      fixture.baseUrl,
+      "/v1/outbound/message",
+      { to: `thread:Project-With-Case/${suffix}`, text: "report" },
+    );
+    expect(sent.message).toMatchObject({
+      conversation: { id: "Project-With-Case" },
+      threadId: created.thread.id,
+    });
+    const got = await post<{ thread: { id: string } }>(fixture.baseUrl, "/v1/actions/thread-get", {
+      threadId: suffix,
+    });
+    expect(got.thread.id).toBe(created.thread.id);
+    await expect(
+      post(fixture.baseUrl, "/v1/actions/thread-get", { threadId: "nope" }),
+    ).rejects.toThrow(/thread not found/);
+  });
+
   it("GET /health and /v1/state work", async () => {
     const healthResp = await fetch(`${fixture.baseUrl}/health`);
     expect(healthResp.status).toBe(200);
     const stateResp = await fetch(`${fixture.baseUrl}/v1/state`);
     const state = (await stateResp.json()) as { cursor: number };
     expect(typeof state.cursor).toBe("number");
+  });
+
+  it("injects a one-shot native delivery failure", async () => {
+    await post(fixture.baseUrl, "/v1/test/fail-next", {
+      operation: "outbound-message",
+      message: "planned delivery failure",
+    });
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        text: "first",
+      }),
+    ).rejects.toThrow(/planned delivery failure/);
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        text: "retry",
+      }),
+    ).resolves.toMatchObject({ message: { text: "retry" } });
+  });
+
+  it("lets root posts through a thread-only fault until a threaded send arrives", async () => {
+    await post(fixture.baseUrl, "/v1/test/fail-next", {
+      operation: "outbound-message",
+      message: "planned starter failure",
+      threadOnly: true,
+    });
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        text: "root narration",
+      }),
+    ).resolves.toMatchObject({ message: { text: "root narration" } });
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        threadId: "1700000000.000100",
+        text: "starter",
+      }),
+    ).rejects.toThrow(/planned starter failure/);
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        threadId: "1700000000.000100",
+        text: "starter retry",
+      }),
+    ).resolves.toMatchObject({ message: { text: "starter retry" } });
   });
 });

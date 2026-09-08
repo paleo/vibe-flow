@@ -3,6 +3,7 @@ import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 /**
@@ -13,12 +14,11 @@ import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 export default async function actionWithoutProjectOrTicket(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: "Peux-tu rendre le bouton d'export plus visible ?",
-    codingAgent,
   });
 
   await ctx.judgeLLM({
@@ -30,6 +30,7 @@ export default async function actionWithoutProjectOrTicket(ctx: ScenarioContext)
       "setup, or coding has started. The question may be in French.",
     label: "action-without-project-or-ticket-handoff",
   });
+  await expectSilentSeedTurn(ctx, starter);
   await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.markScenarioAsEnded("PASS");

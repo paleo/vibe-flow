@@ -6,9 +6,9 @@ import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { expectCodingDelegation, setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
-import { waitForFile } from "./_lib/request-file.ts";
+import { waitForCapturedRequest } from "./_lib/request-file.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
-import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
+import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const RESERVED_TICKET_ID = "side-2";
 const REQUEST = `Sur nimbus, sans ticket, améliore le bouton d'export.
@@ -29,22 +29,19 @@ export default async function explicitNoTicket(ctx: ScenarioContext): Promise<vo
     project: "nimbus",
     projectPath: NIMBUS_PROJECT_PATH,
     request: REQUEST,
-    codingAgent,
   });
   await ctx.judgeLLM({
     attachTo: starter.entry,
     message: starter.match.text,
     rubric:
-      "A thread starter preserving the explicit no-ticket nimbus request. It asks only for a " +
-      "reply to launch the working session and does not ask for an external ticket ID.",
+      "A thread starter preserving the explicit no-ticket nimbus request. It starts the working " +
+      "session without asking for an external ticket ID or a mechanical follow-up (a reply so " +
+      "the bot can start). An announcement that an internal or side ticket will be reserved, or " +
+      "that the work continues in this thread, is the intended path and passes.",
     label: "explicit-no-ticket-starter",
   });
 
-  await sendInThread(ctx, starter.threadId, "Vas-y sans ticket.");
-  const capturedRequest = await waitForFile(REQUEST_PATH, 120_000);
-  if (!capturedRequest.includes(REQUEST)) {
-    throw new Error(`side-2 request omitted details: ${JSON.stringify(capturedRequest)}`);
-  }
+  await waitForCapturedRequest(REQUEST_PATH, REQUEST, 120_000);
   await assertNoTicketWorktreeExists();
 
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(
@@ -56,9 +53,11 @@ export default async function explicitNoTicket(ctx: ScenarioContext): Promise<vo
   const delegation = await expectCodingDelegation(ctx, codingAgent, {
     ticketId: RESERVED_TICKET_ID,
     rubric:
-      "An AlignFirst coding-protocol delegation for side ticket side-2. It asks to add a " +
-      "tooltip to the nimbus export button. Reject if it asks alcode to choose a side-N identifier, " +
-      "create the request file, or set up the workspace.",
+      "A captured coding-agent CLI invocation. Judge only the prompt text supplied through stdin; " +
+      "CLI flags such as exec/--json/--sandbox are the runner's mechanics. Pass an AlignFirst " +
+      "coding-protocol delegation for side ticket side-2 that asks to add a tooltip to the nimbus " +
+      "export button. Reject only if the prompt asks the coding agent to choose a side-N " +
+      "identifier, create the request file, or set up the workspace.",
     label: "explicit-no-ticket-coding-delegation",
     timeoutMs: 240_000,
   });

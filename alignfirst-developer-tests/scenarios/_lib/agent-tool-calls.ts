@@ -1,4 +1,5 @@
 import type { AgentToolCall } from "@paleo/openclaw-test";
+import { escapeRe } from "./common-constants.ts";
 
 const PROJECT_LIST_JSON_RE = /(^|[\s/;(&|])alproject\s+list\b.*--json/;
 
@@ -21,9 +22,20 @@ export function readsFile(call: AgentToolCall, fileName: string): boolean {
     return input.path.includes(fileName);
   }
   if (call.toolName === "exec" && typeof input.command === "string") {
-    return READ_VIA_EXEC.test(input.command) && input.command.includes(fileName);
+    return READ_VIA_EXEC.test(input.command) && namesFile(input.command, fileName);
   }
   return false;
+}
+
+// The command names the file by its full path, or `cd`s into its directory and names it bare
+// (`cd /proj && cat DEVELOPERS.md`).
+function namesFile(command: string, fileName: string): boolean {
+  if (command.includes(fileName)) return true;
+  const slash = fileName.lastIndexOf("/");
+  if (slash <= 0) return false;
+  const dir = fileName.slice(0, slash);
+  const base = fileName.slice(slash + 1);
+  return new RegExp(`\\bcd\\s+${escapeRe(dir)}\\b`).test(command) && command.includes(base);
 }
 
 /** True when the call is an `exec` whose command matches `pattern`. */
@@ -61,22 +73,7 @@ export function listsProjects(call: AgentToolCall): boolean {
   return command !== undefined && PROJECT_LIST_JSON_RE.test(command);
 }
 
-/** True when the call is an `exec` that invokes Claude or Codex directly. */
-export function invokesCodingAgentDirectly(call: AgentToolCall): boolean {
-  const input = inputOf(call);
-  if (call.toolName !== "exec" || typeof input.command !== "string") return false;
-  return (
-    CODING_AGENT_INVOCATION_RE.test(input.command) && !ALCODE_INVOCATION_RE.test(input.command)
-  );
-}
-
-/**
- * Stateful predicate for `waitForAgentToolCall` when the same call shape recurs in one scenario:
- * the wait matches against ALL aggregated calls, so a plain predicate would resolve again on the
- * first occurrence. Each distinct matching call (by `toolUseId`, met in the aggregated `ts` order)
- * gets a 1-based index on first sight; the predicate fires only on the `n`-th — the newest of the
- * first `n` matches. Single-use: the index map lives in the closure.
- */
+/** Counts distinct tool calls across repeated polls of the aggregated transcript. */
 export function nthMatchingCall(
   predicate: (call: AgentToolCall) => boolean,
   n: number,
@@ -89,4 +86,13 @@ export function nthMatchingCall(
     if (known === undefined) indexByToolUseId.set(call.toolUseId, index);
     return index === n;
   };
+}
+
+/** True when the call is an `exec` that invokes Claude or Codex directly. */
+export function invokesCodingAgentDirectly(call: AgentToolCall): boolean {
+  const input = inputOf(call);
+  if (call.toolName !== "exec" || typeof input.command !== "string") return false;
+  return (
+    CODING_AGENT_INVOCATION_RE.test(input.command) && !ALCODE_INVOCATION_RE.test(input.command)
+  );
 }

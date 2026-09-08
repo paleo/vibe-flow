@@ -11,11 +11,13 @@ import type {
   QaBusCreateThreadInput,
   QaBusDeleteMessageInput,
   QaBusEditMessageInput,
+  QaBusFailNextInput,
   QaBusInboundMessageInput,
   QaBusOutboundMessageInput,
   QaBusPollInput,
   QaBusReactToMessageInput,
   QaBusReadMessageInput,
+  QaBusGetThreadInput,
   QaBusRenameThreadInput,
   QaBusSearchMessagesInput,
   QaBusWaitForInput,
@@ -95,9 +97,18 @@ export async function handleQaBusRequest(params: {
           message: params.state.addOutboundMessage(body as unknown as QaBusOutboundMessageInput),
         });
         return true;
+      case "/v1/test/fail-next":
+        params.state.failNext(body as unknown as QaBusFailNextInput);
+        writeJson(params.res, 200, { ok: true });
+        return true;
       case "/v1/actions/thread-create":
         writeJson(params.res, 200, {
           thread: params.state.createThread(body as unknown as QaBusCreateThreadInput),
+        });
+        return true;
+      case "/v1/actions/thread-get":
+        writeJson(params.res, 200, {
+          thread: params.state.getThread(body as unknown as QaBusGetThreadInput),
         });
         return true;
       case "/v1/actions/thread-rename":

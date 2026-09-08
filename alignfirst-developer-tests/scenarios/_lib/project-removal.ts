@@ -47,7 +47,9 @@ export async function waitForPathConfirmation(
       message.text.includes(NIMBUS_PROJECT_PATH),
     {
       sinceCursor: prevStep.nextCursor,
-      timeoutMs: 180_000,
+      // Terra reads the lifecycle runbook slowly; its path list landed 184 s after the starter on
+      // 2026-09-07 (artifact 18-46-01-400Z).
+      timeoutMs: 240_000,
       failFastUnmatchedOutbounds: false,
       failFastCliMockGraceMs: false,
     },

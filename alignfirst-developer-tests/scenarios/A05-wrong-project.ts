@@ -4,6 +4,7 @@ import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const WRONG_PROJECT = "aurora";
@@ -16,12 +17,11 @@ const WRONG_PROJECT = "aurora";
 export default async function wrongProject(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Sur ${WRONG_PROJECT}, le bouton d'export ne marche plus.`,
-    codingAgent,
   });
 
   await ctx.judgeLLM({
@@ -30,6 +30,7 @@ export default async function wrongProject(ctx: ScenarioContext): Promise<void> 
     rubric: unknownProjectRubric(WRONG_PROJECT),
     label: "unknown-project-acknowledgement",
   });
+  await expectSilentSeedTurn(ctx, starter);
   await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.markScenarioAsEnded("PASS");

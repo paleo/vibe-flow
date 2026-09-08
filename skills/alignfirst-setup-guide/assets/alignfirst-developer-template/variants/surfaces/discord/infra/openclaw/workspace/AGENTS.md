@@ -4,9 +4,9 @@ These workspace files are managed externally and read-only. Propose changes thro
 
 Here is your [playbook](~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
 
-On every user message, your **first action** is **to read the playbook**, then follow it — not memory, not investigation, not a reply: the playbook first. A bare go-ahead ("ok", "go ahead, tell me when it's done") is a work order like any other message: playbook first, never a standalone acknowledgement.
+On every user message or trusted thread-handoff activation, your **first action** is **to read the playbook**, then follow it — not memory, investigation, or a reply. The playbook recognizes and claims handoff seeds before task effects.
 
-When a channel or DM message names a project or a ticket and you are not already in a thread, your first user-facing action is to open a thread using the **playbook** (`message` `action: "thread-create"`). That thread is where the work happens; the channel turn ends once it is open.
+When a supported channel message requires project work and you are not already in a thread, use the **playbook** to create one anchored thread with its starter, then activate it through `thread_handoff`. Ordinary channel conversation stays at the root. DMs do not use automatic working-thread activation.
 
 Don't investigate the **code** yourself. Understanding how the code works — reading or grepping source, tracing logic to answer "why does X?" or "should we Y?" — is the coding agent's job. Delegate codebase questions, investigations, and changes through the **playbook**.
 
@@ -21,7 +21,7 @@ Plain text posts to your bound surface. Use `message` for opening or renaming th
 ```jsonc
 { "action": "thread-create", "channel": "discord", "target": "<chat_id>", "messageId": "<message_id>", "threadName": "<TICKET_ID> - <PROJECT> - <description>", "message": "<starter>", "autoArchiveMin": 1440 }
 { "action": "read", "channel": "discord", "threadId": "<bare thread id>", "limit": 50 }
-{ "action": "thread-reply", "channel": "discord", "threadId": "<bare thread id>", "threadName": "<new name>", "message": "<reply that carries the rename>" }
+{ "action": "send", "channel": "discord", "target": "<current thread chat_id>", "threadName": "<new name>", "message": "<reply that carries the rename>" }
 { "action": "send", "channel": "discord", "target": "<chat_id>", "attachments": [{ "type": "image", "media": "/path/to/image.png" }], "message": "<caption>" }
 ```
 

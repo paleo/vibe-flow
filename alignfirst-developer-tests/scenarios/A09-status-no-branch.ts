@@ -7,11 +7,7 @@ import { setupGhMock } from "./_lib/mock-gh.ts";
 import { assertNoChannelRootLeak, waitForReport } from "./_lib/outbound.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
-import {
-  assertNoWorktreeDirs,
-  bootstrapThreadFromChannel,
-  sendInThread,
-} from "./_lib/thread-bootstrap.ts";
+import { assertNoWorktreeDirs, bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const PROJECT = "nimbus";
 const TICKET_ID = "ABC-090";
@@ -25,7 +21,7 @@ const TICKET_ID = "ABC-090";
 export default async function statusNoBranch(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const startCursor = await ctx.getCursor();
@@ -33,10 +29,7 @@ export default async function statusNoBranch(ctx: ScenarioContext): Promise<void
     text: `Où en est ${TICKET_ID} sur ${PROJECT} ?`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
-  await sendInThread(ctx, starter.threadId, "Vas-y.");
-
   const ticketRe = new RegExp(`\\b${TICKET_ID}\\b`);
   const absenceRe =
     /\b(no branch|aucune branche|pas de branche|pas de worktree|no work|aucun travail|rien (n'a |de |encore|started|encore commenc)|nothing (yet|started|to))\b/i;

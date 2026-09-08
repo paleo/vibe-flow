@@ -7,7 +7,7 @@ import { setupGhMock } from "./_lib/mock-gh.ts";
 import { assertNoChannelRootLeak, waitForReport } from "./_lib/outbound.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
-import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
+import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const PROJECT = "nimbus";
 const TICKET_ID = "ABC-080";
@@ -22,7 +22,7 @@ const BRANCH = `${TICKET_ID}/${BRANCH_DESC}`;
 export default async function statusBranchOnly(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   await seedBranch(ctx, NIMBUS_PROJECT_PATH, TICKET_ID, BRANCH_DESC);
@@ -33,12 +33,11 @@ export default async function statusBranchOnly(ctx: ScenarioContext): Promise<vo
     text: `Où en est ${TICKET_ID} sur ${PROJECT} ?`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
-  await sendInThread(ctx, starter.threadId, "Vas-y.");
-
+  // Terra reads the playbook chain slowly: the worktree landed 147 s after the starter on
+  // 2026-09-07 (artifact 18-40-45-966Z). Same budget as A11.
   const worktreeDir = await waitForWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, BRANCH_DESC, {
-    timeoutMs: 120_000,
+    timeoutMs: 180_000,
   });
   assertBranch(worktreeDir, BRANCH);
   ctx.log(`worktree appeared at ${worktreeDir} on existing branch`);

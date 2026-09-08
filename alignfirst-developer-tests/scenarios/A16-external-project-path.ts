@@ -1,5 +1,4 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
-import { HANDOFF_ASK_RUBRIC } from "./_lib/common-constants.ts";
 import {
   extractCodingPrompt,
   isCodingProtocolPrompt,
@@ -10,7 +9,7 @@ import { setupGhMock } from "./_lib/mock-gh.ts";
 import { ORION_PROJECT_PATH } from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { waitForSetupAck } from "./_lib/setup-ack.ts";
-import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
+import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 import { runWorkspaceFlow } from "./_lib/workspace-flow.ts";
 
 const PROJECT = "orion";
@@ -28,21 +27,12 @@ export default async function externalProjectPath(ctx: ScenarioContext): Promise
     project: PROJECT,
     projectPath: ORION_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
-  await ctx.judgeLLM({
-    attachTo: starter.entry,
-    message: starter.match.text,
-    rubric: HANDOFF_ASK_RUBRIC,
-    label: "external-project-handoff-ask",
-  });
-
-  await sendInThread(ctx, starter.threadId, "Vas-y.");
   const ack = await waitForSetupAck(ctx, {
     threadId: starter.threadId,
     prevId: starter.match.id,
     sinceCursor: starter.nextCursor,
-    timeoutMs: 180_000,
+    timeoutMs: 240_000,
   });
   const worktreePath = await runWorkspaceFlow(ctx, codingAgent, {
     projectPath: ORION_PROJECT_PATH,

@@ -4,7 +4,9 @@ export {
   createQaBusThread,
   deleteQaBusMessage,
   editQaBusMessage,
+  failNextQaBusOperation,
   getQaBusState,
+  getQaBusThread,
   injectQaBusInboundMessage,
   pollQaBus,
   reactToQaBusMessage,
@@ -17,6 +19,8 @@ export type {
   QaBusConversation,
   QaBusConversationKind,
   QaBusEvent,
+  QaBusFailNextInput,
+  QaBusFaultOperation,
   QaBusInboundMessageInput,
   QaBusPollResult,
   QaBusStateSnapshot,
@@ -24,7 +28,7 @@ export type {
   QaBusToolCall,
 } from "./protocol.js";
 export { createChannelMockSetupPlugin } from "./channel-setup-plugin.js";
-export { buildDeliveryCallback, handleInbound } from "./inbound.js";
+export { buildDeliveryCallback, handleInbound, resolveInboundSessionKey } from "./inbound.js";
 export { createChannelMockMessageActions } from "./plugin-actions.js";
 export type { ChannelSurface } from "./plugin-actions.js";
 export { createChannelMockPlugin } from "./plugin.js";

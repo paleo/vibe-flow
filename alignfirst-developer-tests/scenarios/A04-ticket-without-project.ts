@@ -4,6 +4,7 @@ import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const TICKET_ID = "ABC-040";
@@ -16,12 +17,11 @@ const TICKET_ID = "ABC-040";
 export default async function ticketWithoutProject(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Ticket ${TICKET_ID}, on doit corriger le bug d'export.`,
-    codingAgent,
   });
 
   await ctx.judgeLLM({
@@ -30,6 +30,7 @@ export default async function ticketWithoutProject(ctx: ScenarioContext): Promis
     rubric: askWhichProjectRubric(TICKET_ID),
     label: "ask-which-project",
   });
+  await expectSilentSeedTurn(ctx, starter);
   await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.markScenarioAsEnded("PASS");

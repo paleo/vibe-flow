@@ -87,7 +87,7 @@ A model provider served by an OpenClaw plugin needs three more lines in `seed/co
 
 ```sh
 install_plugin_once <package>
-set_json plugins.allow "[\"$surface_plugin_id\",\"$RUNTIME_PROVIDER\",\"browser\",\"<id>\"]"
+set_json plugins.allow "[\"$surface_plugin_id\",\"$RUNTIME_PROVIDER\",\"browser\",\"alignfirst-developer\",\"<id>\"]"
 openclaw plugins enable "<id>" --accept-capabilities
 ```
 
@@ -96,6 +96,8 @@ openclaw plugins enable "<id>" --accept-capabilities
 An installed agent-harness plugin cannot claim this deployment's turns because the explicit
 `openclaw` runtime pin is authoritative. A provider plugin may still supply model transport,
 authentication, or chat commands.
+
+The seed installs `@paleo/alignfirst-developer-openclaw-plugin` as **AlignFirst Developer** (ID `alignfirst-developer`) and enables its optional `thread_handoff` tool. This plugin supplies the Developer's OpenClaw capabilities. Thread handoff keeps its SQLite state under `~/.openclaw/thread-handoff/` and needs no official-plugin trust override. Keep that directory writable by `{{SERVICE_USER}}` and follow the package README for consistent backup and retirement.
 
 ## Model-specific parameters
 
@@ -250,6 +252,7 @@ Continue with [08-coding-agent.md](08-coding-agent.md).
 sudo -i -u {{SERVICE_USER}} -- journalctl --user -u openclaw-gateway -f
 sudo -i -u {{SERVICE_USER}} -- systemctl --user restart openclaw-gateway
 sudo -i -u {{SERVICE_USER}} -- openclaw plugins list
+sudo -i -u {{SERVICE_USER}} -- openclaw plugins inspect alignfirst-developer --json --runtime
 sudo -i -u {{SERVICE_USER}} -- openclaw doctor          # interactive; no --fix, see gotchas.md
 sudo -i -u {{SERVICE_USER}} -- openclaw secrets reload   # after a secret rotation
 ```

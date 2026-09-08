@@ -6,6 +6,18 @@ Hard-won notes from tightening the `myclaw` workspace files (`alignfirst-develop
 
 No "Important:", no all-caps emphasis, no triple-bullet restatement of the same point. There are a lot of things that matter. The more you insist, the more diluted later content becomes.
 
+## The seed and the playbook state one rule
+
+The handoff seed (`buildSeed` in the plugin's `service.ts`) and `working-session.md` both tell the thread session when to stay silent. When they disagree, the seed wins: it is the turn's user message. On 2026-09-07 the seed said "End silently **only** when the claim is alreadyClaimed…" while the playbook said a claimed seed turn whose starter already asked a question ends on `NO_REPLY`; Terra obeyed the seed and repeated the question (Terra A05 Slack, artifact `17-51-00-682Z`). When a rule changes in one place, reread the other. A rule that must hold in the seed turn itself goes in the seed: Terra kept re-running the inventory in that turn through two playbook rewordings (3 of 7 A22 cells) and stopped once the seed forbade the lookup (4 of 4, 2026-09-08).
+
+## Name who supplies a value
+
+"The starter's question is still unanswered" let Terra count its own inventory lookup as the answer: the seed turn re-ran `alproject list --json` and posted the result (A05 and A22 Slack, 2026-09-08). When a rule waits for a value, say where it comes from: "no human message has supplied it".
+
+## State the exception before the rule it excepts
+
+An exception placed after the procedure it excepts gets skipped: the model acts on the first sentence. The no-branch sub-path of `project-workspace-setup.md` opened with "set up a workspace on a new branch" and closed with "status request: tell the user there's no work"; Terra created the workspace for a status request (A09 Discord, 2026-09-08). Lead with the exception, then the default.
+
 ## Template + variations beats N full examples
 
 A single labelled template plus a short list of variation tails beats four full-example bullets, and stops the agent from compressing the template away. Bad:
@@ -40,9 +52,9 @@ Channel/DM and thread sessions behave differently; phrase as "Channel/DM: …. T
 
 ## The thread is its own source of truth
 
-Thread sessions are fresh — they don't inherit the channel session's transcript (see the Discord history gap in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md#discord-vs-slack-thread-history--upstream-gap)). Recover project, canonical project path, ticket, and task with `message action: "read"` on the thread. A detailed request also needs its complete original text in the starter. A fresh **Discord** thread session sees only the thread's *own* messages — not the channel message that named the project (it's the thread's parent, excluded from the thread message list), and `read` returns the channel title, not the thread name. So the starter must carry everything forward; don't rely on the original message surviving. Never rerun discovery to replace the recorded path, reconstruct it from the project name, or infer a project from a ticket prefix (`ABC-…` is a label, not a project namespace).
+Thread sessions are fresh — they don't inherit the channel session's transcript (see the Discord history gap in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md#discord-vs-slack-thread-history--upstream-gap)). Recover project, canonical project path, ticket, and task from the handoff seed's starter, or with `message action: "read"` on a human turn. A detailed request also needs its complete original text in the starter. A fresh **Discord** thread session sees only the thread's *own* messages — not the channel message that named the project (it's the thread's parent, excluded from the thread message list), and `read` returns the channel title, not the thread name. So the starter must carry everything forward; don't rely on the original message surviving. Never rerun discovery to replace the recorded path, reconstruct it from the project name, or infer a project from a ticket prefix (`ABC-…` is a label, not a project namespace).
 
-This is why the channel session's starter is the only place the handoff values can live, and why it must state the task rather than assume the user will restate it. The message that wakes the thread session is often content-free ("vas-y", "ok").
+This is why the visible starter must state the task rather than assume the user will restate it. The handoff plugin also carries the exact starter inside an escaped user-content block, so a fresh targeted wake does not depend on parent-history inheritance. Neither carrier is permission to reconstruct missing values.
 
 ## Don't treat a derived value as redundant
 
@@ -54,7 +66,7 @@ This is a common cause of an otherwise-correct run failing an assertion. Concret
 
 The rule above pushes values into a required output. Push the *same* values into two outputs a few minutes apart and the agent drops the second one — correctly, from its point of view: the user can already see them.
 
-This killed the first version of the channel-bootstrap redesign. The channel starter was given the project, project path, ticket, and task; the thread session was then still asked to open with a `[WORK]` banner carrying the same values. Claude Sonnet 5 skipped the banner and posted nothing until the workspace was up, two minutes later. The fix was structural, not more insistence: the starter is the thread's record, and the thread session opens with a bare setup signal that restates nothing.
+This killed the first version of the channel-bootstrap redesign. The channel starter was given the project, project path, ticket, and task; the thread session was then still asked to open with a `[WORK]` banner carrying the same values. Claude Sonnet 5 skipped the banner and posted nothing until the workspace was up, two minutes later. The fix was structural, not more insistence: the starter remains the thread's record, the plugin seed activates it without a content-free human follow-up, and the thread session's next visible output reports new state rather than repeating the starter.
 
 So before requiring an output, check what is already in the thread. Restate a value the agent derived; don't restate one the user is looking at.
 

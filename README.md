@@ -20,11 +20,13 @@ Nine Agent Skill stubs expose the CLI through commands such as `/alspec` in Clau
 
 ## OpenClaw Test toolkit
 
-`@paleo/openclaw-test` and three companion channel packages: they are a Dockerised regression-test harness that drives OpenClaw through synthetic Discord and Slack channels. See [packages/openclaw-test/README.md](packages/openclaw-test/README.md).
+`@paleo/openclaw-test` and three companion channel packages are a Dockerised regression-test harness that drives OpenClaw through synthetic Discord and Slack channels. See [packages/openclaw-test/README.md](packages/openclaw-test/README.md).
 
 ## AlignFirst Developer
 
 AlignFirst Developer is an AI teammate for software work, currently packaged on OpenClaw. See [alignfirst-developer.md](alignfirst-developer.md).
+
+[`@paleo/alignfirst-developer-openclaw-plugin`](packages/alignfirst-developer-openclaw-plugin/README.md) supplies its OpenClaw capabilities under plugin ID `alignfirst-developer`. Its first capability, thread handoff, durably activates the ordinary thread session after confirmed native starter delivery.
 
 ---
 

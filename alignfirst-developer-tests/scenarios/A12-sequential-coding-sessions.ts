@@ -4,15 +4,14 @@ import {
   execMatches,
   invokesAlcode,
   invokesCodingAgentDirectly,
-  nthMatchingCall,
 } from "./_lib/agent-tool-calls.ts";
 import {
   waitForBackgroundStartedAck,
   waitForCodingSessionSucceeded,
   waitForCompletionReport,
 } from "./_lib/coding-session.ts";
+import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
-import { setupCodingAgentMock, type CodingAgentMockHandle } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { assertNoChannelRootLeak, assertNoSelfThreadMessagePost } from "./_lib/outbound.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
@@ -24,10 +23,14 @@ const TICKET_ID = "ABC-0120";
 const PROJECT = "nimbus";
 
 // The delegation launch: an alcode PROTOCOL run. Discriminates against the other alcode execs a
-// turn legitimately makes — the `--openclaw-guide` read, and the wake turn's protocol-less
-// verification run ("Run the project's checks…"), which is foreground and chains no wake.
+// turn legitimately makes — the `--openclaw-guide` read and protocol-less verification runs.
+// A completion-wake turn may also run further protocol runs (review, description) before the
+// next phase starts, so each phase selects the first launch issued after its own inbound.
 const isAlcodeLaunch = (call: AgentToolCall): boolean =>
   invokesAlcode(call) && execMatches(call, /--protocol/);
+
+const launchedSince = (notBefore: string) => (call: AgentToolCall) =>
+  isAlcodeLaunch(call) && call.startedAt !== undefined && call.startedAt >= notBefore;
 
 /**
  * Regression for the heartbeat-cooldown wake gate (incident `.plans/32/from-paleoclaw/
@@ -52,11 +55,11 @@ export default async function sequentialCodingSessions(ctx: ScenarioContext): Pr
   await resetFixtures(ctx);
   // Stream delay > exec `yieldMs` (10s default) so OpenClaw auto-backgrounds the alcode exec even if
   // the agent does not pass `background: true`, letting the "started" ack precede the completion wake.
-  const codingAgent = setupCodingAgentMock(ctx, { streamDelayMs: 12_000 });
+  setupCodingAgentMock(ctx, { streamDelayMs: 12_000 });
   setupGhMock(ctx);
 
   const startCursor = await ctx.getCursor();
-  const threadId = await runFirstDelegation(ctx, codingAgent);
+  const threadId = await runFirstDelegation(ctx);
   await runSecondDelegation(ctx, threadId);
 
   // The wake turn may still be streaming a final answer after the completion
@@ -70,10 +73,8 @@ export default async function sequentialCodingSessions(ctx: ScenarioContext): Pr
 }
 
 /** Phase 1 — the channel bootstrap, then the handoff message that starts the work. */
-async function runFirstDelegation(
-  ctx: ScenarioContext,
-  codingAgent: CodingAgentMockHandle,
-): Promise<string> {
+async function runFirstDelegation(ctx: ScenarioContext): Promise<string> {
+  const phase1NotBefore = new Date().toISOString();
   const starter = await bootstrapThreadFromChannel(ctx, {
     text:
       `Nouvelle fonctionnalité à implémenter sur ${PROJECT} : passer le bouton d'export en gras. ` +
@@ -81,17 +82,13 @@ async function runFirstDelegation(
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
-  const phase1Cursor = await sendInThread(
-    ctx,
-    starter.threadId,
-    "Vas-y, préviens-moi ici quand c'est terminé.",
-  );
+  const phase1Cursor = starter.nextCursor;
 
   await expectDelegationChain(ctx, {
     threadId: starter.threadId,
     sinceCursor: phase1Cursor,
+    notBefore: phase1NotBefore,
     launchIndex: 1,
   });
   return starter.threadId;
@@ -102,6 +99,7 @@ async function runFirstDelegation(
  * taken before the inbound.
  */
 async function runSecondDelegation(ctx: ScenarioContext, threadId: string): Promise<void> {
+  const phase2NotBefore = new Date().toISOString();
   const phase2Cursor = await sendInThread(
     ctx,
     threadId,
@@ -112,6 +110,7 @@ async function runSecondDelegation(ctx: ScenarioContext, threadId: string): Prom
   await expectDelegationChain(ctx, {
     threadId,
     sinceCursor: phase2Cursor,
+    notBefore: phase2NotBefore,
     launchIndex: 2,
   });
 }
@@ -120,26 +119,27 @@ interface DelegationChainOptions {
   threadId: string;
   /** Bus cursor taken before this phase's agent activity; every wait of the phase scans from it. */
   sinceCursor: number;
-  /** 1-based rank of this phase's alcode launch among ALL aggregated launch calls. */
+  /** ISO timestamp taken before this phase's inbound; the phase's launch is issued after it. */
+  notBefore: string;
+  /** 1-based rank used in assertion labels. */
   launchIndex: number;
 }
 
 /**
  * One delegation's full chain: the alcode launch exec (with the chained `openclaw system event`
  * wake — the guide-driven mechanism this scenario pins), the started ack, the `status: succeeded`
- * session file (`minCount = launchIndex`: both runs share `.plans/<ticket>/_alcode/`, so an
- * earlier file matches immediately), and the completion report in the work thread.
+ * session file started by this phase, and the completion report in the work thread.
  */
 async function expectDelegationChain(
   ctx: ScenarioContext,
   opts: DelegationChainOptions,
 ): Promise<void> {
-  const { threadId, sinceCursor, launchIndex } = opts;
+  const { threadId, sinceCursor, notBefore, launchIndex } = opts;
 
   // `waitForAgentToolCall` matches against all aggregated calls, so a plain predicate would
-  // re-match phase 1's launch: discriminate by count and take the newest. The coding-agent
-  // subprocess is a cliMock, not an OpenClaw agent tool call.
-  const launch = await ctx.waitForAgentToolCall(nthMatchingCall(isAlcodeLaunch, launchIndex), {
+  // re-match an earlier launch: select the first launch issued after this phase's inbound. The
+  // coding-agent subprocess is a cliMock, not an OpenClaw agent tool call.
+  const launch = await ctx.waitForAgentToolCall(launchedSince(notBefore), {
     label: `agent delegates to the alcode CLI (launch #${launchIndex})`,
     timeoutMs: 180_000,
   });
@@ -158,6 +158,10 @@ async function expectDelegationChain(
     `launch #${launchIndex}: chains an \`openclaw system event\` wake`,
   );
   ctx.assertRegex(command, /--session-key/, `launch #${launchIndex}: wake targets a --session-key`);
+  const launchStartedAt = launch.startedAt;
+  if (launchStartedAt === undefined) {
+    throw new Error(`alcode launch #${launchIndex} has no start timestamp`);
+  }
 
   // The started ack: a batch judge over the thread's outbounds (see `waitForBackgroundStartedAck`).
   // Tolerant of phrasing/language and of interleaved reasoning narration — the message that tells
@@ -173,7 +177,7 @@ async function expectDelegationChain(
   const sessionFilePath = await waitForCodingSessionSucceeded(ctx, {
     ticketId: TICKET_ID,
     timeoutMs: 120_000,
-    minCount: launchIndex,
+    notBefore: launchStartedAt,
   });
   ctx.log(`coding-session file #${launchIndex} succeeded: ${sessionFilePath}`);
 
