@@ -7,6 +7,7 @@ import type { CommandContext } from "../context.js";
 import { assertMainWorktreeRoot } from "../git.js";
 import { parseBareCommandArgs, parseCommandArgs } from "../parse-args.js";
 import { archiveEntry, archiveThresholdDays, autoArchive } from "../plans/archive.js";
+import { isTicketName } from "../plans/layout.js";
 import { linkPlans } from "../plans/link.js";
 import { resolvePlansMode } from "../plans/mode.js";
 import { findStoppedRebase, renderStoppedRebase } from "../plans/rebase.js";
@@ -188,9 +189,10 @@ function resolveArchiveTarget(
   const stats = statSync(target, { throwIfNoEntry: false });
   if (!stats?.isDirectory() || realpathSync(dirname(target)) !== realpathSync(plansDir))
     throw new CliError(`${argument} must be an existing directory directly under .plans.`);
-  if (basename(target).startsWith("_"))
+  const name = basename(target);
+  if (!isTicketName(name))
     throw new CliError(`${argument}: names starting with _ are not tickets.`);
-  return target;
+  return join(plansDir, name);
 }
 
 function isPathArgument(argument: string): boolean {

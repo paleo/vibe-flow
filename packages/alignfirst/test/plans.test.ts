@@ -3,6 +3,7 @@ import {
   lstatSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   readlinkSync,
   rmSync,
   symlinkSync,
@@ -201,6 +202,22 @@ describe("plans commands", () => {
       env: { ALIGNFIRST_ARCHIVE_DAYS: "1" },
     });
     expect(automatic.stdout).toContain("Archived 79");
+  });
+
+  it("archives a ticket given through the plans clone path", async () => {
+    const fixture = makeFixture();
+    await runMain(["plans", "setup", fixture.clone, "--folder", "product-plans"], {
+      cwd: fixture.product,
+    });
+    mkdirSync(join(fixture.clone, "product-plans", "78"));
+    const result = await runMain(["plans", "archive", join(fixture.clone, "product-plans", "78")], {
+      cwd: fixture.product,
+    });
+    expect(result).toMatchObject({ code: 0, stderr: "" });
+    expect(result.stdout).toContain("Archived 78 → _archives/78");
+    expect(existsSync(join(fixture.clone, "product-plans", "_archives", "78"))).toBe(true);
+    expect(existsSync(join(fixture.clone, "product-plans", "78"))).toBe(false);
+    expect(readdirSync(fixture.product).toSorted()).toEqual([".git", ".plans", "README.md"]);
   });
 
   it("uses plans.autoArchive and honors --no-auto-archive", async () => {

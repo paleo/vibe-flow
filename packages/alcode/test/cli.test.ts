@@ -667,7 +667,7 @@ describe("launch guards", () => {
       env: { ALIGNFIRST_CODE_AGENT: "claude" },
       stdout,
       stderr: makeSink(),
-      alignfirstCommand: ["node", ALIGNFIRST_BIN],
+      alignfirstCommand: [process.execPath, ALIGNFIRST_BIN],
       modelResolver: async () => {
         throw new Error("stop before spawning");
       },

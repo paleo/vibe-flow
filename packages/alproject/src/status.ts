@@ -3,6 +3,7 @@ import { realpathSync } from "node:fs";
 import { basename, isAbsolute, resolve } from "node:path";
 
 import type { DiscoveredProject, ProjectInventory } from "./discovery.js";
+import { errorMessage, isNodeError } from "./errors.js";
 import type { PortRange } from "./markers.js";
 
 const URL_WITH_AUTHORITY = /^[A-Za-z][A-Za-z\d+.-]*:\/\//u;
@@ -130,12 +131,4 @@ function runGit(projectPath: string, ...args: string[]): string {
   } catch (error) {
     throw new Error(`Cannot inspect Git project ${projectPath}: ${errorMessage(error)}`);
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function isNodeError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error;
 }

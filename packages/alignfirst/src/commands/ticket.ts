@@ -55,10 +55,10 @@ interface TicketJsonEntry {
 }
 
 export function runTicket(ctx: CommandContext, args: string[]): number {
-  assertPlansGate(ctx.cwd, ctx.form);
   const usage = renderUsage(ctx);
   const parsed = parseTicketArgs(ctx, args, usage);
   if (parsed === undefined) return 0;
+  assertPlansGate(ctx.cwd, ctx.form);
   const result = resolveTicket(ctx, parsed);
   if (parsed.catchup) {
     ctx.stdout.write(renderCatchup(ctx.cwd, result, renderReport(ctx, parsed, result)));

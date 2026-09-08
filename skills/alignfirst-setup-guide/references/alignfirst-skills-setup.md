@@ -92,7 +92,8 @@ the skills command above, since no bootstrap line describes the protocols.
 ### With `.alignfirst.json`
 
 Detect the ticket format from branches and tickets: `^\d+$` for issue numbers,
-`^[A-Z]+-\d+$` for Jira-like keys, or no field without a convention. Detect the commit style with
+`^[A-Z]+-\d+$` for Jira-like keys, or no field without a convention. The pattern is one anchored
+expression; alternatives go inside a group, as in `^(ABC|XYZ)-\d+$`. Detect the commit style with
 `git log --oneline -20`. Resolve the default branch with
 `git ls-remote --symref origin HEAD`; use the sole remote when `origin` is absent, and ask the user
 when several non-`origin` remotes exist.

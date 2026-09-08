@@ -91,6 +91,15 @@ alproject list --root ~/projects
 
 Workspace files follow [update-workspace.md](update-workspace.md).
 
+### Upgrade from the registry model
+
+A host deployed before `@paleo/alproject` 2 has no marker yet; the `projects` scope tolerates its absence, so the command above creates it. Then remove the immutable registry and guide the old model installed:
+
+```sh
+sudo chattr -i /home/{{SERVICE_USER}}/.alproject.json /home/{{SERVICE_USER}}/projects/alproject-guide.md
+sudo rm /home/{{SERVICE_USER}}/.alproject.json /home/{{SERVICE_USER}}/projects/alproject-guide.md
+```
+
 ## Migrate after a core bump
 
 A release can ship state migrations that only doctor's repair mode applies, with or without a TTY. `openclaw update repair` runs that repair, syncs the plugins at the core's version and refreshes the plugin registry; it needs the configuration and the workspace writable:

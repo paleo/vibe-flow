@@ -5,6 +5,8 @@ import { parseArgs } from "node:util";
 
 import { DEFAULT_ALIGNFIRST_COMMAND } from "./alignfirst-cli.js";
 import { buildInventory, type ProjectInventory } from "./discovery.js";
+import { errorMessage } from "./errors.js";
+import { formatRange } from "./format.js";
 import { renderProjectsGuide } from "./guide.js";
 import {
   assertValidPortRange,
@@ -131,7 +133,7 @@ export function runProjects(ctx: ProjectsContext, tokens: string[]): number {
   }
   if (args.command === "free-ports" && args.size !== undefined) {
     const range = findFreeBlock(inventory, args.size);
-    ctx.stdout.write(args.json ? renderPortRangeJson(range) : `${range.first}..${range.last}\n`);
+    ctx.stdout.write(args.json ? renderPortRangeJson(range) : `${formatRange(range)}\n`);
     return 0;
   }
   throw new Error("Invalid alproject command");
@@ -147,10 +149,6 @@ function inspectProjectInventory(ctx: ProjectsContext, rootOption: string | unde
     ctx.stdout.write(renderProjectDoctorFailure(errorMessage(error)));
     return 1;
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 function parseProjectsArgs(tokens: string[]): ProjectsArgs {

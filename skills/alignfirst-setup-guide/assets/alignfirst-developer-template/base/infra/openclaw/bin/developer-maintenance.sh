@@ -139,6 +139,7 @@ unlock_skills() {
 }
 
 unlock_projects() {
+  [ -e "$PROJECTS_MARKER" ] || return 0
   chattr -i "$PROJECTS_MARKER"
   chown "$SERVICE_USER:$SERVICE_USER" "$PROJECTS_MARKER"
 }
@@ -216,6 +217,7 @@ restore_skills() {
 }
 
 restore_projects() {
+  [ -e "$PROJECTS_MARKER" ] || return 0
   chown root:root "$PROJECTS_MARKER" &&
     chmod 644 "$PROJECTS_MARKER" &&
     chattr +i "$PROJECTS_MARKER"

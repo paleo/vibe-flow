@@ -2,4 +2,4 @@
 "@paleo/alcode": minor
 ---
 
-`new --no-ticket` and the delegated prompt run the `alignfirst` CLI, now a prerequisite. Removed `reserve-side-ticket`.
+Breaking change: `reserve-side-ticket` is removed, and the `alignfirst` CLI is a prerequisite, run by `new --no-ticket` and by the delegated prompt.

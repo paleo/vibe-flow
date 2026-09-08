@@ -1,9 +1,9 @@
-import { existsSync, lstatSync, realpathSync, statSync } from "node:fs";
+import { realpathSync } from "node:fs";
 import { join } from "node:path";
 
 import { CliError } from "../cli-error.js";
 import { gitOutput } from "../git.js";
-import { missingPlansError } from "./layout.js";
+import { assertPlansGate } from "./layout.js";
 
 export type PlansMode = SharedPlans | LocalPlans;
 
@@ -18,16 +18,7 @@ export interface LocalPlans {
 
 export function resolvePlansMode(cwd: string, form: string): PlansMode {
   const plansPath = join(cwd, ".plans");
-  const stats = lstatSync(plansPath, { throwIfNoEntry: false });
-  if (!stats) throw missingPlansError(form);
-  if (stats.isSymbolicLink() && !existsSync(plansPath))
-    throw new CliError(
-      `The .plans symlink is broken. Re-run ${form} plans setup with the clone location.`,
-    );
-  if (!statSync(plansPath).isDirectory())
-    throw new CliError(
-      `.plans is not a directory. Remove it, then run ${form} plans setup (see the project documentation).`,
-    );
+  const stats = assertPlansGate(cwd, form);
   if (plansRepositoryId(plansPath, stats.isSymbolicLink(), form) === repositoryId(cwd))
     return { kind: "local" };
   return { kind: "shared", repoToplevel: gitOutput(plansPath, "rev-parse", "--show-toplevel") };

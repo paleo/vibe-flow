@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
 
 import type { ProjectInventory, ProjectsDirectory } from "./discovery.js";
+import { escapeAdditionalJsonCharacters, formatRange } from "./format.js";
 import type { PortRange } from "./markers.js";
 
 export function renderProjectsGuide(inventory?: ProjectInventory): string {
@@ -42,22 +43,9 @@ function renderDirectory(inventory: ProjectInventory, directory: ProjectsDirecto
 }
 
 function renderData(value: string): string {
-  const escaped = escapeControlCharacters(JSON.stringify(value));
+  const escaped = escapeAdditionalJsonCharacters(JSON.stringify(value));
   const delimiter = "`".repeat(longestBacktickRun(escaped) + 1);
   return `${delimiter}${escaped}${delimiter}`;
-}
-
-function escapeControlCharacters(value: string): string {
-  return Array.from(value, (character) => {
-    const codePoint = character.codePointAt(0);
-    if (
-      codePoint === undefined ||
-      !((codePoint >= 0x7f && codePoint <= 0x9f) || codePoint === 0x2028 || codePoint === 0x2029)
-    ) {
-      return character;
-    }
-    return `\\u${codePoint.toString(16).padStart(4, "0")}`;
-  }).join("");
 }
 
 function longestBacktickRun(value: string): number {
@@ -67,5 +55,5 @@ function longestBacktickRun(value: string): number {
 }
 
 function renderRange(range: PortRange | undefined, absent = "(none)"): string {
-  return range === undefined ? absent : `${range.first}..${range.last}`;
+  return range === undefined ? absent : formatRange(range);
 }

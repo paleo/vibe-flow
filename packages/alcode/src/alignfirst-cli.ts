@@ -30,8 +30,8 @@ export function runAlignfirst(
   };
 }
 
-export function reserveSideTicket(command: string[], cwd: string): string {
-  const result = runAlignfirst(command, ["ticket", "--side", "--json"], cwd);
+export function reserveSideTicket(command: string[], cwd: string, env: NodeJS.ProcessEnv): string {
+  const result = runAlignfirst(command, ["ticket", "--side", "--json"], cwd, env);
   if (result.status !== 0) {
     throw new Error(result.stderr.trim() || "alignfirst ticket --side failed");
   }

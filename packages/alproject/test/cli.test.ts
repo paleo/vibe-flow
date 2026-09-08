@@ -315,6 +315,7 @@ describe("project discovery", () => {
   it("fails the listing when alignfirst is missing", async () => {
     const fixture = makeFixture({});
     mkdirSync(join(fixture.root, "candidate"));
+    writeProjectConfig(join(fixture.root, "candidate"), {});
     const result = await runProjects(fixture, ["list"], {
       alignfirstCommand: ["/nonexistent/alignfirst"],
     });

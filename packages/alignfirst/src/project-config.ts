@@ -118,6 +118,25 @@ function assertValidPattern(pattern: string, label: string): void {
       `ticketIdPattern is not a valid regular expression: ${errorMessage(error)}`,
     );
   }
+  if (hasInnerAnchor(pattern))
+    throw invalidConfig(
+      label,
+      "ticketIdPattern must be one anchored expression; group alternatives: ^(ABC|XYZ)-\\d+$",
+    );
+}
+
+/** Branch detection unanchors the pattern by trimming its ends, so inner anchors never match. */
+function hasInnerAnchor(pattern: string): boolean {
+  let inClass = false;
+  for (let i = 0; i < pattern.length; ++i) {
+    const char = pattern[i];
+    if (char === "\\") ++i;
+    else if (inClass) inClass = char !== "]";
+    else if (char === "[") inClass = true;
+    else if (char === "^" && i !== 0) return true;
+    else if (char === "$" && i !== pattern.length - 1) return true;
+  }
+  return false;
 }
 
 function assertValidPortRange(range: PortRange, label: string): void {

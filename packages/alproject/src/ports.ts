@@ -1,4 +1,5 @@
 import type { ProjectInventory } from "./discovery.js";
+import { formatRange } from "./format.js";
 import { MARKER_FILENAME, type PortRange } from "./markers.js";
 
 interface AllocatedPortRange {
@@ -21,9 +22,7 @@ export function findFreeBlock(inventory: ProjectInventory, size: number): PortRa
   ];
   const first = lowestFreeBase(occupied, size, rootRange.first, rootRange.last);
   if (first === undefined) {
-    throw new Error(
-      `No block of ${size} contiguous free ports in ${rootRange.first}..${rootRange.last}.`,
-    );
+    throw new Error(`No block of ${size} contiguous free ports in ${formatRange(rootRange)}.`);
   }
   return { first, last: first + size - 1 };
 }

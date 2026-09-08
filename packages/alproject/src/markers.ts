@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { type } from "arktype";
 
+import { errorMessage } from "./errors.js";
+
 export const MARKER_FILENAME = ".alignfirst-projects.json";
 
 const portRangeSchema = type({
@@ -65,8 +67,4 @@ export function assertValidPortRange(range: PortRange, label: string): void {
 
 function invalidMarker(path: string, detail: string): Error {
   return new Error(`Invalid projects marker ${path}: ${detail}`);
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

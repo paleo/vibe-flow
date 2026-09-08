@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
@@ -284,7 +284,16 @@ describe("ticket command", () => {
     expect((await runMain(["ticket", "78"], { cwd })).stderr).toContain(
       "No .plans/ directory in the current directory.",
     );
+    expect(await runMain(["ticket", "--help"], { cwd })).toMatchObject({ code: 0, stderr: "" });
+    symlinkSync(join(cwd, "missing-clone"), join(cwd, ".plans"));
+    expect((await runMain(["ticket", "78"], { cwd })).stderr).toContain(
+      "The .plans symlink is broken.",
+    );
+    rmSync(join(cwd, ".plans"));
     mkdirSync(join(cwd, ".plans"));
+    expect((await runMain(["ticket", "_archives"], { cwd })).stderr).toContain(
+      "Invalid ticket id: _archives",
+    );
     writeFileSync(
       join(cwd, ".alignfirst.json"),
       JSON.stringify({ schemaVersion: 1, ticketIdPattern: "^\\d+$" }),

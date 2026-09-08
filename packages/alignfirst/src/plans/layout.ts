@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, lstatSync, type Stats, statSync } from "node:fs";
 import { join } from "node:path";
 
 import { CliError } from "../cli-error.js";
@@ -18,9 +18,20 @@ export function archivesDir(cwd: string): string {
   return join(plansDir(cwd), ARCHIVES_DIR);
 }
 
-export function assertPlansGate(cwd: string, form: string): void {
-  if (existsSync(plansDir(cwd))) return;
-  throw missingPlansError(form);
+/** Returns the lstat of `.plans`, so callers can tell a symlink from a directory. */
+export function assertPlansGate(cwd: string, form: string): Stats {
+  const path = plansDir(cwd);
+  const stats = lstatSync(path, { throwIfNoEntry: false });
+  if (!stats) throw missingPlansError(form);
+  if (stats.isSymbolicLink() && !existsSync(path))
+    throw new CliError(
+      `The .plans symlink is broken. Re-run ${form} plans setup with the clone location.`,
+    );
+  if (!statSync(path).isDirectory())
+    throw new CliError(
+      `.plans is not a directory. Remove it, then run ${form} plans setup (see the project documentation).`,
+    );
+  return stats;
 }
 
 export function missingPlansMessage(form: string): string {

@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import type { CommandContext } from "./context.js";
 import { renderDefaultBranchLine, resolveDefaultBranch } from "./default-branch.js";
+import { errorMessage } from "./errors.js";
 import { gitOutputOrUndefined, gitSucceeds } from "./git.js";
 import { resolvePlansMode } from "./plans/mode.js";
 import type { CommitConfig } from "./project-config.js";
@@ -73,8 +74,7 @@ function renderPlans(ctx: CommandContext): string | undefined {
         : "";
     return `${base}${archival}`;
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return `Plans: ${message.split("\n", 1)[0]}`;
+    return `Plans: ${errorMessage(error).split("\n", 1)[0]}`;
   }
 }
 

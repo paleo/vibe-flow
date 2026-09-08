@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { CliError } from "../cli-error.js";
+import { errorMessage } from "../errors.js";
 import { formatLocalTimestamp, formatSize } from "../format.js";
 import type { ResolvedTicketDir, TicketEntry } from "./ticket.js";
 
@@ -65,7 +66,6 @@ function readBody(cwd: string, file: CatchupFile): string {
   try {
     return readFileSync(join(cwd, file.path), "utf-8");
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    throw new CliError(`Cannot load catchup file ${file.path}: ${detail}`);
+    throw new CliError(`Cannot load catchup file ${file.path}: ${errorMessage(error)}`);
   }
 }

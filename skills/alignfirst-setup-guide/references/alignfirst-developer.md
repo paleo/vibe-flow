@@ -53,7 +53,8 @@ The agent **runtime** is fixed: every AlignFirst Developer uses OpenClaw's embed
 | `{{TEAM_MEMBERS}}` | Operator | `USER.md` |
 | `{{PORT_RANGE_FIRST}}`, `{{PORT_RANGE_LAST}}` | Operator (suggested 28000–28599) | `.alignfirst-projects.json`, overview, workspace `AGENTS.md`, `09` |
 | `{{PLANS_REPOSITORY_URL}}` | Operator, team plans only | `02`, `add-project.md` |
-| `{{PLANS_CLONE_NAME}}` | Operator, team plans only | `common.conf`, `02`, `add-project.md`, projects marker |
+| `{{PLANS_CLONE_NAME}}` | Operator, team plans only | `common.conf`, `02`, `add-project.md` |
+| `{{PLANS_CLONE_NOTE}}` | Derived | projects marker |
 | `{{SLACK_OWNER_ID}}`, `{{SLACK_CHANNEL_ID}}` | Slack administrator | `.env.example` (Slack overlay) |
 | `{{DISCORD_OWNER_ID}}`, `{{DISCORD_GUILD_ID}}`, `{{DISCORD_CHANNEL_ID}}` | Discord administrator | `.env.example` (Discord overlay) |
 | `{{DEV_DOMAIN}}` | Operator | `09`, Caddyfile, `authelia.yml`, `REMOTE_DEV_DOMAIN` in `common.conf`, overview, gotchas |
@@ -70,7 +71,7 @@ The channel IDs are known before the bot exists (the channel, the server and the
 
 The last two rows exist only when the gateway option is on. `{{PORT_RANGE_REGEX}}` is a regex matching exactly the integers `PORT_RANGE_FIRST..PORT_RANGE_LAST`: one digit class per position when the range allows it (`28000..28599` → `28[0-5][0-9]{2}`), otherwise an alternation of such classes (`6500..7700` → `6[5-9][0-9]{2}|7[0-6][0-9]{2}|7700`). `{{DEV_DOMAIN_REGEX}}` is `DEV_DOMAIN` with every `.` escaped as `\.`.
 
-With team plans, collect `{{PLANS_REPOSITORY_URL}}` and `{{PLANS_CLONE_NAME}}` at render time. Both the operator and the service account clone it under `~/projects`; each account supplies its own credentials.
+With team plans, collect `{{PLANS_REPOSITORY_URL}}` and `{{PLANS_CLONE_NAME}}` at render time. Both the operator and the service account clone it under `~/projects`; each account supplies its own credentials. `{{PLANS_CLONE_NOTE}}` is then a space followed by `The plans clone at ~/projects/{{PLANS_CLONE_NAME}} is a repository, not a project.`; without team plans it is empty.
 
 ## Assemble the Admin Repository
 

@@ -391,7 +391,7 @@ async function runSession(args: SessionArgs, agent: CodingAgent, ctx: RunContext
   let catchupContent: string | undefined;
   try {
     ticket = args.noTicket
-      ? reserveSideTicket(alignfirstCommand, cwd)
+      ? reserveSideTicket(alignfirstCommand, cwd, env)
       : resolveTicket(args, records);
     if (args.catchup === true) {
       if (ticket === undefined) {

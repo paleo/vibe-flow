@@ -157,7 +157,7 @@ export function isPathSafeTicketId(id: string): boolean {
 }
 
 export function validateTicketId(id: string, pattern?: string): void {
-  if (!isPathSafeTicketId(id)) throw new CliError(`Invalid ticket id: ${id}`);
+  if (!isPathSafeTicketId(id) || !isTicketName(id)) throw new CliError(`Invalid ticket id: ${id}`);
   if (pattern !== undefined && !new RegExp(pattern).test(id) && !SIDE_TICKET.test(id))
     throw new CliError(`Ticket id "${id}" does not match ticketIdPattern "${pattern}".`);
 }

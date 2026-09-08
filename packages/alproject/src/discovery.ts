@@ -1,9 +1,13 @@
-import { lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 
 import { runAlignfirst } from "./alignfirst-cli.js";
+import { errorMessage, isNodeError } from "./errors.js";
+import { formatRange } from "./format.js";
 import { type PortRange, type ProjectsMarker, readMarker } from "./markers.js";
 import { containsRange, rangesOverlap } from "./ports.js";
+
+const PROJECT_CONFIG_FILENAME = ".alignfirst.json";
 
 export interface ProjectInventory {
   root: string;
@@ -173,6 +177,10 @@ function classifyCandidate(
   state: WalkState,
   ctx: InventoryContext,
 ): DiscoveredProject[] {
+  if (!existsSync(join(candidate.path, PROJECT_CONFIG_FILENAME))) {
+    addOther(state.directories, candidate.directory, candidate.name);
+    return [];
+  }
   const description = describeProject(ctx.alignfirstCommand, candidate.path, {
     ...ctx.env,
     HOME: ctx.home,
@@ -429,22 +437,10 @@ function sortInventory(
     project.workspaces.sort((left, right) => left.localeCompare(right));
 }
 
-function formatRange(range: PortRange): string {
-  return `${range.first}..${range.last}`;
-}
-
 function isPortRange(value: unknown): value is PortRange {
   return isRecord(value) && typeof value.first === "number" && typeof value.last === "number";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
-}
-
-function isNodeError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

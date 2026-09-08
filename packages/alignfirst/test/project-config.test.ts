@@ -42,6 +42,7 @@ describe("project config", () => {
     [{ schemaVersion: 1, extra: true }, "extra"],
     [{ schemaVersion: 1, cli: "not a range" }, "semver"],
     [{ schemaVersion: 1, ticketIdPattern: "[" }, "regular expression"],
+    [{ schemaVersion: 1, ticketIdPattern: "^ABC-\\d+$|^XYZ-\\d+$" }, "one anchored expression"],
     [{ schemaVersion: 1, portRange: { first: 2, last: 1 } }, "must not exceed"],
     [{ schemaVersion: 1, ticketPattern: "^\\d+$" }, "ticketPattern"],
     [{ schemaVersion: 1, project: {} }, "project"],
@@ -50,6 +51,16 @@ describe("project config", () => {
   ])("rejects invalid config %#", (value, message) => {
     expect(() => validateProjectConfig(value, "config")).toThrow(message);
   });
+
+  it.each(["^(ABC|XYZ)-\\d+$", "^[^/]+$", "^\\$\\d+$", "\\d+"])(
+    "accepts ticketIdPattern %s",
+    (ticketIdPattern) => {
+      expect(validateProjectConfig({ schemaVersion: 1, ticketIdPattern }, "config")).toEqual({
+        schemaVersion: 1,
+        ticketIdPattern,
+      });
+    },
+  );
 
   it("reads a file, returns undefined when absent, and reports invalid JSON", () => {
     const dir = makeTempDir();
