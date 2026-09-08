@@ -24,14 +24,18 @@ Run `{{TICKET_CMD}} --next merge.summary.md` to continue the current cycle. Appe
 
 Resolve the conflicts properly — preserve both intents whenever possible. Do not blindly accept one side.
 
+Resolve conflicts one at a time. Avoid batch processing, broad search-and-replace operations, and other brute-force edits.
+
 **Special case for lock files:** If a lock file has conflicts:
 
 1. Accept all the changes from the incoming branch.
 2. After all other conflicts are resolved, run the proper install command so the package manager re-applies the current branch's dependency changes.
 
-## 4. Finalize the Merge
+## 4. Validate and Commit
 
-Finalize the merge using git's default commit message (e.g. `git commit --no-edit`). Do not write your own commit message — git has already prepared the proper merge message.
+After resolving all conflicts, run the codebase's usual checks, such as compilation, linting, and unit tests. Commit the merge as soon as the available checks pass, using Git's default message (for example, `git commit --no-edit`).
+
+If you need to execute the project, whether through E2E tests or manual checks, do so after the merge commit. Commit any resulting fixes separately.
 
 ## 5. Summarize
 
