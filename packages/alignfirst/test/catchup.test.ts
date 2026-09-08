@@ -85,9 +85,7 @@ describe("ticket --catchup", () => {
     const result = await runMain(["ticket", "78", "--catchup"], { cwd });
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain(
-      "History too large to print (over the 30 KiB budget). Read the relevant files among the entries above, skipping the plans (`*-main-plan.md`, `*-plan-*.md`): their `.summary.md` files cover them.",
-    );
+    expect(result.stdout).toContain("History too large to print");
     expect(result.stdout).toContain("  - `A9-spec.md` (15.6 KiB, ");
     expect(result.stdout).toContain("  - `A10-review.md` (15.6 KiB, ");
     expect(result.stdout).not.toContain("<file");

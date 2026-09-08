@@ -24,6 +24,8 @@ const USAGE = `Usage:
   {{FORM}} ticket --side [--next [<filename>]] [--new-cycle] [--json] [--dry-run]
   {{FORM}} ticket [<id>] --catchup
 
+--next may repeat, each occurrence with a filename: the names are numbered in order.
+
 --catchup prints the ticket's Markdown files, plans excluded, summaries included.
 Files over 64 KiB are listed without content. Above 30 KiB of output, only the entry
 list is printed.
@@ -32,13 +34,16 @@ list is printed.
 interface TicketOptions {
   id: string;
   branch?: string;
-  next?: string | true;
+  next?: NextRequest;
   newCycle: boolean;
   json: boolean;
   dryRun: boolean;
   side: boolean;
   catchup: boolean;
 }
+
+/** `true` asks for the bare FILE_PREFIX; filenames ask for one FILE_NAME each, in order. */
+type NextRequest = string[] | true;
 
 interface TicketJsonReport {
   TICKET_ID: string;
@@ -116,11 +121,10 @@ function parseTicketArgs(
     throw new CliError(
       `--catchup cannot be combined with --side, --next, --json, or --dry-run.\n\n${usage}`,
     );
-  if (normalized.filename !== undefined) validateNextFilename(normalized.filename);
   const resolution = resolveTicketId(ctx, positionals[0], values);
   return {
     ...resolution,
-    next: values.next === undefined ? undefined : (normalized.filename ?? true),
+    next: values.next === undefined ? undefined : resolveNextRequest(normalized.requests, usage),
     newCycle: values["new-cycle"],
     json: values.json,
     dryRun: values["dry-run"],
@@ -131,11 +135,12 @@ function parseTicketArgs(
 
 interface NormalizedNextArgs {
   args: string[];
-  filename?: string;
+  /** One entry per `--next` occurrence: its filename, or `undefined` for the bare form. */
+  requests: (string | undefined)[];
 }
 
 function normalizeNextArgs(args: string[]): NormalizedNextArgs {
-  const normalized: NormalizedNextArgs = { args: [] };
+  const normalized: NormalizedNextArgs = { args: [], requests: [] };
   for (let index = 0; index < args.length; ++index) {
     const arg = args[index];
     if (arg === "--") {
@@ -143,20 +148,28 @@ function normalizeNextArgs(args: string[]): NormalizedNextArgs {
       break;
     }
     if (arg.startsWith("--next=")) {
-      normalized.filename = arg.slice("--next=".length);
+      normalized.requests.push(arg.slice("--next=".length));
       normalized.args.push("--next");
       continue;
     }
     normalized.args.push(arg);
     if (arg !== "--next") continue;
     const following = args[index + 1];
-    delete normalized.filename;
     if (following !== undefined && !following.startsWith("-")) {
-      normalized.filename = following;
+      normalized.requests.push(following);
       ++index;
-    }
+    } else normalized.requests.push(undefined);
   }
   return normalized;
+}
+
+function resolveNextRequest(requests: (string | undefined)[], usage: string): NextRequest {
+  if (requests.length === 1 && requests[0] === undefined) return true;
+  const filenames = requests.filter((request) => request !== undefined);
+  if (filenames.length < requests.length)
+    throw new CliError(`A repeated --next requires a filename on each occurrence.\n\n${usage}`);
+  for (const filename of filenames) validateNextFilename(filename);
+  return filenames;
 }
 
 function validateNextFilename(filename: string): void {
@@ -210,22 +223,30 @@ function writeNextReport(
   ctx: CommandContext,
   options: TicketOptions,
   result: ResolvedTicketDir,
-  filename: string | true,
+  request: NextRequest,
 ): void {
   const names = result.entries.map((entry) => entry.name);
   const { cycleLetter, fileNumber } = nextFilePosition(names, options.newCycle);
-  const prefix = `${cycleLetter}${fileNumber}`;
+  const fileName = (filename: string, offset: number) =>
+    `${cycleLetter}${fileNumber + offset}-${filename}`;
   const report = {
     TICKET_DIR: `${relative(ctx.cwd, result.dir)}/`,
     CYCLE_LETTER: cycleLetter,
-    FILE_NUMBER: fileNumber,
-    ...(filename === true ? { FILE_PREFIX: prefix } : { FILE_NAME: `${prefix}-${filename}` }),
+    ...(request === true
+      ? { FILE_NUMBER: fileNumber, FILE_PREFIX: `${cycleLetter}${fileNumber}` }
+      : request.length === 1
+        ? { FILE_NUMBER: fileNumber, FILE_NAME: fileName(request[0], 0) }
+        : { FILE_NAMES: request.map(fileName) }),
   };
   if (options.json) {
     ctx.stdout.write(`${JSON.stringify(report, undefined, 2)}\n`);
     return;
   }
-  const lines = Object.entries(report).map(([name, value]) => `- ${name}: \`${value}\``);
+  const lines = Object.entries(report).map(([name, value]) =>
+    Array.isArray(value)
+      ? [`- ${name}:`, ...value.map((item) => `  - \`${item}\``)].join("\n")
+      : `- ${name}: \`${value}\``,
+  );
   ctx.stdout.write(`${lines.join("\n")}\n`);
 }
 

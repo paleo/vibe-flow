@@ -178,6 +178,46 @@ describe("ticket command", () => {
     );
   });
 
+  it("numbers a batch of filenames in order when --next repeats", async () => {
+    const cwd = makeProject();
+    const directory = join(cwd, ".plans", "78");
+    mkdirSync(directory);
+    writeFileSync(join(directory, "A1-spec.md"), "spec");
+    const batch = ["--next", "main-plan.md", "--next=plan-api.md", "--next", "plan-ui.md"];
+    const markdown = await runMain(["ticket", "78", ...batch], { cwd });
+    expect(markdown.code).toBe(0);
+    expect(markdown.stdout).toBe(
+      [
+        "- TICKET_DIR: `.plans/78/`",
+        "- CYCLE_LETTER: `A`",
+        "- FILE_NAMES:",
+        "  - `A2-main-plan.md`",
+        "  - `A3-plan-api.md`",
+        "  - `A4-plan-ui.md`",
+        "",
+      ].join("\n"),
+    );
+    const json = await runMain(["ticket", "78", ...batch, "--json", "--new-cycle"], { cwd });
+    expect(JSON.parse(json.stdout)).toEqual({
+      TICKET_DIR: ".plans/78/",
+      CYCLE_LETTER: "B",
+      FILE_NAMES: ["B1-main-plan.md", "B2-plan-api.md", "B3-plan-ui.md"],
+    });
+  });
+
+  it("rejects a bare --next inside a repeated --next", async () => {
+    const cwd = makeProject();
+    for (const args of [
+      ["ticket", "78", "--next", "--next", "plan-api.md"],
+      ["ticket", "78", "--next", "main-plan.md", "--next", "--json"],
+    ]) {
+      const result = await runMain(args, { cwd });
+      expect(result.code, args.join(" ")).toBe(1);
+      expect(result.stderr).toContain("A repeated --next requires a filename on each occurrence.");
+    }
+    expect(existsSync(join(cwd, ".plans", "78"))).toBe(false);
+  });
+
   it("keeps argument validation for bare --next", async () => {
     const cwd = makeProject();
     for (const args of [

@@ -207,32 +207,22 @@ Note:
 
 ## Phase 5. Writing
 
-Write the plan file(s) according to the determined structure:
+Continue the current cycle. Request the file names with `{{TICKET_CMD}} --next`, then write every file it named before requesting anything else. Append each name to TICKET_DIR to get its path. Never overwrite an existing file.
 
-Continue the current cycle. Immediately before writing each file, run `{{TICKET_CMD}} --next plan.md`, `{{TICKET_CMD}} --next main-plan.md`, or `{{TICKET_CMD}} --next plan-<descriptor>.md`. Append FILE_NAME to TICKET_DIR to get its path. Write that file before requesting the next one.
+**Single plan**: run `{{TICKET_CMD}} --next plan.md`.
 
-**Single Plan**:
+- Plan: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-plan.md`, e.g. `.plans/123/A2-plan.md`
+- Handover: `.plans/123/A2-plan.summary.md`
 
-- **Single plan**: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-plan.md`
-  - Example: `.plans/123/A2-plan.md`
-  - Handover: `.plans/123/A2-plan.summary.md`
-  - No main plan needed
+**Multiple plans**: run one command with a `--next` per file, the main plan first, then the specialized plans in the order the main plan lists them. The command returns all the names, numbered in that order, so the main plan can reference the specialized plans exactly. Example:
 
-**Multiple Plans**:
+```
+{{TICKET_CMD}} --next main-plan.md --next plan-api.md --next plan-ui.md
+```
 
-- **Main plan**: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-main-plan.md`
-  - Example: `.plans/123/A2-main-plan.md`
-  - Handover: `.plans/123/A2-main-plan.summary.md` (written after all specialized plans complete)
-- **Specialized plans**: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-plan-{DESCRIPTOR}.md`
-  - Use a descriptive name as `{DESCRIPTOR}` (e.g., work scope, stack area)
-  - Example: `.plans/123/A3-plan-api.md`, `.plans/123/A4-plan-ui.md`
-  - Handovers: `.plans/123/A3-plan-api.summary.md`, etc.
-
-**Important**:
-
-- Use lowercase, hyphenated descriptors for plan names (work scope descriptor)
-- When multiple plans are created, the main plan should be written first and have the lowest FILE_NUMBER
-- Be careful never to overwrite an existing file
+- Main plan: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-main-plan.md`, e.g. `.plans/123/A2-main-plan.md`
+- Specialized plans: `{TICKET_DIR}{CYCLE_LETTER}{FILE_NUMBER}-plan-{DESCRIPTOR}.md`, e.g. `.plans/123/A3-plan-api.md`, `.plans/123/A4-plan-ui.md`. The descriptor is lowercase and hyphenated and names the work scope or stack area.
+- Handovers: replace the final `.md` with `.summary.md`, e.g. `.plans/123/A3-plan-api.summary.md`. The main plan handover is written after all specialized plans complete.
 
 _Important Note: There will be lint errors in the markdown files you write. Ignore them. NEVER FIX LINT ERRORS (FORMATTING ISSUES) IN THE PLANS._
 
