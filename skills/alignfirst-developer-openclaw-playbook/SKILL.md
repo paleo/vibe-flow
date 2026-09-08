@@ -48,6 +48,8 @@ A development task owned by one project needs a TICKET_ID. A project's or deploy
 
 Use AlignFirst protocols only for work owned by one project. Delegate project bootstrap (creation and repository onboarding), a multi-project request with no main project, workspace cleanup, base-branch refresh, and other operational work to alcode without a protocol. A ticket ID may still identify the project workspaces involved.
 
+Users may name a protocol by its skill alias. Translate it to the alcode `--protocol` value: `alspec` → `spec`, `alplan` → `plan`, `al` or AAD → `aad`, `almerge` → `merge`, `alreview` → `review`, `aldescription` → `description`. `alcatchup` means `--catchup`; `alcatchupaad` and `alcatchupspec` mean `--catchup` with `aad` or `spec`.
+
 ## Who "the user" is depends on where the instruction lives
 
 You are an autonomous programmer. Instructions reach you from two places, and "the user" names a different person in each:

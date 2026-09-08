@@ -19,10 +19,11 @@ Route by the user's intent. Load only the references needed for that route.
 The **AlignFirst CLI** is the `alignfirst` npm package and bin. It provides `guide`, `ticket`, `sync`,
 `plans`, `docmap`, `conventions`, `context`, `config`, and `doctor`.
 
-The **AlignFirst skills** are ten stubs that run the CLI: `alignfirst`, `alspec`, `alplan`, `al`,
-`almerge`, `alreview`, `aldescription`, `alcatchup`, `alcatchupaad`, and `alcatchupspec`. The nine command skills keep
+The **AlignFirst skills** are stubs that run the CLI. The nine command skills `alspec`, `alplan`,
+`al`, `almerge`, `alreview`, `aldescription`, `alcatchup`, `alcatchupaad`, and `alcatchupspec` keep
 `disable-model-invocation: true`; humans invoke them as `/alspec` in Claude Code, GitHub Copilot,
-Cursor, or `$alspec` in Codex.
+Cursor, or `$alspec` in Codex. The optional `alignfirst` skill lets the agent recognize a protocol
+named in prose; a project whose instruction file runs `alignfirst context` provides this itself.
 
 `alignfirst-setup-guide` and `alignfirst-developer-openclaw-playbook` are separate skills. A team
 plans repository is an optional CLI mode configured through `alignfirst plans setup`.
@@ -49,7 +50,7 @@ Do not present the tooling menu or add unrelated tools on this route.
 When the user asks what the project could adopt, inspect the repository and present these independent
 choices:
 
-- **AlignFirst** installs the CLI and the ten skills for collaborative specification, planning,
+- **AlignFirst** installs the CLI and the command skills for collaborative specification, planning,
   implementation, merge, review, description, and catch-up workflows. A team plans repository is an
   optional sub-choice.
 - **docmap** makes the repository's `docs/` tree discoverable to agents and humans. It is available
@@ -73,9 +74,9 @@ AlignFirst Developer builds and deploys the teammate itself.
 
 Inspect the repository before changing it. A prepared project has all of these:
 
-1. The AlignFirst CLI as a prerequisite in `README.md`, the ten skills, and a bootstrap line in
-   `AGENTS.md` or `CLAUDE.md`. `.alignfirst.json` is required for an AlignFirst Developer project and
-   optional otherwise.
+1. The AlignFirst CLI as a prerequisite in `README.md` and a bootstrap line in `AGENTS.md` or
+   `CLAUDE.md`. `.alignfirst.json` is required for an AlignFirst Developer project and optional
+   otherwise.
 2. A clean `alproject doctor --root <projects-directory>` result after writing
    `.alignfirst.json` and before workspace setup. Stop preparation when the inventory is unhealthy.
 3. The team plans repository through `alignfirst plans setup` when the team has one.

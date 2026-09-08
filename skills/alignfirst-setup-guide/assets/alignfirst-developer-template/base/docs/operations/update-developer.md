@@ -74,7 +74,7 @@ Sweep the escaped symlinks the `skills` CLI writes into `~/.openclaw/skills/` ([
 sudo -i -u {{SERVICE_USER}} -- find /home/{{SERVICE_USER}}/.openclaw/skills -maxdepth 1 -type l -print -delete
 ```
 
-`~/.agents/skills/` is shared between OpenClaw and the coding agent; the `al*` command skills there are not orphans — see [gotchas.md](../gotchas.md#agentsskills-is-shared-between-openclaw-and-the-coding-agent).
+`~/.agents/skills/` is shared between OpenClaw and the coding agent; `skills remove` deletes a skill for both — see [gotchas.md](../gotchas.md#agentsskills-is-shared-between-openclaw-and-the-coding-agent).
 
 ## Seed snapshot and projects marker
 

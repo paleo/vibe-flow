@@ -8,7 +8,7 @@ The `alignfirst` CLI provides the AlignFirst workflows. See [the CLI README](pac
 
 ### Agent skills
 
-Eight Agent Skill stubs expose the CLI through commands such as `/alspec` in Claude Code and `$alspec` in Codex. See [the Agent skills section](packages/alignfirst/README.md#agent-skills).
+Nine Agent Skill stubs expose the CLI through commands such as `/alspec` in Claude Code and `$alspec` in Codex. See [the Agent skills section](packages/alignfirst/README.md#agent-skills).
 
 ## Docmap - Agent-discoverable documentation
 

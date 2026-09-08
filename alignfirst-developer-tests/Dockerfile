@@ -22,8 +22,7 @@ RUN apk add --no-cache git curl && \
 
 # PATH wrappers for the real CLIs. `/opt/alignfirst` is the read-only monorepo root
 # mount, so @paleo/docmap, arktype, and semver resolve through its root node_modules.
-# `alproject` spawns `alignfirst`. The mocked coding agent never runs the stub
-# skills, so no `npx -y alignfirst` resolution is needed.
+# `alproject` spawns `alignfirst`.
 RUN printf '#!/bin/sh\nexec node /opt/alignfirst/packages/alcode/bin/alcode.mjs "$@"\n' > /usr/local/bin/alcode && \
     printf '#!/bin/sh\nexec node /opt/alignfirst/packages/alignfirst/bin/alignfirst.mjs "$@"\n' > /usr/local/bin/alignfirst && \
     printf '#!/bin/sh\nexec node /opt/alignfirst/packages/alproject/bin/alproject.mjs "$@"\n' > /usr/local/bin/alproject && \
@@ -89,10 +88,7 @@ RUN cd /opt/alignfirst-developer-tests/fixtures/template && \
 # Install AlignFirst skills under /home/claw/.agents/skills/ (the path OpenClaw scans).
 RUN npx -y skills add https://github.com/paleo/alignfirst --global --yes \
       --agent universal --agent claude-code \
-      --skill alignfirst --skill al --skill alplan --skill alspec \
-      --skill aldescription --skill alreview --skill alcatchup \
-      --skill alcatchupaad --skill alcatchupspec \
-      --skill almerge --skill alignfirst-setup-guide \
+      --skill alignfirst-setup-guide \
       --skill alignfirst-developer-openclaw-playbook
 
 USER root

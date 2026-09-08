@@ -104,7 +104,7 @@ As the service account, every write must fail with `Operation not permitted` or 
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/.openclaw/workspace/AGENTS.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/.openclaw/openclaw.json'
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/projects/.alignfirst-projects.json'
-sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.agents/skills/alignfirst/SKILL.md'
+sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.agents ~/.agents-x'
 sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g cowsay
 ```

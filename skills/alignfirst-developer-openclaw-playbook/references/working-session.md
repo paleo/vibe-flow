@@ -44,7 +44,7 @@ Skip this step for project lifecycle and operational work. A new project's boots
 
 For new single-project work where the user explicitly says there is no ticket:
 
-1. Read `{PROJECT_PATH}/DEVELOPERS.md` and the `alignfirst` skill.
+1. Read `{PROJECT_PATH}/DEVELOPERS.md` and run `alignfirst context` from PROJECT_PATH.
 2. Run `alignfirst sync`, so identifier selection sees the current shared task set.
 3. Run `alignfirst ticket --side` from PROJECT_PATH (`exec`). It creates `.plans/side-N/` and prints the directory; TICKET_ID is the `side-N` it reports.
 4. Write `.plans/{TICKET_ID}/A1-request.md` with the complete recorded request. For a short request, use the starter's task line and the message that explicitly confirmed no ticket.
@@ -132,7 +132,7 @@ The agent usually has no question. When it does, answer it: a technical question
 
 Before acting on any file the user names under `.plans/`, run `alignfirst sync`. Then never read a plan file, main plans included. A request to execute a plan means: read the spec next to it when one exists — same directory, same leading letter (`A1-spec.md` for `A2-plan.md`) — then hand the plan's path to alcode, as the delegation guide describes.
 
-For the `.plans/` directory's task directories, cycles, filenames, and artifact conventions, read the `alignfirst` skill. Project instructions only define whether and how the directory is shared.
+For the `.plans/` directory's task directories, cycles, filenames, and artifact conventions, run `alignfirst guide` from PROJECT_PATH; its output ends with the ticket directory and work file rules. Project instructions only define whether and how the directory is shared.
 
 ### Hand-written changes in `.plans/`
 

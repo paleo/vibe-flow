@@ -63,7 +63,14 @@ That range is reachable only through the authenticated HTTPS gateway; ports outs
   - archives: `zip`, `unzip`, `7z`, `xz`, `zstd` (plus base `tar`, `gzip`, `bzip2`)
   - media/docs: `ffmpeg`, `pandoc`
   - shell quality: `shellcheck`, `shfmt`
-- **Library docs.** `ctx7 library <name> "<question>"`, then `ctx7 docs <id> "<question>"` (Context7, auth preconfigured). Mainly for the coding agent: when the work you delegate touches a library, specs included, tell it to fetch current docs with `ctx7`.
+
+### Context7 - Library docs
+
+`ctx7 library <name> "<question>"`, then `ctx7 docs <id> "<question>"`. Mainly for the coding agent: when the work you delegate touches a library, specs included, tell it to fetch documentation with `ctx7`.
+
+### AlignFirst - Workflow protocols
+
+The `alignfirst` CLI is installed globally. From a project root, `alignfirst context` prints the project's conventions, documentation map and protocol aliases; `alignfirst guide` prints the protocol table and the ticket directory and work file rules. You run `alignfirst ticket` and `alignfirst sync` yourself; protocols run through `alcode --protocol`.
 
 ### Node
 

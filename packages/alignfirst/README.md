@@ -48,15 +48,21 @@ Run `alignfirst --help` for command usage or `alignfirst guide` to choose a prot
 
 ## Agent skills
 
-Ten optional Agent Skill stubs expose the CLI to Claude Code, Codex, GitHub Copilot, and Cursor. Protocol skills reuse guides already in context and load missing guides through `npx -y alignfirst guide`. Catchup skills load ticket history through `npx -y alignfirst ticket --catchup`.
+Nine optional Agent Skill stubs expose the CLI as commands in Claude Code, Codex, GitHub Copilot, and Cursor. Protocol skills reuse guides already in context and load missing guides through `npx -y alignfirst guide`. Catchup skills load ticket history through `npx -y alignfirst ticket --catchup`.
 
 Install them globally:
 
 ```sh
 npx skills add https://github.com/paleo/alignfirst --global \
-  --skill alignfirst --skill al --skill alplan --skill alspec \
-  --skill aldescription --skill alreview --skill alcatchup --skill almerge \
+  --skill al --skill alplan --skill alspec --skill aldescription \
+  --skill alreview --skill alcatchup --skill almerge \
   --skill alcatchupaad --skill alcatchupspec
+```
+
+Install the `alignfirst` skill when a project's `AGENTS.md` does not run `npx alignfirst context`; it lets the agent recognize a protocol named in prose:
+
+```sh
+npx skills add https://github.com/paleo/alignfirst --global --skill alignfirst
 ```
 
 Start a new agent session to load the skills.
