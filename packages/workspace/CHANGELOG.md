@@ -1,5 +1,11 @@
 # @paleo/workspace
 
+## 0.33.0
+
+### Minor Changes
+
+- 44e1f9e: The kernel checks `portRange` in `.alignfirst.json` against the port scheme.
+
 ## 0.32.0
 
 ### Minor Changes

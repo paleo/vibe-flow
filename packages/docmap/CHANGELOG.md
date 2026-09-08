@@ -1,5 +1,11 @@
 # @paleo/docmap
 
+## 0.10.0
+
+### Minor Changes
+
+- 44e1f9e: The CLI can be embedded with an injected command prefix.
+
 ## 0.9.1
 
 ### Patch Changes
