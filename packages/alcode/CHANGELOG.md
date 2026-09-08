@@ -1,5 +1,12 @@
 # @paleo/alcode
 
+## 0.13.0
+
+### Minor Changes
+
+- 44e1f9e: Breaking change: the `catchup` value of `--protocol` is removed; `new --catchup` replaces it and loads the ticket history before the protocol and message. `--message-file <path|->` reads the message from a file or stdin. The prompt reaches the coding agent through stdin. `--no-ticket` reads `TICKET_ID` from the `alignfirst` report.
+- 44e1f9e: Breaking change: `reserve-side-ticket` is removed, and the `alignfirst` CLI is a prerequisite, run by `new --no-ticket` and by the delegated prompt.
+
 ## 0.12.0
 
 ### Minor Changes
