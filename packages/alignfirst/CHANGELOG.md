@@ -1,5 +1,11 @@
 # alignfirst
 
+## 0.1.1
+
+### Patch Changes
+
+- 6d72df2: Tightened merge conflict resolution and validation guidance.
+
 ## 0.1.0
 
 ### Minor Changes

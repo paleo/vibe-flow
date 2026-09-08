@@ -1,5 +1,11 @@
 # @paleo/alcode
 
+## 0.13.1
+
+### Patch Changes
+
+- 6d72df2: Prevented OpenClaw completion wake-ups from being lost by keeping the wake command's semicolon on the `alcode` command line.
+
 ## 0.13.0
 
 ### Minor Changes

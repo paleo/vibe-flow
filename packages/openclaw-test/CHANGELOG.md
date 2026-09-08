@@ -1,5 +1,20 @@
 # @paleo/openclaw-test
 
+## 0.17.0
+
+### Minor Changes
+
+- 6d72df2: Added `ctx.busUrl` to `ScenarioContext` for direct test-bus calls.
+
+### Patch Changes
+
+- 6d72df2: Fixed the pnpm fixture-install example for current pnpm releases.
+- Updated dependencies [6d72df2]
+- Updated dependencies [6d72df2]
+  - @paleo/openclaw-channel-mock-core@0.8.0
+  - @paleo/openclaw-slack-mock@0.4.0
+  - @paleo/openclaw-discord-mock@0.4.0
+
 ## 0.16.0
 
 ### Minor Changes
