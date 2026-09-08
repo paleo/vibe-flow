@@ -16,6 +16,7 @@ import type {
   PluginConfiguration,
   SourceContext,
 } from "./types.js";
+import { nonempty } from "./values.js";
 
 export interface ResolvedHandoffRoute {
   routeKey: string;
@@ -184,6 +185,7 @@ export function createHandoffRecord(params: {
     starterText: params.receipt.starterText,
     deliveryContext: params.route.deliveryContext,
     createdAt: params.createdAt,
+    enqueueCount: 0,
     state: "pending",
   };
 }
@@ -199,10 +201,4 @@ export function evidenceMatches(record: HandoffRecord, receipt: DeliveryReceipt)
     record.starterMessageId === receipt.starterMessageId &&
     record.starterText === receipt.starterText
   );
-}
-
-function nonempty(value: unknown): string | undefined {
-  if (typeof value !== "string") return;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
 }

@@ -19,7 +19,6 @@ export default async function multiProjectHandoff(ctx: ScenarioContext): Promise
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: TASK,
-    codingAgent,
   });
 
   ctx.assertRegex(starter.match.text, /\bnimbus\b/iu, "starter carries nimbus");

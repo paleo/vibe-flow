@@ -1,6 +1,10 @@
 import type { OpenClawPluginApi, PluginLogger } from "openclaw/plugin-sdk/plugin-entry";
 import { describe, expect, it, vi } from "vitest";
-import { buildSeed, createHandoffService } from "../src/thread-handoff/service.js";
+import {
+  buildSeed,
+  createHandoffService,
+  MAX_ENQUEUE_ATTEMPTS,
+} from "../src/thread-handoff/service.js";
 import { createHandoffStore } from "../src/thread-handoff/state.js";
 import { handoff, temporaryStateDir } from "./helpers.js";
 
@@ -52,7 +56,7 @@ describe("handoff enqueue and recovery", () => {
     const restarted = createHandoffService({
       runtime: fixture.runtime,
       getStore: () => fixture.store,
-      logger: fixture.logger,
+      logger: fixture.logger as unknown as PluginLogger,
     });
     await restarted.start();
     expect(fixture.enqueue).toHaveBeenCalledTimes(1);
@@ -60,21 +64,53 @@ describe("handoff enqueue and recovery", () => {
     fixture.store.close();
   });
 
-  it("leaves a pending record when enqueue fails", async () => {
-    const fixture = serviceFixture(false);
+  it("treats a still-queued identical seed as queued and wakes again", async () => {
+    const fixture = serviceFixture({ queueResult: false });
     const record = handoff();
     fixture.store.insertHandoff(record);
-    await expect(fixture.service.enqueue(record)).rejects.toThrow(/did not accept/);
-    const persisted = fixture.store.findHandoffByRoute(record.routeKey);
-    expect(persisted).toMatchObject({ state: "pending" });
-    expect(persisted).not.toHaveProperty("lastEnqueuedAt");
+    await fixture.service.enqueue(record);
+    expect(fixture.store.findHandoffByRoute(record.routeKey)).toMatchObject({
+      state: "pending",
+      enqueueCount: 1,
+      lastEnqueuedAt: expect.any(Number),
+    });
+    expect(fixture.wake).toHaveBeenCalledTimes(1);
+    fixture.store.close();
+  });
+
+  it("parks a pending handoff after the wake cap and warns once", async () => {
+    const fixture = serviceFixture({ now: () => 100_000 });
+    fixture.store.insertHandoff(
+      handoff({ enqueueCount: MAX_ENQUEUE_ATTEMPTS - 1, lastEnqueuedAt: 0 }),
+    );
+    await fixture.service.start();
+    await fixture.service.stop();
+    expect(fixture.enqueue).toHaveBeenCalledTimes(1);
+    expect(fixture.logger.warn).toHaveBeenCalledTimes(1);
+    expect(fixture.logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("retire handoff-1 --force"),
+    );
+
+    const restarted = createHandoffService({
+      runtime: fixture.runtime,
+      getStore: () => fixture.store,
+      logger: fixture.logger,
+      now: () => 200_000,
+    });
+    await restarted.start();
+    await restarted.stop();
+    expect(fixture.enqueue).toHaveBeenCalledTimes(1);
+    expect(fixture.store.findHandoffByRoute("route-1")).toMatchObject({
+      state: "pending",
+      enqueueCount: MAX_ENQUEUE_ATTEMPTS,
+    });
     fixture.store.close();
   });
 });
 
-function serviceFixture(queueResult = true) {
+function serviceFixture(options: { queueResult?: boolean; now?: () => number } = {}) {
   const store = createHandoffStore(temporaryStateDir());
-  const enqueue = vi.fn(() => queueResult);
+  const enqueue = vi.fn(() => options.queueResult ?? true);
   const wake = vi.fn();
   const runtime = {
     system: { enqueueSystemEvent: enqueue, requestHeartbeat: wake },
@@ -84,13 +120,18 @@ function serviceFixture(queueResult = true) {
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
-  } as unknown as PluginLogger;
+  };
   return {
     store,
     enqueue,
     wake,
     runtime,
     logger,
-    service: createHandoffService({ runtime, getStore: () => store, logger }),
+    service: createHandoffService({
+      runtime,
+      getStore: () => store,
+      logger: logger as unknown as PluginLogger,
+      now: options.now,
+    }),
   };
 }

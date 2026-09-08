@@ -27,7 +27,6 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
     project: "nimbus",
     projectPath: NIMBUS_PROJECT_PATH,
     request: REQUEST,
-    codingAgent,
   });
 
   await ctx.judgeLLM({

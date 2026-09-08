@@ -4,7 +4,7 @@
     "auth": { "mode": "none" }
   },
   "plugins": {
-    "allow": ["codex", "discord-mock", "slack-mock", "alignfirst-developer"],
+    "allow": ["codex", "browser", "discord-mock", "slack-mock", "alignfirst-developer"],
     "load": {
       "paths": [
         "/opt/openclaw-test/src/node_modules/@paleo/openclaw-discord-mock",

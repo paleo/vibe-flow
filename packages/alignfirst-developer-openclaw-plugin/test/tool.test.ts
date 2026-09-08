@@ -6,8 +6,9 @@ import type {
 import { describe, expect, it, vi } from "vitest";
 import type { ReceiptCoordinator } from "../src/thread-handoff/receipts.js";
 import { createHandoffService } from "../src/thread-handoff/service.js";
-import { createHandoffStore } from "../src/thread-handoff/state.js";
+import { createHandoffStore, type HandoffStore } from "../src/thread-handoff/state.js";
 import { createThreadHandoffTool } from "../src/thread-handoff/tool.js";
+import type { DeliveryReceipt } from "../src/thread-handoff/types.js";
 import { handoff, receipt, temporaryStateDir } from "./helpers.js";
 
 describe("thread_handoff tool", () => {
@@ -86,9 +87,9 @@ describe("thread_handoff tool", () => {
 });
 
 function toolFixture(
-  availableReceipt: ReturnType<typeof receipt> | null = receipt(),
+  availableReceipt: DeliveryReceipt | null = receipt(),
   contextOverrides: Partial<OpenClawPluginToolContext> = {},
-  providedStore?: ReturnType<typeof createHandoffStore>,
+  providedStore?: HandoffStore,
 ) {
   const store = providedStore ?? createHandoffStore(temporaryStateDir());
   const waitForReceipt = vi.fn().mockResolvedValue(availableReceipt);

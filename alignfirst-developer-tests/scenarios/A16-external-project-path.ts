@@ -28,7 +28,6 @@ export default async function externalProjectPath(ctx: ScenarioContext): Promise
     project: PROJECT,
     projectPath: ORION_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   const ack = await waitForSetupAck(ctx, {
     threadId: starter.threadId,

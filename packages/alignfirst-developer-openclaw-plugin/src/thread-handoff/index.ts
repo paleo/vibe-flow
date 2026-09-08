@@ -5,6 +5,12 @@ import { createHandoffService } from "./service.js";
 import { createHandoffStore, type HandoffStore, resolveDatabasePath } from "./state.js";
 import { createThreadHandoffTool } from "./tool.js";
 import type { PluginConfiguration } from "./types.js";
+import { asRecord } from "./values.js";
+
+export const DEFAULT_CHANNEL_SURFACES: PluginConfiguration["channelSurfaces"] = {
+  slack: "slack",
+  discord: "discord",
+};
 
 export function registerThreadHandoff(api: OpenClawPluginApi): void {
   const configuration = readConfiguration(api.pluginConfig);
@@ -54,19 +60,11 @@ function readConfiguration(value: unknown): PluginConfiguration {
   const record = asRecord(value);
   const configured = asRecord(record?.channelSurfaces);
   const channelSurfaces: PluginConfiguration["channelSurfaces"] = {};
-  for (const [channel, surface] of Object.entries(
-    configured ?? { slack: "slack", discord: "discord" },
-  )) {
+  for (const [channel, surface] of Object.entries(configured ?? DEFAULT_CHANNEL_SURFACES)) {
     if (surface !== "slack" && surface !== "discord") {
       throw new Error(`Invalid thread-handoff surface for channel ${channel}.`);
     }
     channelSurfaces[channel] = surface;
   }
   return { channelSurfaces };
-}
-
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : undefined;
 }

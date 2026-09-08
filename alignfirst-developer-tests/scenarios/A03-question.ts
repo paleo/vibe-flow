@@ -49,7 +49,6 @@ export default async function projectInvestigationQuestion(ctx: ScenarioContext)
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, {
     timeoutMs: 180_000,

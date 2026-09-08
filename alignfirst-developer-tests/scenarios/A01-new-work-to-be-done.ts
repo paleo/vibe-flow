@@ -34,7 +34,6 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
     text: "Nous avons un travail à faire sur nimbus.",
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
 
   // The starter is the channel session's only post, so the ask for the ticket

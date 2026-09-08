@@ -49,6 +49,7 @@ export function handoff(overrides: Partial<HandoffRecord> = {}): HandoffRecord {
       threadId: "100.200",
     },
     createdAt: 1_000,
+    enqueueCount: 0,
     state: "pending",
     ...overrides,
   };

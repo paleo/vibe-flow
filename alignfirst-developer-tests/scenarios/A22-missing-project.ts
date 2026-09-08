@@ -22,13 +22,12 @@ export default async function missingProject(ctx: ScenarioContext): Promise<void
       },
     ],
   });
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Sur ${PROJECT}, analyse pourquoi les tests sont lents.`,
     project: PROJECT,
-    codingAgent,
   });
   const projectPathLine = starter.match.text
     .split(/\r?\n/u)

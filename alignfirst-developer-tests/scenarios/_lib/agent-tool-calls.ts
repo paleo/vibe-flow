@@ -74,24 +74,3 @@ export function invokesCodingAgentDirectly(call: AgentToolCall): boolean {
     CODING_AGENT_INVOCATION_RE.test(input.command) && !ALCODE_INVOCATION_RE.test(input.command)
   );
 }
-
-/**
- * Stateful predicate for `waitForAgentToolCall` when the same call shape recurs in one scenario:
- * the wait matches against ALL aggregated calls, so a plain predicate would resolve again on the
- * first occurrence. Each distinct matching call (by `toolUseId`, met in the aggregated `ts` order)
- * gets a 1-based index on first sight; the predicate fires only on the `n`-th — the newest of the
- * first `n` matches. Single-use: the index map lives in the closure.
- */
-export function nthMatchingCall(
-  predicate: (call: AgentToolCall) => boolean,
-  n: number,
-): (call: AgentToolCall) => boolean {
-  const indexByToolUseId = new Map<string, number>();
-  return (call) => {
-    if (!predicate(call)) return false;
-    const known = indexByToolUseId.get(call.toolUseId);
-    const index = known ?? indexByToolUseId.size + 1;
-    if (known === undefined) indexByToolUseId.set(call.toolUseId, index);
-    return index === n;
-  };
-}

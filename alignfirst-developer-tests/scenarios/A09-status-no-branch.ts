@@ -22,7 +22,7 @@ export default async function statusNoBranch(ctx: ScenarioContext): Promise<void
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const startCursor = await ctx.getCursor();
@@ -30,7 +30,6 @@ export default async function statusNoBranch(ctx: ScenarioContext): Promise<void
     text: `Où en est ${TICKET_ID} sur ${PROJECT} ?`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
   const ticketRe = new RegExp(`\\b${TICKET_ID}\\b`);
   const absenceRe =

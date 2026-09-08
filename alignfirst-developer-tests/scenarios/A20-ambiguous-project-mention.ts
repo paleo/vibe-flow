@@ -27,7 +27,7 @@ export default async function ambiguousProjectMention(ctx: ScenarioContext): Pro
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const startCursor = await ctx.getCursor();
@@ -35,7 +35,6 @@ export default async function ambiguousProjectMention(ctx: ScenarioContext): Pro
     text: "Et sinon, ça avance bien sur orion ?",
     project: PROJECT,
     projectPath: ORION_PROJECT_PATH,
-    codingAgent,
   });
   if (!alproject.calls.some((call) => call.argv[0] === "list" && call.argv[1] === "--json")) {
     throw new Error("the session routed the project mention without structured inventory lookup");

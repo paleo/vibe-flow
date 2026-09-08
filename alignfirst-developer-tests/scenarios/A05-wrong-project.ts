@@ -18,12 +18,11 @@ export default async function wrongProject(ctx: ScenarioContext): Promise<void> 
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Sur ${WRONG_PROJECT}, le bouton d'export ne marche plus.`,
-    codingAgent,
   });
 
   await ctx.judgeLLM({

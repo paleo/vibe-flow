@@ -1,5 +1,5 @@
 import { buildJsonPluginConfigSchema, definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { registerThreadHandoff } from "./thread-handoff/index.js";
+import { DEFAULT_CHANNEL_SURFACES, registerThreadHandoff } from "./thread-handoff/index.js";
 
 const configSchema = buildJsonPluginConfigSchema({
   type: "object",
@@ -8,7 +8,7 @@ const configSchema = buildJsonPluginConfigSchema({
     channelSurfaces: {
       type: "object",
       additionalProperties: { enum: ["slack", "discord"] },
-      default: { slack: "slack", discord: "discord" },
+      default: DEFAULT_CHANNEL_SURFACES,
     },
   },
 });

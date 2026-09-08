@@ -30,7 +30,6 @@ export default async function explicitNoTicket(ctx: ScenarioContext): Promise<vo
     project: "nimbus",
     projectPath: NIMBUS_PROJECT_PATH,
     request: REQUEST,
-    codingAgent,
   });
   await ctx.judgeLLM({
     attachTo: starter.entry,

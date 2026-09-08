@@ -36,9 +36,16 @@ export interface HandoffRecord extends SourceContext {
   starterText: string;
   deliveryContext: DeliveryRoute;
   createdAt: number;
+  enqueueCount: number;
   lastEnqueuedAt?: number;
   state: "pending" | "claimed";
   claimedAt?: number;
+}
+
+export interface ReceiptIdentity {
+  sourceSessionKey: string;
+  sourceSessionId: string;
+  threadId: string;
 }
 
 export interface PluginConfiguration {

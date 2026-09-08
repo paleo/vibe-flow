@@ -180,6 +180,8 @@ export type QaBusFaultOperation = "outbound-message" | "thread-create";
 export type QaBusFailNextInput = {
   operation: QaBusFaultOperation;
   message?: string;
+  /** Fail only an `outbound-message` that carries a thread target; others pass untouched. */
+  threadOnly?: boolean;
 };
 
 export type QaBusStateSnapshot = {

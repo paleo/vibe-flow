@@ -34,7 +34,6 @@ export default async function projectRemovalFailure(ctx: ScenarioContext): Promi
     text: `Supprime physiquement le projet ${PROJECT}.`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    seededWorktreePaths: [fixture.worktreePath],
   });
   await sendInThread(ctx, starter.threadId, "Prépare la suppression et montre-moi les chemins.");
   await waitForPathConfirmation(ctx, starter, fixture.worktreePath);

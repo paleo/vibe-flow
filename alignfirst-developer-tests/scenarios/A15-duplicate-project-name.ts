@@ -23,14 +23,13 @@ export default async function duplicateProjectName(ctx: ScenarioContext): Promis
       registeredProject(PROJECT, DUPLICATE_PATH, EXTERNAL_PROJECT_PARENT),
     ],
   });
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Sur ${PROJECT}, ticket ${TICKET_ID}, passe le bouton d'export en gras.`,
     project: PROJECT,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   ctx.assertRegex(
     starter.match.text,

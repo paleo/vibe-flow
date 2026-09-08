@@ -18,12 +18,11 @@ export default async function ticketWithoutProject(ctx: ScenarioContext): Promis
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: `Ticket ${TICKET_ID}, on doit corriger le bug d'export.`,
-    codingAgent,
   });
 
   await ctx.judgeLLM({

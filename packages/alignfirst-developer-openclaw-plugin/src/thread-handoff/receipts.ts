@@ -1,8 +1,14 @@
 import { createHash } from "node:crypto";
 import type { OpenClawPluginToolContext, PluginLogger } from "openclaw/plugin-sdk/plugin-entry";
-import type { HandoffStore } from "./state.js";
-import type { DeliveryReceipt, PluginConfiguration, SourceContext } from "./types.js";
 import { readSourceContext } from "./routing.js";
+import type { HandoffStore } from "./state.js";
+import type {
+  DeliveryReceipt,
+  PluginConfiguration,
+  ReceiptIdentity,
+  SourceContext,
+} from "./types.js";
+import { asRecord, nonempty } from "./values.js";
 
 const RECEIPT_TTL_MS = 60 * 60 * 1_000;
 const CONTEXT_LIMIT = 10_000;
@@ -12,7 +18,7 @@ const RECEIPT_POLL_MS = 25;
 export interface ReceiptCoordinator {
   captureContext(context: OpenClawPluginToolContext): void;
   observe(event: ToolObservation, context: HookContext): void;
-  waitForReceipt(identity: ReceiptLookup): Promise<DeliveryReceipt | undefined>;
+  waitForReceipt(identity: ReceiptIdentity): Promise<DeliveryReceipt | undefined>;
 }
 
 interface ToolObservation {
@@ -26,12 +32,6 @@ interface ToolObservation {
 interface HookContext {
   sessionKey?: string;
   sessionId?: string;
-}
-
-export interface ReceiptLookup {
-  sourceSessionKey: string;
-  sourceSessionId: string;
-  threadId: string;
 }
 
 interface CachedContext {
@@ -259,24 +259,12 @@ function accountMatches(params: Record<string, unknown>, accountId: string | und
   return supplied === undefined || supplied === accountId;
 }
 
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : undefined;
-}
-
 function contextKey(sessionKey: string, sessionId: string): string {
   return `${sessionKey}\u0000${sessionId}`;
 }
 
 function lookupKey(sessionKey: string, sessionId: string, threadId: string): string {
   return `${contextKey(sessionKey, sessionId)}\u0000${threadId}`;
-}
-
-function nonempty(value: unknown): string | undefined {
-  if (typeof value !== "string") return;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
 }
 
 async function delay(milliseconds: number): Promise<void> {

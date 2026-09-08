@@ -20,9 +20,12 @@ export default async function recoverableHandoffFailure(ctx: ScenarioContext): P
   const alproject = setupAlprojectMock(ctx);
   const codingAgent = setupCodingAgentMock(ctx);
   setupGhMock(ctx);
+  // Slack starters are threaded sends; root narration must not consume the fault.
   await failNextQaBusOperation({
-    baseUrl: "http://bus:43123",
-    operation: ctx.channel === "slack-mock" ? "outbound-message" : "thread-create",
+    baseUrl: ctx.busUrl,
+    ...(ctx.channel === "slack-mock"
+      ? { operation: "outbound-message", threadOnly: true }
+      : { operation: "thread-create" }),
     message: "planned recoverable starter failure",
   });
 
@@ -33,7 +36,6 @@ export default async function recoverableHandoffFailure(ctx: ScenarioContext): P
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   const calls = await ctx.getAgentToolCalls();
   const failedNativeCalls = calls.filter((call) => {

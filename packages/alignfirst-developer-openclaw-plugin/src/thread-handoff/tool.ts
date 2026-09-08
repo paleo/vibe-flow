@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { OpenClawPluginToolContext } from "openclaw/plugin-sdk/plugin-entry";
 import { jsonResult } from "openclaw/plugin-sdk/tool-results";
-import { Type } from "typebox";
+import { type Static, Type } from "typebox";
 import { HandoffError } from "./errors.js";
 import type { ReceiptCoordinator } from "./receipts.js";
 import {
@@ -13,9 +13,9 @@ import {
 } from "./routing.js";
 import type { HandoffService } from "./service.js";
 import type { HandoffStore } from "./state.js";
-import type { PluginConfiguration, ToolSuccess } from "./types.js";
+import type { HandoffRecord, PluginConfiguration, SourceContext, ToolSuccess } from "./types.js";
 
-export const threadHandoffParameters = Type.Union([
+const threadHandoffParameters = Type.Union([
   Type.Object(
     {
       action: Type.Literal("start"),
@@ -32,14 +32,18 @@ export const threadHandoffParameters = Type.Union([
   ),
 ]);
 
-export function createThreadHandoffTool(params: {
+type ToolInput = Static<typeof threadHandoffParameters>;
+
+export interface ThreadHandoffToolParams {
   context: OpenClawPluginToolContext;
   configuration: PluginConfiguration;
   receipts: ReceiptCoordinator;
   getStore: () => HandoffStore;
   service: HandoffService;
   now?: () => number;
-}) {
+}
+
+export function createThreadHandoffTool(params: ThreadHandoffToolParams) {
   params.receipts.captureContext(params.context);
   return {
     name: "thread_handoff",
@@ -58,56 +62,56 @@ export function createThreadHandoffTool(params: {
   };
 }
 
-type ToolInput = { action: "start"; threadId: string } | { action: "claim"; handoffId?: string };
-
 async function executeAction(
-  params: Parameters<typeof createThreadHandoffTool>[0],
+  params: ThreadHandoffToolParams,
   input: ToolInput,
 ): Promise<ToolSuccess> {
   const source = readSourceContext(params.context, params.configuration);
   if (!source) {
     throw new HandoffError("unsupportedContext", "Trusted channel session context is unavailable.");
   }
-  if (input.action === "claim") {
-    const result = params.getStore().claimHandoff(
-      {
-        targetSessionKey: source.sessionKey,
-        agentId: source.agentId,
-        ...(source.accountId ? { accountId: source.accountId } : {}),
-        ...(input.handoffId ? { handoffId: input.handoffId } : {}),
-      },
-      (params.now ?? Date.now)(),
-    );
-    if (input.handoffId && result.status === "none") {
-      throw new HandoffError("invalidTarget", "The requested handoff does not exist.");
-    }
-    return { status: result.status };
+  if (input.action === "claim") return claimHandoff(params, source, input.handoffId);
+  return startHandoff(params, source, input.threadId);
+}
+
+function claimHandoff(
+  params: ThreadHandoffToolParams,
+  source: SourceContext,
+  handoffId: string | undefined,
+): ToolSuccess {
+  const result = params.getStore().claimHandoff(
+    {
+      targetSessionKey: source.sessionKey,
+      agentId: source.agentId,
+      ...(source.accountId ? { accountId: source.accountId } : {}),
+      ...(handoffId ? { handoffId } : {}),
+    },
+    (params.now ?? Date.now)(),
+  );
+  if (handoffId && result.status === "none") {
+    throw new HandoffError("invalidTarget", "The requested handoff does not exist.");
   }
+  return { status: result.status };
+}
+
+async function startHandoff(
+  params: ThreadHandoffToolParams,
+  source: SourceContext,
+  threadId: string,
+): Promise<ToolSuccess> {
   const surface = assertSupportedSource(source, params.configuration);
-  const route = resolveHandoffRoute(source, input.threadId, surface);
+  const route = resolveHandoffRoute(source, threadId, surface);
   return params.service.runForTarget(route.targetSessionKey, async () => {
     const store = params.getStore();
     const existing = store.findHandoffByRoute(route.routeKey);
     if (existing) {
-      if (!sourceMatchesExisting(existing, source, input.threadId)) {
-        throw new HandoffError(
-          "conflictingHandoff",
-          "This target already belongs to different delivery evidence.",
-        );
-      }
-      if (existing.state === "pending" && existing.lastEnqueuedAt === undefined) {
-        await params.service.enqueue(existing);
-      }
-      return {
-        status: "alreadyStarted",
-        handoffId: existing.handoffId,
-        sessionKey: existing.targetSessionKey,
-      };
+      if (!sourceMatchesExisting(existing, source, threadId)) throw conflictingHandoff();
+      return resumeExisting(params.service, existing);
     }
     const receipt = await params.receipts.waitForReceipt({
       sourceSessionKey: source.sessionKey,
       sourceSessionId: source.sessionId,
-      threadId: input.threadId,
+      threadId,
     });
     if (!receipt) {
       throw new HandoffError(
@@ -123,20 +127,8 @@ async function executeAction(
     });
     const inserted = store.insertHandoff(record);
     if (!inserted.inserted) {
-      if (!evidenceMatches(inserted.record, receipt)) {
-        throw new HandoffError(
-          "conflictingHandoff",
-          "This target already belongs to different delivery evidence.",
-        );
-      }
-      if (inserted.record.state === "pending" && inserted.record.lastEnqueuedAt === undefined) {
-        await params.service.enqueue(inserted.record);
-      }
-      return {
-        status: "alreadyStarted",
-        handoffId: inserted.record.handoffId,
-        sessionKey: inserted.record.targetSessionKey,
-      };
+      if (!evidenceMatches(inserted.record, receipt)) throw conflictingHandoff();
+      return resumeExisting(params.service, inserted.record);
     }
     await params.service.enqueue(record);
     return { status: "queued", handoffId: record.handoffId, sessionKey: record.targetSessionKey };
@@ -144,8 +136,8 @@ async function executeAction(
 }
 
 function sourceMatchesExisting(
-  record: ReturnType<typeof createHandoffRecord>,
-  source: NonNullable<ReturnType<typeof readSourceContext>>,
+  record: HandoffRecord,
+  source: SourceContext,
   threadId: string,
 ): boolean {
   return (
@@ -157,6 +149,26 @@ function sourceMatchesExisting(
     record.parentConversationId === source.parentConversationId &&
     record.threadId === threadId
   );
+}
+
+function conflictingHandoff(): HandoffError {
+  return new HandoffError(
+    "conflictingHandoff",
+    "This target already belongs to different delivery evidence.",
+  );
+}
+
+/** A record whose first enqueue never completed gets its seed now; otherwise nothing to redo. */
+async function resumeExisting(
+  service: HandoffService,
+  record: HandoffRecord,
+): Promise<ToolSuccess> {
+  if (record.state === "pending" && record.enqueueCount === 0) await service.enqueue(record);
+  return {
+    status: "alreadyStarted",
+    handoffId: record.handoffId,
+    sessionKey: record.targetSessionKey,
+  };
 }
 
 function parseInput(value: unknown): ToolInput {

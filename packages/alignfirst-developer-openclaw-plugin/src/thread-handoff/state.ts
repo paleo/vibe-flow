@@ -2,7 +2,7 @@ import { chmodSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { HandoffError } from "./errors.js";
-import type { DeliveryReceipt, HandoffRecord } from "./types.js";
+import type { DeliveryReceipt, HandoffRecord, ReceiptIdentity } from "./types.js";
 
 const DATABASE_DIRECTORY_MODE = 0o700;
 const DATABASE_FILE_MODE = 0o600;
@@ -15,17 +15,11 @@ export interface HandoffStore {
   findHandoffByRoute(routeKey: string): HandoffRecord | undefined;
   insertHandoff(record: HandoffRecord): { inserted: boolean; record: HandoffRecord };
   claimHandoff(identity: ClaimIdentity, now: number): ClaimResult;
-  updateEnqueued(routeKey: string, enqueuedAt: number): HandoffRecord | undefined;
-  listPending(now: number, retryIntervalMs: number): HandoffRecord[];
+  recordEnqueue(routeKey: string, enqueuedAt: number): HandoffRecord | undefined;
+  listPending(query: PendingQuery): HandoffRecord[];
   listHandoffs(): HandoffRecord[];
-  retireClaimed(handoffId: string): boolean;
+  retireHandoff(handoffId: string, options: RetireOptions): boolean;
   close(): void;
-}
-
-export interface ReceiptIdentity {
-  sourceSessionKey: string;
-  sourceSessionId: string;
-  threadId: string;
 }
 
 export interface ClaimIdentity {
@@ -40,15 +34,21 @@ export interface ClaimResult {
   record?: HandoffRecord;
 }
 
+/** Pending records last enqueued before `now - retryIntervalMs`, with fewer than `maxEnqueues`. */
+export interface PendingQuery {
+  now: number;
+  retryIntervalMs: number;
+  maxEnqueues: number;
+}
+
+export interface RetireOptions {
+  /** Also retire a pending record. */
+  force: boolean;
+}
+
 export function createHandoffStore(stateDir: string): HandoffStore {
   const database = openDatabase(resolveDatabasePath(stateDir));
   return createStoreOperations(database);
-}
-
-export function verifyPersistenceOpen(stateDir: string): string {
-  const databasePath = resolveDatabasePath(stateDir);
-  createHandoffStore(stateDir).close();
-  return databasePath;
 }
 
 export function resolveDatabasePath(stateDir: string): string {
@@ -101,10 +101,11 @@ function initializeSchema(database: DatabaseSync): void {
         target_session_key TEXT NOT NULL UNIQUE,
         handoff_id TEXT NOT NULL UNIQUE,
         state TEXT NOT NULL CHECK (state IN ('pending', 'claimed')),
+        enqueue_count INTEGER NOT NULL DEFAULT 0,
         last_enqueued_at INTEGER,
         record_json TEXT NOT NULL
       ) STRICT;
-      CREATE INDEX handoffs_pending_idx ON handoffs (state, last_enqueued_at);
+      CREATE INDEX handoffs_pending_idx ON handoffs (state, enqueue_count, last_enqueued_at);
       PRAGMA user_version = 1;
     `);
   });
@@ -117,10 +118,10 @@ function createStoreOperations(database: DatabaseSync): HandoffStore {
     findHandoffByRoute: (routeKey) => findHandoffByRoute(database, routeKey),
     insertHandoff: (record) => insertHandoff(database, record),
     claimHandoff: (identity, now) => claimHandoff(database, identity, now),
-    updateEnqueued: (routeKey, enqueuedAt) => updateEnqueued(database, routeKey, enqueuedAt),
-    listPending: (now, retryIntervalMs) => listPending(database, now, retryIntervalMs),
+    recordEnqueue: (routeKey, enqueuedAt) => recordEnqueue(database, routeKey, enqueuedAt),
+    listPending: (query) => listPending(database, query),
     listHandoffs: () => listHandoffs(database),
-    retireClaimed: (handoffId) => retireClaimed(database, handoffId),
+    retireHandoff: (handoffId, options) => retireHandoff(database, handoffId, options),
     close: () => database.close(),
   };
 }
@@ -177,12 +178,7 @@ function findReceipt(
 }
 
 function findHandoffByRoute(database: DatabaseSync, routeKey: string): HandoffRecord | undefined {
-  return runStateOperation("read a handoff", () => {
-    const row = database
-      .prepare("SELECT record_json FROM handoffs WHERE route_key = ?")
-      .get(routeKey) as JsonRow;
-    return row ? parseHandoff(row.record_json) : undefined;
-  });
+  return runStateOperation("read a handoff", () => readHandoffByRoute(database, routeKey));
 }
 
 function insertHandoff(
@@ -197,14 +193,16 @@ function insertHandoff(
       database
         .prepare(
           `INSERT INTO handoffs (
-             route_key, target_session_key, handoff_id, state, last_enqueued_at, record_json
-           ) VALUES (?, ?, ?, ?, ?, ?)`,
+             route_key, target_session_key, handoff_id, state, enqueue_count, last_enqueued_at,
+             record_json
+           ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(
           record.routeKey,
           record.targetSessionKey,
           record.handoffId,
           record.state,
+          record.enqueueCount,
           record.lastEnqueuedAt ?? null,
           JSON.stringify(record),
         );
@@ -265,40 +263,41 @@ function assertClaimIdentity(record: HandoffRecord, identity: ClaimIdentity): vo
   }
 }
 
-function updateEnqueued(
+function recordEnqueue(
   database: DatabaseSync,
   routeKey: string,
   enqueuedAt: number,
 ): HandoffRecord | undefined {
-  return runStateOperation("record handoff enqueue time", () =>
+  return runStateOperation("record a handoff enqueue", () =>
     inTransaction(database, () => {
       const current = readHandoffByRoute(database, routeKey);
       if (current?.state !== "pending") return current;
-      const updated: HandoffRecord = { ...current, lastEnqueuedAt: enqueuedAt };
+      const updated: HandoffRecord = {
+        ...current,
+        enqueueCount: current.enqueueCount + 1,
+        lastEnqueuedAt: enqueuedAt,
+      };
       database
         .prepare(
-          `UPDATE handoffs SET last_enqueued_at = ?, record_json = ?
+          `UPDATE handoffs SET enqueue_count = ?, last_enqueued_at = ?, record_json = ?
            WHERE route_key = ? AND state = 'pending'`,
         )
-        .run(enqueuedAt, JSON.stringify(updated), routeKey);
+        .run(updated.enqueueCount, enqueuedAt, JSON.stringify(updated), routeKey);
       return updated;
     }),
   );
 }
 
-function listPending(
-  database: DatabaseSync,
-  now: number,
-  retryIntervalMs: number,
-): HandoffRecord[] {
+function listPending(database: DatabaseSync, query: PendingQuery): HandoffRecord[] {
   return runStateOperation("list pending handoffs", () => {
     const rows = database
       .prepare(
         `SELECT record_json FROM handoffs
-         WHERE state = 'pending' AND (last_enqueued_at IS NULL OR last_enqueued_at <= ?)
+         WHERE state = 'pending' AND enqueue_count < ?
+           AND (last_enqueued_at IS NULL OR last_enqueued_at <= ?)
          ORDER BY COALESCE(last_enqueued_at, 0), rowid`,
       )
-      .all(now - retryIntervalMs) as unknown as StoredJsonRow[];
+      .all(query.maxEnqueues, query.now - query.retryIntervalMs) as unknown as StoredJsonRow[];
     return rows.map((row) => parseHandoff(row.record_json));
   });
 }
@@ -312,7 +311,7 @@ function listHandoffs(database: DatabaseSync): HandoffRecord[] {
   });
 }
 
-function retireClaimed(database: DatabaseSync, handoffId: string): boolean {
+function retireHandoff(database: DatabaseSync, handoffId: string, options: RetireOptions): boolean {
   return runStateOperation("retire a handoff", () =>
     inTransaction(database, () => {
       const row = database
@@ -320,12 +319,13 @@ function retireClaimed(database: DatabaseSync, handoffId: string): boolean {
         .get(handoffId) as JsonRow;
       if (!row) return false;
       const record = parseHandoff(row.record_json);
-      if (record.state !== "claimed") {
-        throw new HandoffError("conflictingHandoff", "Pending handoffs cannot be retired.");
+      if (record.state === "pending" && !options.force) {
+        throw new HandoffError(
+          "conflictingHandoff",
+          "This handoff is pending; pass --force to retire it anyway.",
+        );
       }
-      const result = database
-        .prepare("DELETE FROM handoffs WHERE handoff_id = ? AND state = 'claimed'")
-        .run(handoffId);
+      const result = database.prepare("DELETE FROM handoffs WHERE handoff_id = ?").run(handoffId);
       return result.changes === 1;
     }),
   );
@@ -401,6 +401,7 @@ function parseHandoff(json: string): HandoffRecord {
     typeof value.sessionKey !== "string" ||
     typeof value.threadId !== "string" ||
     typeof value.starterText !== "string" ||
+    typeof value.enqueueCount !== "number" ||
     (value.state !== "pending" && value.state !== "claimed")
   ) {
     throw new Error("Invalid handoff record.");

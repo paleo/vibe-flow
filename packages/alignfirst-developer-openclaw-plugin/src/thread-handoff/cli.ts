@@ -1,5 +1,5 @@
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { createHandoffStore } from "./state.js";
+import { createHandoffStore, type HandoffStore } from "./state.js";
 
 export function registerThreadHandoffCli(api: OpenClawPluginApi): void {
   api.registerCli(
@@ -16,7 +16,10 @@ export function registerThreadHandoffCli(api: OpenClawPluginApi): void {
         .command("retire")
         .description("Retire one claimed handoff")
         .argument("<handoff-id>")
-        .action((handoffId: string) => retireHandoff(api, handoffId));
+        .option("--force", "Also retire a pending handoff")
+        .action((handoffId: string, options: { force?: boolean }) =>
+          retireHandoff(api, handoffId, options.force === true),
+        );
     },
     {
       descriptors: [
@@ -44,24 +47,21 @@ function listHandoffs(api: OpenClawPluginApi, json: boolean): void {
     }
     for (const record of records) {
       process.stdout.write(
-        `${record.handoffId}\t${record.state}\t${record.targetSessionKey}\t${record.createdAt}\n`,
+        `${record.handoffId}\t${record.state}\t${record.enqueueCount} wakes\t${record.targetSessionKey}\t${record.createdAt}\n`,
       );
     }
   });
 }
 
-function retireHandoff(api: OpenClawPluginApi, handoffId: string): void {
+function retireHandoff(api: OpenClawPluginApi, handoffId: string, force: boolean): void {
   withStore(api, (store) => {
-    const retired = store.retireClaimed(handoffId.trim());
+    const retired = store.retireHandoff(handoffId.trim(), { force });
     if (!retired) throw new Error(`Unknown handoff: ${handoffId}`);
     process.stdout.write(`Retired ${handoffId}.\n`);
   });
 }
 
-function withStore<T>(
-  api: OpenClawPluginApi,
-  operation: (store: ReturnType<typeof createHandoffStore>) => T,
-): T {
+function withStore<T>(api: OpenClawPluginApi, operation: (store: HandoffStore) => T): T {
   const store = createHandoffStore(api.runtime.state.resolveStateDir());
   try {
     return operation(store);

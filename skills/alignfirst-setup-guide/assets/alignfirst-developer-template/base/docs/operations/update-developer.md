@@ -40,7 +40,8 @@ The prefix is root-owned and immutable ([06](../installations/06-security-harden
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- bash -lc '
 openclaw update --yes --no-restart --accept-capabilities
-openclaw plugins update alignfirst-developer --accept-capabilities
+openclaw plugins list --json | grep -q "\"alignfirst-developer\"" &&
+  openclaw plugins update alignfirst-developer --accept-capabilities
 /usr/bin/npm install -g @paleo/alproject@latest @paleo/alcode@latest ctx7@latest
 '
 ```
@@ -48,7 +49,8 @@ openclaw plugins update alignfirst-developer --accept-capabilities
 `--accept-capabilities` accepts the plugins' reviewed capability changes. Without it the post-update plugin sync stops with an unresolved review, which `openclaw update repair --accept-capabilities` finishes.
 
 `alignfirst-developer` is an independent npm plugin, so its explicit update is separate from the core and
-official channel-plugin update. Its state directory remains in place across package replacement.
+official channel-plugin update. The seed installs it the first time, in the re-seed step below, and
+its state directory remains in place across package replacement.
 
 Update the coding agent through its package-scoped command: [08-coding-agent.md § Update](../installations/08-coding-agent.md#update).
 
@@ -111,9 +113,11 @@ sudo /usr/local/sbin/alignfirst-developer-maintenance config workspace -- \
 
 Read its output: every imported or removed file is a change to port into the repository.
 
-## Re-seed after a core bump
+## Re-seed
 
-A new OpenClaw release can retire keys the seed sets, turn on new defaults and widen the channel plugin's declared capabilities. Re-seed through [configure-developer.md](configure-developer.md): `config set` under the new binary rewrites the config in the current schema, and the surface module re-records the plugin consent. A `config set` that fails names a retired key; the trailing interactive `openclaw doctor` shows the new defaults. Port both into the seed modules before starting the gateway.
+Re-seed after a core bump, and whenever the `git pull` above changed anything under `infra/openclaw/`: the seed is the configuration's source of truth, and a release that adds a plugin or a tool ships as a seed change. Re-seed through [configure-developer.md](configure-developer.md).
+
+A new OpenClaw release can retire keys the seed sets, turn on new defaults and widen the channel plugin's declared capabilities. `config set` under the new binary rewrites the config in the current schema, and the surface module re-records the plugin consent. A `config set` that fails names a retired key; the trailing interactive `openclaw doctor` shows the new defaults. Port both into the seed modules before starting the gateway.
 
 ## Gateway unit and restart
 

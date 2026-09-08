@@ -11,7 +11,7 @@ import {
   waitForCompletionReport,
 } from "./_lib/coding-session.ts";
 import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
-import { setupCodingAgentMock, type CodingAgentMockHandle } from "./_lib/mock-coding-agent.ts";
+import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { assertNoChannelRootLeak, assertNoSelfThreadMessagePost } from "./_lib/outbound.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
@@ -56,11 +56,11 @@ export default async function sequentialCodingSessions(ctx: ScenarioContext): Pr
   const alproject = setupAlprojectMock(ctx);
   // Stream delay > exec `yieldMs` (10s default) so OpenClaw auto-backgrounds the alcode exec even if
   // the agent does not pass `background: true`, letting the "started" ack precede the completion wake.
-  const codingAgent = setupCodingAgentMock(ctx, { streamDelayMs: 12_000 });
+  setupCodingAgentMock(ctx, { streamDelayMs: 12_000 });
   setupGhMock(ctx);
 
   const startCursor = await ctx.getCursor();
-  const threadId = await runFirstDelegation(ctx, codingAgent);
+  const threadId = await runFirstDelegation(ctx);
   await runSecondDelegation(ctx, threadId);
 
   // The wake turn may still be streaming a final answer after the completion
@@ -74,10 +74,7 @@ export default async function sequentialCodingSessions(ctx: ScenarioContext): Pr
 }
 
 /** Phase 1 — the channel bootstrap, then the handoff message that starts the work. */
-async function runFirstDelegation(
-  ctx: ScenarioContext,
-  codingAgent: CodingAgentMockHandle,
-): Promise<string> {
+async function runFirstDelegation(ctx: ScenarioContext): Promise<string> {
   const phase1NotBefore = new Date().toISOString();
   const starter = await bootstrapThreadFromChannel(ctx, {
     text:
@@ -86,7 +83,6 @@ async function runFirstDelegation(
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   const phase1Cursor = starter.nextCursor;
 

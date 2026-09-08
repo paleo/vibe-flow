@@ -23,7 +23,6 @@ export default async function humanReplyRacingStartup(ctx: ScenarioContext): Pro
     text: `Nous avons un travail à faire sur ${PROJECT}, mais le ticket arrive juste après.`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
     afterStarter: async (threadId) => {
       await sendInThread(
         ctx,

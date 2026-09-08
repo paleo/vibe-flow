@@ -190,4 +190,32 @@ describe("bus HTTP round-trip", () => {
       }),
     ).resolves.toMatchObject({ message: { text: "retry" } });
   });
+
+  it("lets root posts through a thread-only fault until a threaded send arrives", async () => {
+    await post(fixture.baseUrl, "/v1/test/fail-next", {
+      operation: "outbound-message",
+      message: "planned starter failure",
+      threadOnly: true,
+    });
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        text: "root narration",
+      }),
+    ).resolves.toMatchObject({ message: { text: "root narration" } });
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        threadId: "1700000000.000100",
+        text: "starter",
+      }),
+    ).rejects.toThrow(/planned starter failure/);
+    await expect(
+      post(fixture.baseUrl, "/v1/outbound/message", {
+        to: "channel:sample-project",
+        threadId: "1700000000.000100",
+        text: "starter retry",
+      }),
+    ).resolves.toMatchObject({ message: { text: "starter retry" } });
+  });
 });

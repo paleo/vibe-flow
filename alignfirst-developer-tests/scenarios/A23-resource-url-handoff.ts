@@ -49,7 +49,6 @@ export default async function resourceUrlHandoff(ctx: ScenarioContext): Promise<
     text: `Peux-tu relire ${PULL_REQUEST_URL} ?`,
     project: "nimbus",
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
 
   await ctx.judgeLLM({

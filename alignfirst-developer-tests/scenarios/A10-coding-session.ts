@@ -40,7 +40,7 @@ export default async function codingSession(ctx: ScenarioContext): Promise<void>
   const alproject = setupAlprojectMock(ctx);
   // Stream delay > exec `yieldMs` (10s default) so OpenClaw auto-backgrounds the alcode exec even if
   // the agent does not pass `background: true`, letting the "started" ack precede the completion wake.
-  const codingAgent = setupCodingAgentMock(ctx, { streamDelayMs: 12000 });
+  setupCodingAgentMock(ctx, { streamDelayMs: 12000 });
   setupGhMock(ctx);
 
   const startCursor = await ctx.getCursor();
@@ -52,7 +52,6 @@ export default async function codingSession(ctx: ScenarioContext): Promise<void>
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   const threadId = starter.threadId;
   const goAheadCursor = starter.nextCursor;

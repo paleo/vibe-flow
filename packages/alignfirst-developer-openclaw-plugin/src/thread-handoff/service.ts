@@ -3,6 +3,8 @@ import type { HandoffStore } from "./state.js";
 import type { HandoffRecord } from "./types.js";
 
 const RETRY_INTERVAL_MS = 30_000;
+/** Wakes per pending handoff before it parks; a parked record stays claimable. */
+export const MAX_ENQUEUE_ATTEMPTS = 10;
 
 export interface HandoffService {
   enqueue(record: HandoffRecord): Promise<void>;
@@ -11,13 +13,15 @@ export interface HandoffService {
   stop(): Promise<void>;
 }
 
-export function createHandoffService(params: {
+export interface HandoffServiceParams {
   runtime: OpenClawPluginApi["runtime"];
   getStore: () => HandoffStore;
   logger: PluginLogger;
   now?: () => number;
   retryIntervalMs?: number;
-}): HandoffService {
+}
+
+export function createHandoffService(params: HandoffServiceParams): HandoffService {
   const now = params.now ?? Date.now;
   const retryIntervalMs = params.retryIntervalMs ?? RETRY_INTERVAL_MS;
   const targetWork = new Map<string, Promise<unknown>>();
@@ -26,7 +30,7 @@ export function createHandoffService(params: {
   let stopped = true;
 
   const service: HandoffService = {
-    enqueue: (record) => enqueueRecord(params.runtime, params.getStore(), record, now()),
+    enqueue: (record) => enqueueRecord(params, record, now()),
     runForTarget: (targetSessionKey, operation) =>
       serializeTarget(targetWork, targetSessionKey, operation),
     async start() {
@@ -64,7 +68,11 @@ async function recoverPending(
   now: number,
   retryIntervalMs: number,
 ): Promise<void> {
-  const records = getStore().listPending(now, retryIntervalMs);
+  const records = getStore().listPending({
+    now,
+    retryIntervalMs,
+    maxEnqueues: MAX_ENQUEUE_ATTEMPTS,
+  });
   await Promise.all(
     records.map((record) =>
       service
@@ -80,27 +88,34 @@ async function recoverPending(
   );
 }
 
+/**
+ * The seed is replaceable and keyed on the handoff, so OpenClaw answers `false` when an identical
+ * seed is still queued: the target has not consumed it yet, which counts as queued here.
+ */
 async function enqueueRecord(
-  runtime: OpenClawPluginApi["runtime"],
-  store: HandoffStore,
+  params: HandoffServiceParams,
   record: HandoffRecord,
   enqueuedAt: number,
 ): Promise<void> {
-  const queued = runtime.system.enqueueSystemEvent(buildSeed(record), {
+  params.runtime.system.enqueueSystemEvent(buildSeed(record), {
     sessionKey: record.targetSessionKey,
     deliveryContext: record.deliveryContext,
     contextKey: `thread-handoff:${record.handoffId}`,
     replace: true,
   });
-  if (!queued) throw new Error("OpenClaw did not accept the thread-handoff seed.");
-  store.updateEnqueued(record.routeKey, enqueuedAt);
-  runtime.system.requestHeartbeat({
+  const updated = params.getStore().recordEnqueue(record.routeKey, enqueuedAt);
+  params.runtime.system.requestHeartbeat({
     source: "notifications-event",
     intent: "immediate",
     reason: "wake",
     agentId: record.agentId,
     sessionKey: record.targetSessionKey,
   });
+  if (updated?.state === "pending" && updated.enqueueCount >= MAX_ENQUEUE_ATTEMPTS) {
+    params.logger.warn(
+      `thread-handoff ${record.handoffId} parked after ${updated.enqueueCount} wakes without a claim; it stays claimable, or retire it with: openclaw thread-handoff retire ${record.handoffId} --force`,
+    );
+  }
 }
 
 export function buildSeed(record: HandoffRecord): string {

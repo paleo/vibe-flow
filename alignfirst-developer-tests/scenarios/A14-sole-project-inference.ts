@@ -24,7 +24,6 @@ export default async function soleProjectInference(ctx: ScenarioContext): Promis
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
   const ack = await waitForSetupAck(ctx, {
     threadId: starter.threadId,

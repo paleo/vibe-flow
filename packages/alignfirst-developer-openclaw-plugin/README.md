@@ -69,13 +69,15 @@ block; it is not plugin instruction text.
 The database is `<stateDir>/thread-handoff/state.sqlite`, where `stateDir` comes from
 `api.runtime.state.resolveStateDir()`. It uses WAL, full synchronous durability, a `0700` directory,
 and a `0600` database file. Receipts expire after one hour and are capped at 10,000 active entries.
-Handoffs have a separate 10,000-record cap and do not expire automatically. Pending records are
-retried at startup and every 30 seconds. Claimed records remain as duplicate-start protection;
+Handoffs have a separate 10,000-record cap and do not expire automatically. A pending record is
+re-seeded and woken at startup and every 30 seconds, ten times at most. After the tenth wake the
+record parks: the plugin logs one warning, stops waking the target, and keeps the record claimable
+for the next human message in the thread. Claimed records remain as duplicate-start protection;
 native OpenClaw recovery, not this plugin, owns interrupted work after claim.
 
-Use `openclaw thread-handoff list [--json]` to inspect records and
-`openclaw thread-handoff retire <handoff-id>` to remove a claimed record. Pending records cannot be
-retired.
+Use `openclaw thread-handoff list [--json]` to inspect records, with their wake counts, and
+`openclaw thread-handoff retire <handoff-id>` to remove a claimed record. Add `--force` to retire a
+pending record, typically a parked one.
 
 For a backup, stop the gateway and let the plugin close/checkpoint its connection, then copy the
 database together with any WAL/SHM crash-state files; alternatively use a SQLite-consistent backup.

@@ -1,4 +1,9 @@
-import type { AgentToolCall, ScenarioContext, WaitForOutboundResult } from "@paleo/openclaw-test";
+import type {
+  AgentToolCall,
+  BusMessage,
+  ScenarioContext,
+  WaitForOutboundResult,
+} from "@paleo/openclaw-test";
 import { inputOf } from "./agent-tool-calls.ts";
 import {
   isMetaNarration,
@@ -156,13 +161,23 @@ export async function assertNoLiteralNoReply(
   ctx: ScenarioContext,
   sinceCursor: number,
 ): Promise<void> {
-  const { messages } = await ctx.poll({ sinceCursor, timeoutMs: 1_000 });
-  const leaks = messages.filter(
-    (m) =>
-      m.direction === "outbound" &&
-      m.conversation.id === ctx.conversationId &&
-      /\bNO_REPLY\b/u.test(m.text),
-  );
+  const leaks: BusMessage[] = [];
+  let cursor = sinceCursor;
+  // A poll page is capped by the bus; walk every page since the cursor.
+  while (true) {
+    const { messages, nextCursor } = await ctx.poll({ sinceCursor: cursor, timeoutMs: 1_000 });
+    if (messages.length === 0) break;
+    cursor = nextCursor;
+    for (const m of messages) {
+      if (
+        m.direction === "outbound" &&
+        m.conversation.id === ctx.conversationId &&
+        /\bNO_REPLY\b/u.test(m.text)
+      ) {
+        leaks.push(m);
+      }
+    }
+  }
   for (const m of leaks)
     ctx.log(`literal NO_REPLY posted: ${JSON.stringify(m.text.slice(0, 120))}`);
   ctx.assertLength(leaks, 0, "no literal NO_REPLY reached the user");

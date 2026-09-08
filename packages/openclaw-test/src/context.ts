@@ -74,6 +74,8 @@ export interface ScenarioContext {
   channel: ChannelId;
   conversationId: string;
   accountId: ChannelId;
+  /** The bus the gateway's channel plugins talk to; for direct bus calls such as fault injection. */
+  busUrl: string;
   /**
    * The most recent agent-action entry (`outboundReceived` / `cliMock` /
    * `agentToolCall`). Capture this synchronously after `await` resolves to
@@ -298,6 +300,7 @@ export function createContext(params: {
     channel,
     conversationId,
     accountId,
+    busUrl: BUS_URL,
     get currentEntry() {
       return currentEntry;
     },

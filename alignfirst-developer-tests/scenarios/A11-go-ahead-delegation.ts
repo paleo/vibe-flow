@@ -52,7 +52,6 @@ export default async function threadSessionDelegation(ctx: ScenarioContext): Pro
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
-    codingAgent,
   });
 
   await runSetupPhaseWithoutDelegation(ctx, codingAgent, starter);

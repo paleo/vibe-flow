@@ -24,7 +24,7 @@ export default async function statusExistingWorktree(ctx: ScenarioContext): Prom
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const seededPath = await seedWorktree(ctx, NIMBUS_PROJECT_PATH, TICKET_ID, BRANCH_DESC);
@@ -36,8 +36,6 @@ export default async function statusExistingWorktree(ctx: ScenarioContext): Prom
     text: `Où en est ${TICKET_ID} sur ${PROJECT} ?`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
-    seededWorktreePaths: [seededWorktreePath],
   });
   // Matched at conversation level on purpose: a report that leaked to the
   // channel root fails on the placement assert below, with the real cause,

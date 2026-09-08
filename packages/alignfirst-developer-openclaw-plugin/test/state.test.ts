@@ -67,7 +67,7 @@ describe("handoff SQLite state", () => {
     second.close();
   });
 
-  it("rejects mismatched claim identities and pending retirement", () => {
+  it("rejects mismatched claim identities and unforced pending retirement", () => {
     const store = createHandoffStore(temporaryStateDir());
     store.insertHandoff(handoff());
     expect(() =>
@@ -76,7 +76,29 @@ describe("handoff SQLite state", () => {
         2_000,
       ),
     ).toThrow(/invalidTarget|cannot claim/);
-    expect(() => store.retireClaimed("handoff-1")).toThrow(/Pending handoffs/);
+    expect(() => store.retireHandoff("handoff-1", { force: false })).toThrow(/--force/);
+    expect(store.retireHandoff("handoff-1", { force: true })).toBe(true);
+    expect(store.findHandoffByRoute("route-1")).toBeUndefined();
+    store.close();
+  });
+
+  it("lists pending handoffs due for a wake and below the enqueue cap", () => {
+    const store = createHandoffStore(temporaryStateDir());
+    store.insertHandoff(handoff());
+    store.insertHandoff(
+      handoff({ routeKey: "route-2", handoffId: "handoff-2", targetSessionKey: "t2" }),
+    );
+    store.recordEnqueue("route-2", 5_000);
+    const query = { now: 10_000, retryIntervalMs: 30_000, maxEnqueues: 2 };
+    expect(store.listPending(query).map((record) => record.handoffId)).toEqual(["handoff-1"]);
+    expect(store.listPending({ ...query, now: 40_000 }).map((r) => r.handoffId)).toEqual([
+      "handoff-1",
+      "handoff-2",
+    ]);
+    store.recordEnqueue("route-2", 40_000);
+    expect(store.listPending({ ...query, now: 80_000 }).map((r) => r.handoffId)).toEqual([
+      "handoff-1",
+    ]);
     store.close();
   });
 

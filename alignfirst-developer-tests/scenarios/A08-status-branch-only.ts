@@ -23,7 +23,7 @@ export default async function statusBranchOnly(ctx: ScenarioContext): Promise<vo
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   await seedBranch(ctx, NIMBUS_PROJECT_PATH, TICKET_ID, BRANCH_DESC);
@@ -34,7 +34,6 @@ export default async function statusBranchOnly(ctx: ScenarioContext): Promise<vo
     text: `Où en est ${TICKET_ID} sur ${PROJECT} ?`,
     project: PROJECT,
     projectPath: NIMBUS_PROJECT_PATH,
-    codingAgent,
   });
   // Terra reads the playbook chain slowly: the worktree landed 147 s after the starter on
   // 2026-09-07 (artifact 18-40-45-966Z). Same budget as A11.

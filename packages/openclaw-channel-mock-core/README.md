@@ -17,7 +17,9 @@ plugins can distinguish confirmed, failed, and partial starter delivery.
 
 Test scenarios can arm one recoverable transport fault with
 `failNextQaBusOperation({ baseUrl, operation: "outbound-message" | "thread-create" })`. The bus
-consumes it before side effects, so a retry can prove that only one native starter exists.
+consumes it before side effects, so a retry can prove that only one native starter exists. With
+`threadOnly: true`, an `outbound-message` fault waits for a send that carries a thread target and
+lets root posts through.
 
 `zod` is a peer dependency pinned to OpenClaw's own version: the config schema composes OpenClaw's zod objects with locally built ones, so both must resolve to the same zod instance. When upgrading OpenClaw, move the peer pin to whatever zod version the new OpenClaw release pins.
 

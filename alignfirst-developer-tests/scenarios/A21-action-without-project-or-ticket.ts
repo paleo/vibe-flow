@@ -15,12 +15,11 @@ export default async function actionWithoutProjectOrTicket(ctx: ScenarioContext)
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
   const alproject = setupAlprojectMock(ctx);
-  const codingAgent = setupCodingAgentMock(ctx);
+  setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: "Peux-tu rendre le bouton d'export plus visible ?",
-    codingAgent,
   });
 
   await ctx.judgeLLM({

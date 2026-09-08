@@ -3,7 +3,6 @@ import { basename, dirname } from "node:path";
 import type { ScenarioContext } from "@paleo/openclaw-test";
 import { execMatches, inputOf, invokesAlcode, readsFile } from "./agent-tool-calls.ts";
 import { escapeRe, STARTER_HANDS_OFF_RUBRIC } from "./common-constants.ts";
-import type { CodingAgentMockHandle } from "./mock-coding-agent.ts";
 import { assertNoChannelRootLeak, requireThreadId, waitForStarter } from "./outbound.ts";
 import { FIXTURE_PROJECT_PATHS } from "./project-fixtures.ts";
 import type { Step } from "./types.ts";
@@ -21,9 +20,6 @@ export interface ChannelBootstrapOptions {
   ticketId?: string;
   /** Asserted verbatim in the starter for a detailed request. */
   request?: string;
-  codingAgent?: CodingAgentMockHandle;
-  /** Worktree paths seeded before the run; anything else on disk is the channel session's. */
-  seededWorktreePaths?: string[];
   starterTimeoutMs?: number;
   /** Runs immediately after native starter delivery, before waiting for the start call. */
   afterStarter?: (threadId: string) => Promise<void>;
@@ -215,13 +211,4 @@ function findFixtureWorktreePaths(): string[] {
       .filter((entry) => entry.startsWith(prefix))
       .map((entry) => `${parent}/${entry}`);
   }).sort();
-}
-
-export function assertNoCodingAgentCalls(codingAgent: CodingAgentMockHandle): void {
-  if (codingAgent.codingAgentCalls.length === 0) return;
-  throw new Error(
-    `expected no coding-agent call; got ${codingAgent.codingAgentCalls.length}: ${JSON.stringify(
-      codingAgent.codingAgentCalls.map((call) => ({ agent: call.agent, argv: call.argv })),
-    )}`,
-  );
 }

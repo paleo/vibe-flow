@@ -52,11 +52,16 @@ type QaBusEventSeed =
       senderId: string;
     };
 
+interface QaBusFault {
+  message: string;
+  threadOnly: boolean;
+}
+
 export function createQaBusState() {
   const conversations = new Map<string, QaBusConversation>();
   const threads = new Map<string, QaBusThread>();
   const messages = new Map<string, QaBusMessage>();
-  const faults = new Map<QaBusFaultOperation, string>();
+  const faults = new Map<QaBusFaultOperation, QaBusFault>();
   const events: QaBusEvent[] = [];
   let cursor = 0;
   const waiters = createQaBusWaiterStore(() =>
@@ -85,11 +90,11 @@ export function createQaBusState() {
     return created;
   };
 
-  const consumeFault = (operation: QaBusFaultOperation) => {
+  const consumeFault = (operation: QaBusFaultOperation, threaded = true) => {
     const fault = faults.get(operation);
-    if (!fault) return;
+    if (!fault || (fault.threadOnly && !threaded)) return;
     faults.delete(operation);
-    throw new Error(fault);
+    throw new Error(fault.message);
   };
 
   const createMessage = (params: {
@@ -173,7 +178,6 @@ export function createQaBusState() {
       return cloneMessage(message);
     },
     addOutboundMessage(input: QaBusOutboundMessageInput) {
-      consumeFault("outbound-message");
       const accountId = normalizeAccountId(input.accountId);
       const normalizedTarget = normalizeConversationFromTarget(input.to);
       // A thread is a channel on Discord: a target naming a stored thread delivers into that
@@ -185,7 +189,8 @@ export function createQaBusState() {
       const conversation = storedThread
         ? ensureConversation({ id: storedThread.conversationId, kind: "channel" })
         : normalizedTarget.conversation;
-      const threadId = storedThread?.id ?? requestedThreadId;
+      const threadId = storedThread?.id ?? requestedThreadId ?? resolveThreadId(input.threadId);
+      consumeFault("outbound-message", threadId !== undefined);
       const message = createMessage({
         direction: "outbound",
         accountId,
@@ -194,7 +199,7 @@ export function createQaBusState() {
         senderName: input.senderName?.trim() || DEFAULT_BOT_NAME,
         text: input.text,
         timestamp: input.timestamp,
-        threadId: threadId ?? resolveThreadId(input.threadId),
+        threadId,
         replyToId: input.replyToId,
         attachments: input.attachments,
         toolCalls: input.toolCalls,
@@ -227,7 +232,10 @@ export function createQaBusState() {
       if (input.operation !== "outbound-message" && input.operation !== "thread-create") {
         throw new Error(`unsupported test bus fault operation: ${String(input.operation)}`);
       }
-      faults.set(input.operation, input.message?.trim() || `injected ${input.operation} failure`);
+      faults.set(input.operation, {
+        message: input.message?.trim() || `injected ${input.operation} failure`,
+        threadOnly: input.threadOnly === true,
+      });
     },
     getThread(input: QaBusGetThreadInput) {
       const thread = threads.get(resolveThreadId(input.threadId) ?? "");

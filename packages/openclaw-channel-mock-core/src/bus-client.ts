@@ -1,7 +1,7 @@
 import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
 import type {
+  QaBusFailNextInput,
   QaBusInboundMessageInput,
-  QaBusFaultOperation,
   QaBusMessage,
   QaBusPollResult,
   QaBusSearchMessagesInput,
@@ -176,11 +176,7 @@ export async function sendQaBusMessage(params: {
   return await postJson<{ message: QaBusMessage }>(params.baseUrl, "/v1/outbound/message", params);
 }
 
-export async function failNextQaBusOperation(params: {
-  baseUrl: string;
-  operation: QaBusFaultOperation;
-  message?: string;
-}) {
+export async function failNextQaBusOperation(params: QaBusFailNextInput & { baseUrl: string }) {
   return await postJson<{ ok: true }>(params.baseUrl, "/v1/test/fail-next", params);
 }
 
