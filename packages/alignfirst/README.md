@@ -40,7 +40,7 @@ The guide installs the selected components and configures the repository. Remove
 - `plans` — Set up, check and archive plans.
 - `docmap` — Browse project documentation.
 - `conventions` — Print the effective project conventions.
-- `context` — Print the conventions and the documentation map.
+- `context` — Print the conventions, the documentation map when `docs/` exists, and the protocol aliases.
 - `config` — Report the effective project configuration.
 - `doctor` — Diagnose an AlignFirst setup.
 

@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe("context command", () => {
-  it("prints titled conventions and docmap sections, then the documentation map", async () => {
+  it("prints the conventions, the docmap sections, then the protocols section", async () => {
     const cwd = temp();
     mkdirSync(join(cwd, "docs"));
     writeFileSync(join(cwd, "docs", "topic.md"), "---\ntitle: Topic\n---\n\n# Topic\n");
@@ -22,16 +22,27 @@ describe("context command", () => {
     expect(result.stdout).toContain(
       "Default branch: unresolved; ask before default-branch operations.\n\n# Docmap Usage\n\ndocmap — browse",
     );
-    expect(result.stdout.indexOf("# Documentation")).toBeGreaterThan(
-      result.stdout.indexOf("# Docmap Usage"),
-    );
-    expect(result.stdout).toContain("`docs/topic.md` — Topic");
+    expect(result.stdout).toContain("`docs/topic.md` — Topic\n\n# AlignFirst Protocols\n\n");
+    expect(result.stdout).toContain("`alignfirst guide <protocol>` prints");
+    expect(result.stdout).toContain("`alcatchup` stands for `alignfirst ticket --catchup`");
+    expect(result.stdout).not.toContain("{{");
   });
 
-  it("keeps docmap's missing-documentation result", async () => {
+  it("skips the docmap sections without a docs directory", async () => {
     const result = await runMain(["context"], { cwd: temp() });
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("No documentation folder");
+    expect(result.stdout).not.toContain("Docmap");
+    expect(result.stdout).toContain(
+      "Default branch: unresolved; ask before default-branch operations.\n\n# AlignFirst Protocols\n\n",
+    );
+  });
+
+  it("renders the npx command form", async () => {
+    const result = await runMain(["context"], {
+      cwd: temp(),
+      env: { npm_config_user_agent: "npm/10.0.0 node/v22.0.0" },
+    });
+    expect(result.stdout).toContain("`npx -y alignfirst guide <protocol>` prints");
   });
 });
 

@@ -111,7 +111,7 @@ Detect existing footprints before proposing changes:
 - docmap: a `docmap` script, `@paleo/docmap`, `alignfirst docmap` in an instruction file, or `docs/`.
 - workspace: a `workspace` script or `@paleo/workspace`.
 - AlignFirst: `.alignfirst.json`, an AlignFirst CLI prerequisite in `README.md`, `.plans/`, a
-  bootstrap line running `alignfirst conventions` or `alignfirst context`, an AlignFirst instruction
+  bootstrap line running `alignfirst context`, an AlignFirst instruction
   section, or a canonical skill installation.
 - team plans: a `.plans` symlink or `plans.folder` in `.alignfirst.json`.
 - AlignFirst Developer preparation: the complete five-part contract above.

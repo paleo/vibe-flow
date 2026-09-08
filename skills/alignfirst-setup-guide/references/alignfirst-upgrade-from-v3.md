@@ -87,8 +87,8 @@ environment variable may remain; report any historical reference retained on pur
 ## Replace Project Instructions
 
 Replace the AlignFirst section in `AGENTS.md` or `CLAUDE.md` with the bootstrap line from
-`alignfirst-skills-setup.md`. Use `alignfirst context` when the project adopts docmap through the CLI;
-this also replaces the `npm run docmap` instruction.
+`alignfirst-skills-setup.md`. The line also replaces the `npm run docmap` instruction when the project
+adopts docmap through the CLI.
 
 In `workspace.mjs`, replace the main-worktree plans check with:
 

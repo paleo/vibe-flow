@@ -112,8 +112,8 @@ Write `.alignfirst.json` with the agreed fields. Never add `cli`:
 ```
 
 Keep only applicable optional fields. Replace any hand-written AlignFirst or docmap section in
-`AGENTS.md` or `CLAUDE.md` with one bootstrap line. Use `alignfirst context` when the project uses
-docmap and `alignfirst conventions` otherwise:
+`AGENTS.md` or `CLAUDE.md` with one bootstrap line. Its output carries the conventions, the
+documentation map when `docs/` exists, and the protocol aliases:
 
 ```markdown
 ## AlignFirst
@@ -125,8 +125,8 @@ Before inspecting or changing this repository, run `alignfirst context` once fro
 
 Use this only when the user requests a project-local CLI. Add the exact current `alignfirst` version
 as a dev dependency with the project package manager and install dependencies before invoking it.
-Write `npx alignfirst context` or `npx alignfirst conventions` in the instruction file and local skill
-stubs. A global installation is the default. No npm script is required.
+Write `npx alignfirst context` in the instruction file and local skill stubs. A global installation
+is the default. No npm script is required.
 
 Continue with [plans-setup.md](plans-setup.md) when the team has a plans repository. Finish with:
 

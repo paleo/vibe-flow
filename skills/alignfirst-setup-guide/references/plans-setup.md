@@ -45,8 +45,7 @@ When `.alignfirst.json` already exists without `plans.folder`, supply the folder
 alignfirst plans setup <plans-clone-path> --folder project-a
 ```
 
-With the `alignfirst conventions` or `alignfirst context` bootstrap line, the CLI delivers the sync
-instruction. Otherwise, ensure the instruction file says:
+With the `alignfirst context` bootstrap line, the CLI delivers the sync instruction. Otherwise, ensure the instruction file says:
 
 > After every change in `.plans/`, run `alignfirst sync`.
 
