@@ -241,7 +241,7 @@ export function createChannelMockMessageActions(params: {
           const threadRename = await applyThreadRename({
             baseUrl,
             accountId: account.accountId,
-            threadId,
+            threadId: message.threadId,
             actionParams,
           });
           if (surface === "slack") {
@@ -330,13 +330,7 @@ export function createChannelMockMessageActions(params: {
             senderName: account.botDisplayName,
             threadId: thread.id,
           });
-          const threadRename = await applyThreadRename({
-            baseUrl,
-            accountId: account.accountId,
-            threadId: thread.id,
-            actionParams,
-          });
-          return jsonResult({ message, ...threadRename });
+          return jsonResult({ message });
         }
         case "react": {
           const messageId = readStringParam(actionParams, "messageId");

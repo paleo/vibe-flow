@@ -36,6 +36,8 @@ const REQUEST_PATH = `${NOVA_PROJECT_PATH}/.plans/side-1/A1-request.md`;
 // artifacts: the defect is more likely here than in the bot.
 export default async function projectCreation(ctx: ScenarioContext): Promise<void> {
   await resetFixtures(ctx);
+  await configureGitIdentity(ctx);
+  let scaffoldCreated = false;
   const codingAgent = setupCodingAgentMock(ctx, {
     onPrompt: async (scenario, cwd, prompt) => {
       if (cwd !== NOVA_PROJECT_PATH) return;
@@ -46,16 +48,19 @@ export default async function projectCreation(ctx: ScenarioContext): Promise<voi
       if (!hasCompleteCreationRequest(capturedRequest)) {
         throw new Error("project bootstrap started before the side-1 request reservation");
       }
-      await copyBootstrapTemplate(scenario);
+      if (!scaffoldCreated) {
+        await copyBootstrapTemplate(scenario);
+        scaffoldCreated = true;
+      }
       // A verifying bot may ask for the `packageManager` declaration the template omits;
       // comply, like a real alcode would.
       if (/\bpackageManager\b/u.test(prompt)) await declarePackageManager(scenario);
       await verifyProjectInventory(scenario);
-      // A bot may delegate the initial commit itself ("create one initial
-      // commit with message …", "run git commit -m …"); comply, like a real
-      // alcode. The affirmative verb (or a literal `git commit`) guards
-      // against matching "do NOT commit" in a scaffold prompt.
-      if (/\b(cr[ée]e|create|make|fais)\b[^.!\n]{0,80}\bcommit|git\s+commit\b/iu.test(prompt)) {
+      const holdsCommit = /\b(?:do not|don't|never)\s+(?:\w+\s+){0,3}commit\b/iu.test(prompt);
+      if (
+        !holdsCommit &&
+        /\b(cr[ée]e|create|make|fais)\b[^.!\n]{0,80}\bcommit|git\s+commit\b/iu.test(prompt)
+      ) {
         // Honor the commit message the bot chose — it may verify it in git log.
         const message =
           prompt.match(/['"`](chore:[^'"`]{3,80})['"`]/u)?.[1] ?? "chore: bootstrap nova project";
@@ -127,6 +132,19 @@ export default async function projectCreation(ctx: ScenarioContext): Promise<voi
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");
+}
+
+async function configureGitIdentity(ctx: ScenarioContext): Promise<void> {
+  await assertGatewayCommand(
+    ctx,
+    ["git", "config", "--global", "user.name", "myclaw"],
+    "deployment Git author name",
+  );
+  await assertGatewayCommand(
+    ctx,
+    ["git", "config", "--global", "user.email", "myclaw@example.test"],
+    "deployment Git author email",
+  );
 }
 
 function hasCompleteCreationRequest(request: string): boolean {
@@ -267,6 +285,16 @@ function assertCreationCalls(calls: AgentToolCall[]): void {
   }
   if (!/--size(?:\s+|=)8\b/.test(freePortsCommand)) {
     throw new Error(`free-ports call did not request size 8: ${JSON.stringify(commands)}`);
+  }
+  const allocatedExpectedBlock = calls.some((call) => {
+    if (call.toolName !== "exec" || !/alproject\s+free-ports\b/.test(JSON.stringify(call.input))) {
+      return false;
+    }
+    const result = JSON.stringify(call.result);
+    return result !== undefined && /\b6600\b/.test(result) && /\b6607\b/.test(result);
+  });
+  if (!allocatedExpectedBlock) {
+    throw new Error("free-ports did not allocate the lifecycle parent's 6600..6607 block");
   }
 }
 

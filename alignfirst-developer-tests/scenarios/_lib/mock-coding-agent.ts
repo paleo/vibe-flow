@@ -37,6 +37,10 @@ const GENERIC_VERIFY_RESULT =
 
 const VERIFICATION_INTENT_RE =
   /(manual(?:ly)?\s+(?:test|verify|check)|\b(?:test|verify)\b[\s\S]*\b(?:change|button|page|fix|feature)\b)/i;
+const PUSH_REQUEST_RE =
+  /(?:^|[\n.!?;:,])\s*(?:please\s+)?(?:push|publish|run\s+`?git\s+push|commit(?:\s+[\w-]+){0,6}?\s*(?:and|then|\+)\s*push)\b/iu;
+const PUSH_PROHIBITION_RE =
+  /\b(?:do\s+not|don't|never|without)\s+(?:(?:run|a|any|git)\s+|`)*(?:push|publish)(?:ing)?\b/iu;
 
 // Pick the result that matches the task described in the coding-protocol prompt,
 // mirroring how a real coding agent reports the change it actually made. Tooltip
@@ -264,12 +268,20 @@ export function setupCodingAgentMock(
           return 1;
         }
         const hooked = await options.onPrompt?.(ctx, cwd, prompt);
+        const pushResult =
+          hooked === undefined && !isCodingProtocolPrompt(prompt)
+            ? await pushMockFixtureBranch(ctx, cwd, prompt)
+            : undefined;
         let resultText: string;
         if (hooked !== undefined) {
           resultText = hooked;
         } else if (isCodingProtocolPrompt(prompt)) {
           resultText = codingResultFor(prompt);
           await commitMockCodingChange(ctx, cwd, prompt, stderr);
+          const published = await pushMockFixtureBranch(ctx, cwd, prompt);
+          if (published !== undefined) resultText += ` ${published}`;
+        } else if (pushResult !== undefined) {
+          resultText = pushResult;
         } else if (VERIFICATION_INTENT_RE.test(prompt)) {
           resultText = verificationResultFor(prompt);
         } else if (looksLikeWorktreeList(prompt)) {
@@ -559,12 +571,69 @@ async function commitMockCodingChange(
   }
 }
 
-function isFixtureWorktreePath(path: string): boolean {
+export interface PushFixtureContext extends Pick<ScenarioContext, "execInGateway"> {}
+
+export async function pushMockFixtureBranch(
+  ctx: PushFixtureContext,
+  cwd: string,
+  prompt: string,
+): Promise<string | undefined> {
+  const instruction = prompt.split("\n\n## Current instruction\n\n").at(-1);
+  if (
+    instruction === undefined ||
+    PUSH_PROHIBITION_RE.test(instruction) ||
+    !PUSH_REQUEST_RE.test(instruction)
+  ) {
+    return;
+  }
+  const projectPath = fixtureProjectForWorktree(cwd);
+  if (projectPath === undefined) {
+    throw new Error(`mock-coding-agent: refusing to push outside a fixture worktree: ${cwd}`);
+  }
+  const commonDir = await runFixtureGit(ctx, cwd, ["rev-parse", "--git-common-dir"]);
+  if (commonDir !== `${projectPath}/.git`) {
+    throw new Error(`mock-coding-agent: unexpected fixture Git directory: ${commonDir}`);
+  }
+  const origin = await runFixtureGit(ctx, cwd, ["remote", "get-url", "--push", "origin"]);
+  const expectedOrigin = `/home/claw/.fixture-origins/${basename(projectPath)}.git`;
+  if (origin !== expectedOrigin) {
+    throw new Error(`mock-coding-agent: refusing to push to non-fixture origin: ${origin}`);
+  }
+  const branch = await runFixtureGit(ctx, cwd, ["symbolic-ref", "--short", "HEAD"]);
+  if (!/^(?:ABC-\d+|side-\d+)\/.+/u.test(branch)) {
+    throw new Error(`mock-coding-agent: refusing to push non-ticket branch: ${branch}`);
+  }
+  await runFixtureGit(ctx, cwd, ["push", "--set-upstream", "origin", "HEAD"]);
+  return `Published the existing commit on ${branch} to origin; upstream tracking is configured.`;
+}
+
+async function runFixtureGit(
+  ctx: PushFixtureContext,
+  cwd: string,
+  args: string[],
+): Promise<string> {
+  const result = await ctx.execInGateway(["git", "-C", cwd, ...args], { timeoutMs: 30_000 });
+  if (result.exitCode !== 0) {
+    throw new Error(
+      `mock-coding-agent: git ${args.join(" ")} failed (exit ${result.exitCode}): ${result.stderr}`,
+    );
+  }
+  return result.stdout.trim();
+}
+
+function fixtureProjectForWorktree(path: string): string | undefined {
   const normalizedPath = path.replace(/\/$/, "");
-  return FIXTURE_PROJECT_PATHS.some((projectPath) => {
-    const prefix = `${dirname(projectPath)}/${basename(projectPath)}-`;
-    return normalizedPath.startsWith(prefix);
+  return FIXTURE_PROJECT_PATHS.find((projectPath) => {
+    const prefix = `${basename(projectPath)}-`;
+    return (
+      dirname(normalizedPath) === dirname(projectPath) &&
+      basename(normalizedPath).startsWith(prefix)
+    );
   });
+}
+
+function isFixtureWorktreePath(path: string): boolean {
+  return fixtureProjectForWorktree(path) !== undefined;
 }
 
 /** Recognize the active instruction after optional catchup history. */

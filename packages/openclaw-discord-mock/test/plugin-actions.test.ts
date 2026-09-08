@@ -136,6 +136,28 @@ describe("discord-mock handleAction (post-normalization shape)", () => {
     });
   });
 
+  it("send to a native thread channel delivers the message and renames the thread", async () => {
+    const thread = fixture.bus.state.createThread({
+      accountId: "default",
+      conversationId: "sample-project",
+      title: "Original topic",
+    });
+    await runHandler(fixture, "send", {
+      to: `channel:${thread.id}`,
+      text: "work started",
+      threadName: "Updated topic",
+    });
+    const snapshot = fixture.bus.state.getSnapshot();
+    expect(snapshot.messages).toHaveLength(1);
+    expect(snapshot.messages[0]).toMatchObject({
+      conversation: { id: "sample-project" },
+      threadId: thread.id,
+      text: "work started",
+    });
+    expect(snapshot.threads).toHaveLength(1);
+    expect(snapshot.threads[0]).toMatchObject({ id: thread.id, title: "Updated topic" });
+  });
+
   it("thread-reply posts to the thread", async () => {
     const thread = fixture.bus.state.createThread({
       accountId: "default",
@@ -163,6 +185,27 @@ describe("discord-mock handleAction (post-normalization shape)", () => {
     const reply = fixture.bus.state.getSnapshot().messages.find((m) => m.threadId === thread.id);
     expect(reply?.conversation.id).toBe("sample-project");
     expect(reply?.text).toBe("reply body");
+  });
+
+  it("thread-reply ignores threadName and preserves the existing title", async () => {
+    const thread = fixture.bus.state.createThread({
+      accountId: "default",
+      conversationId: "sample-project",
+      title: "Original topic",
+    });
+    await runHandler(fixture, "thread-reply", {
+      threadId: thread.id,
+      text: "reply body",
+      threadName: "Ignored topic",
+    });
+    const snapshot = fixture.bus.state.getSnapshot();
+    expect(snapshot.messages).toHaveLength(1);
+    expect(snapshot.messages[0]).toMatchObject({
+      conversation: { id: "sample-project" },
+      threadId: thread.id,
+      text: "reply body",
+    });
+    expect(snapshot.threads[0]).toMatchObject({ id: thread.id, title: "Original topic" });
   });
 
   it("declares threadId as the thread-reply delivery target alias", () => {

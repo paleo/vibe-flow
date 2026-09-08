@@ -19,7 +19,7 @@ Plain text posts to your bound surface. Use `message` for opening or renaming th
 ```jsonc
 { "action": "thread-create", "channel": "discord-mock", "target": "<chat_id>", "messageId": "<message_id>", "threadName": "<TICKET_ID> - <PROJECT> - <description>", "message": "<starter>", "autoArchiveMin": 1440 }
 { "action": "read", "channel": "discord-mock", "threadId": "<bare thread id>", "limit": 50 }
-{ "action": "thread-reply", "channel": "discord-mock", "threadId": "<bare thread id>", "threadName": "<new name>", "message": "<reply that carries the rename>" }
+{ "action": "send", "channel": "discord-mock", "target": "<current thread chat_id>", "threadName": "<new name>", "message": "<reply that carries the rename>" }
 { "action": "send", "channel": "discord-mock", "target": "<chat_id>", "attachments": [{ "type": "image", "media": "/path/to/image.png" }], "message": "<caption>" }
 ```
 

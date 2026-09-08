@@ -1,4 +1,5 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
+import { getQaBusThread } from "@paleo/openclaw-channel-mock-core";
 import { NEW_WORK_QUESTION_RUBRIC } from "./_lib/common-constants.ts";
 import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
@@ -52,7 +53,7 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  await expectThreadRenamedWithTicket(ctx);
+  await expectThreadRenamedWithTicket(ctx, starter.threadId);
   await assertNoLiteralNoReply(ctx, startCursor);
   await waitForProjectListing(ctx, "channel session lists the projects");
 
@@ -86,7 +87,10 @@ async function sendTicketAndExpectSetupSignal(
  * which on Discord means a `message` call carrying `threadName` (there is no
  * rename action). Slack threads have no name, so this is Discord-only.
  */
-async function expectThreadRenamedWithTicket(ctx: ScenarioContext): Promise<void> {
+async function expectThreadRenamedWithTicket(
+  ctx: ScenarioContext,
+  threadId: string,
+): Promise<void> {
   if (ctx.channel !== "discord-mock") return;
   const renameRe = new RegExp(`\\b${TICKET_ID}\\b`);
   await ctx.waitForAgentToolCall(
@@ -97,4 +101,10 @@ async function expectThreadRenamedWithTicket(ctx: ScenarioContext): Promise<void
     },
     { label: "agent renames the thread with the ticket", timeoutMs: 120_000 },
   );
+  const { thread } = await getQaBusThread({
+    baseUrl: ctx.busUrl,
+    accountId: ctx.accountId,
+    threadId,
+  });
+  ctx.assertRegex(thread.title, renameRe, "thread title contains the supplied ticket");
 }

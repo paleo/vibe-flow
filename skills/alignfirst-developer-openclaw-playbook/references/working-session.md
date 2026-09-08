@@ -91,7 +91,7 @@ Slack threads have no name — skip this section entirely there; a rename attemp
 
 On Discord, keep the thread's name describing the work. As soon as you have a description of what's to be done — the channel opened the thread on a vague message, the user just supplied the ticket, the task turned out to be something else — rename it: `<TICKET_ID> - <PROJECT> - <1-to-5-word description>`, dropping a leading segment you don't have yet. This applies to threads without a workspace too.
 
-On Discord the rename travels with a post: `message` `action: "thread-reply"` with the thread's `threadId`, the new name as `threadName`, and your next user-facing line as `message`. The work of the turn continues after the post. When the post was the turn's last word, end the turn on exactly `NO_REPLY`; any plain text after it, the line itself or a tool-result echo, would post a second message.
+On Discord the rename travels with a post: `message` `action: "send"` with the current thread's complete `chat_id` as `target`, the new name as `threadName`, and your next user-facing line as `message`. `thread-reply` ignores `threadName`. The work of the turn continues after the post. When the post was the turn's last word, end the turn on exactly `NO_REPLY`; any plain text after it, the line itself or a tool-result echo, would post a second message.
 
 ### Interpreting requests
 

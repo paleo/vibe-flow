@@ -31,7 +31,7 @@ When the task changed with the message that woke you — a ticket that just arri
 
 Rename the thread whenever its name doesn't match what you now know. Format: `<TICKET_ID> - <PROJECT> - <1-to-5-word description>`, the description covering the task. A ticket that just arrived, a project that was unknown when the thread opened, a task that turned out to be something else — each one calls for the rename.
 
-Discord renames a thread through a post, so make the setup signal carry it: send that line with `message` `action: "thread-reply"`, passing the thread's `threadId`, the new name as `threadName`, and the line itself as `message`. Don't also write the line as plain text; that posts it twice. The post does not end the turn: Step 4 follows in the same turn, and the turn ends on the banner.
+Discord renames a thread through a post, so make the setup signal carry it: send that line with `message` `action: "send"`, passing the current thread's complete `chat_id` as `target`, the new name as `threadName`, and the line itself as `message`. Don't also write the line as plain text; that posts it twice. The post does not end the turn: Step 4 follows in the same turn, and the turn ends on the banner.
 
 That single call is the whole exception. The post right after it, and every one that follows, is plain text again; with nothing to rename, the tool never targets your own thread.
 
