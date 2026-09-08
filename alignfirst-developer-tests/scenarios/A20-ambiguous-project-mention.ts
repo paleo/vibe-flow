@@ -74,8 +74,10 @@ async function expectTicketAsk(ctx: ScenarioContext, starter: Step): Promise<voi
     attachTo: ask.entry,
     message: ask.match.text,
     rubric:
-      "A question asking the user which ticket the orion status concerns. It does not claim that " +
-      "a workspace exists or that inspection has started. May be in French.",
+      "A question asking the user for a ticket for the orion status, in any framing: which " +
+      "ticket, a ticket id, or an offer to reserve a side ticket instead. Explaining why a ticket " +
+      "is needed is fine. Fail only if it asks nothing, or claims that a workspace exists or that " +
+      "inspection has started. May be in French.",
     label: "ticket-asked-in-thread",
   });
 }

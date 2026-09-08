@@ -5,7 +5,7 @@ import { expectCodingDelegation, setupCodingAgentMock } from "./_lib/mock-coding
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { waitForReport } from "./_lib/outbound.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
-import { waitForFile } from "./_lib/request-file.ts";
+import { waitForCapturedRequest } from "./_lib/request-file.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
 
@@ -64,10 +64,7 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
 
   await sendInThread(ctx, starter.threadId, `Utilise le ticket ${TICKET_ID}.`);
   const requestPath = `${NIMBUS_PROJECT_PATH}/.plans/${TICKET_ID}/A1-request.md`;
-  const requestFile = await waitForFile(requestPath, 120_000);
-  if (!requestFile.includes(REQUEST)) {
-    throw new Error(`captured request omitted details: ${JSON.stringify(requestFile)}`);
-  }
+  await waitForCapturedRequest(requestPath, REQUEST, 120_000);
 
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, {
     timeoutMs: 180_000,

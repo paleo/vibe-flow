@@ -29,11 +29,11 @@ Then continue with the turn whatever the result: `claimed`, `alreadyClaimed`, or
 - **Seed turn**: the seed's `starterText` is the thread's only message. Work from it, plus any human message of this turn. Do not call `message read`.
 - **Human turn**: call `message` `action: "read"` with the current channel and the bare thread ID from conversation metadata, and combine the history with your transcript.
 
-Recover the task, the full request, every PROJECT / PROJECT_PATH pair, and TICKET_ID from that context. The starter's values come from the inventory the channel session consulted; run `alproject list --json` only where a runbook or the multi-project procedure asks for it. Later thread messages supply missing values; they do not rewrite the recorded request. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix. Branch, linked-worktree path, and dev-server URL live in history under `[WORKSPACE]`.
+Recover the task, the full request, every PROJECT / PROJECT_PATH pair, and TICKET_ID from that context. The starter's values come from the inventory the channel session consulted; run `alproject list --json` only where a runbook or the multi-project procedure asks for it. Later thread messages supply missing values; they do not rewrite the recorded request. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix. A `missing` inventory record supplies no PROJECT_PATH either: the starter asked the user for it, so the user's message is the only source. Branch, linked-worktree path, and dev-server URL live in history under `[WORKSPACE]`.
 
 What the seed turn says:
 
-- The starter asked for a value and nothing has supplied it: end on `NO_REPLY`. Do not repeat the question.
+- The starter asked for a value and no human message has supplied it: end on `NO_REPLY`. Only the user supplies that value; a lookup of your own is not an answer, and the question is not repeated.
 - The starter asked nothing but a required value is missing (a detailed request without a ticket, for instance): ask for it now. A silent turn here leaves the thread dead.
 - The request is complete: proceed. It is the go-ahead; wait only for an explicit request to hold.
 

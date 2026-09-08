@@ -6,7 +6,7 @@ import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
 import { expectCodingDelegation, setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
-import { waitForFile } from "./_lib/request-file.ts";
+import { waitForCapturedRequest } from "./_lib/request-file.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
@@ -37,14 +37,13 @@ export default async function explicitNoTicket(ctx: ScenarioContext): Promise<vo
     message: starter.match.text,
     rubric:
       "A thread starter preserving the explicit no-ticket nimbus request. It starts the working " +
-      "session without asking for an external ticket ID or a mechanical follow-up.",
+      "session without asking for an external ticket ID or a mechanical follow-up (a reply so " +
+      "the bot can start). An announcement that an internal or side ticket will be reserved, or " +
+      "that the work continues in this thread, is the intended path and passes.",
     label: "explicit-no-ticket-starter",
   });
 
-  const capturedRequest = await waitForFile(REQUEST_PATH, 120_000);
-  if (!capturedRequest.includes(REQUEST)) {
-    throw new Error(`side-2 request omitted details: ${JSON.stringify(capturedRequest)}`);
-  }
+  await waitForCapturedRequest(REQUEST_PATH, REQUEST, 120_000);
   await assertNoTicketWorktreeExists();
 
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(

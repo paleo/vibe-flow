@@ -8,7 +8,15 @@ No "Important:", no all-caps emphasis, no triple-bullet restatement of the same 
 
 ## The seed and the playbook state one rule
 
-The handoff seed (`buildSeed` in the plugin's `service.ts`) and `working-session.md` both tell the thread session when to stay silent. When they disagree, the seed wins: it is the turn's user message. On 2026-09-07 the seed said "End silently **only** when the claim is alreadyClaimed…" while the playbook said a claimed seed turn whose starter already asked a question ends on `NO_REPLY`; Terra obeyed the seed and repeated the question (Terra A05 Slack, artifact `17-51-00-682Z`). When a rule changes in one place, reread the other.
+The handoff seed (`buildSeed` in the plugin's `service.ts`) and `working-session.md` both tell the thread session when to stay silent. When they disagree, the seed wins: it is the turn's user message. On 2026-09-07 the seed said "End silently **only** when the claim is alreadyClaimed…" while the playbook said a claimed seed turn whose starter already asked a question ends on `NO_REPLY`; Terra obeyed the seed and repeated the question (Terra A05 Slack, artifact `17-51-00-682Z`). When a rule changes in one place, reread the other. A rule that must hold in the seed turn itself goes in the seed: Terra kept re-running the inventory in that turn through two playbook rewordings (3 of 7 A22 cells) and stopped once the seed forbade the lookup (4 of 4, 2026-09-08).
+
+## Name who supplies a value
+
+"The starter's question is still unanswered" let Terra count its own inventory lookup as the answer: the seed turn re-ran `alproject list --json` and posted the result (A05 and A22 Slack, 2026-09-08). When a rule waits for a value, say where it comes from: "no human message has supplied it".
+
+## State the exception before the rule it excepts
+
+An exception placed after the procedure it excepts gets skipped: the model acts on the first sentence. The no-branch sub-path of `project-workspace-setup.md` opened with "set up a workspace on a new branch" and closed with "status request: tell the user there's no work"; Terra created the workspace for a status request (A09 Discord, 2026-09-08). Lead with the exception, then the default.
 
 ## Template + variations beats N full examples
 
