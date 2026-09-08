@@ -94,7 +94,7 @@ AlignFirst stores specifications, plans, and summaries in `.plans/<ticket-id>/`.
 ## Updates
 
 ```sh
-npm update -g alignfirst
+npm install -g alignfirst@latest
 npx skills update --global --yes
 ```
 
