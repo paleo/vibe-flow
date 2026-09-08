@@ -51,7 +51,7 @@ export default async function duplicateProjectName(ctx: ScenarioContext): Promis
       "or coding has started.",
     label: "duplicate-project-path-choice",
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

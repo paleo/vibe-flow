@@ -39,7 +39,7 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
       "session without asking for a content-free activation message.",
     label: "detailed-request-preserved",
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   const firstWakeCursor = starter.nextCursor;
   const ticketQuestion = await waitForReport(

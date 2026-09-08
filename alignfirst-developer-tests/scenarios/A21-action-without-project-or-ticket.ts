@@ -3,6 +3,7 @@ import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 /**
@@ -31,7 +32,8 @@ export default async function actionWithoutProjectOrTicket(ctx: ScenarioContext)
       "setup, or coding has started. The question may be in French.",
     label: "action-without-project-or-ticket-handoff",
   });
-  alproject.assertListCallCount(1);
+  await expectSilentSeedTurn(ctx, starter);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

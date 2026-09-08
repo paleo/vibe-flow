@@ -3,9 +3,11 @@ import { NEW_WORK_QUESTION_RUBRIC } from "./_lib/common-constants.ts";
 import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
+import { assertNoLiteralNoReply } from "./_lib/outbound.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { waitForSetupAck } from "./_lib/setup-ack.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
 import type { Step } from "./_lib/types.ts";
 import { runWorkspaceFlow } from "./_lib/workspace-flow.ts";
@@ -27,6 +29,7 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
   const codingAgent = setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
+  const startCursor = await ctx.getCursor();
   const starter = await bootstrapThreadFromChannel(ctx, {
     text: "Nous avons un travail à faire sur nimbus.",
     project: PROJECT,
@@ -43,21 +46,28 @@ export default async function projectDetectionStarter(ctx: ScenarioContext): Pro
     label: "starter-work-question",
   });
 
-  const ack = await sendTicketAndExpectSetupSignal(ctx, starter);
+  // The starter asked for the ticket, so the seed turn has nothing to say.
+  const quietCursor = await expectSilentSeedTurn(ctx, starter);
+  const ack = await sendTicketAndExpectSetupSignal(ctx, starter, quietCursor);
   await runWorkspaceFlow(ctx, codingAgent, {
     projectPath: NIMBUS_PROJECT_PATH,
     ticketId: TICKET_ID,
     prevStep: ack,
   });
   await expectThreadRenamedWithTicket(ctx);
-  alproject.assertListCallCount(1);
+  await assertNoLiteralNoReply(ctx, startCursor);
+  await alproject.assertListCallCount(1);
 
   ctx.log({ attachTo: ack.entry, label: "setup signal received" });
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");
 }
 
-async function sendTicketAndExpectSetupSignal(ctx: ScenarioContext, starter: Step): Promise<Step> {
+async function sendTicketAndExpectSetupSignal(
+  ctx: ScenarioContext,
+  starter: Step,
+  sinceCursor: number,
+): Promise<Step> {
   await sendInThread(
     ctx,
     starter.threadId,
@@ -67,7 +77,7 @@ async function sendTicketAndExpectSetupSignal(ctx: ScenarioContext, starter: Ste
   return await waitForSetupAck(ctx, {
     threadId: starter.threadId,
     prevId: starter.match.id,
-    sinceCursor: starter.nextCursor,
+    sinceCursor,
     timeoutMs: 240_000,
   });
 }

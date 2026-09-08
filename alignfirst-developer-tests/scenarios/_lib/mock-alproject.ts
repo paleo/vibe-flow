@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { basename, dirname } from "node:path";
 import type { ScenarioContext } from "@paleo/openclaw-test";
+import { execMatches, inputOf } from "./agent-tool-calls.ts";
 import {
   EXTERNAL_PROJECT_PARENT,
   LUMEN_PROJECT_PATH,
@@ -41,7 +42,12 @@ export interface AlprojectMockCall {
 export interface AlprojectMockHandle {
   calls: AlprojectMockCall[];
   projects: AlprojectRecord[];
-  assertListCallCount(expected: number): void;
+  /**
+   * Pins the channel session's inventory lookups. A thread session that refreshes the inventory
+   * once is tolerated and logged: the playbook asks it to work from the starter, and a defensive
+   * re-list neither replaces recorded values nor costs anything the scenario measures.
+   */
+  assertListCallCount(expected: number): Promise<void>;
 }
 
 export interface AlprojectCommandResponse {
@@ -107,18 +113,40 @@ export function setupAlprojectMock(
   return {
     calls,
     projects,
-    assertListCallCount(expected) {
-      const listCalls = calls.filter((call) => call.argv[0] === "list");
-      if (listCalls.length !== expected) {
-        throw new Error(
-          `expected ${expected} alproject list call(s), got ${listCalls.length}: ${JSON.stringify(calls)}`,
-        );
-      }
+    async assertListCallCount(expected) {
       for (const [index, call] of calls.entries()) {
         if (call.order !== index + 1) throw new Error("alproject call order is inconsistent");
       }
+      const listCalls = calls.filter((call) => call.argv[0] === "list");
+      const refreshes = await countThreadSessionListCalls(ctx);
+      const channelCalls = listCalls.length - refreshes;
+      if (channelCalls !== expected) {
+        throw new Error(
+          `expected ${expected} alproject list call(s) from the channel session, got ${channelCalls} ` +
+            `(plus ${refreshes} thread refresh(es)): ${JSON.stringify(calls)}`,
+        );
+      }
+      if (refreshes > 1) {
+        throw new Error(`thread session re-listed the inventory ${refreshes} times`);
+      }
+      if (refreshes === 1) ctx.log("thread session refreshed the inventory once — tolerated");
     },
   };
+}
+
+// The channel session is the one that issued `thread_handoff start`; every other session that ran
+// `alproject list` is a thread session refreshing the inventory. Without a start call there is no
+// thread session, and every list call belongs to the channel.
+async function countThreadSessionListCalls(ctx: ScenarioContext): Promise<number> {
+  const agentCalls = await ctx.getAgentToolCalls();
+  const start = agentCalls.find(
+    (call) => call.toolName === "thread_handoff" && inputOf(call).action === "start",
+  );
+  if (start?.sessionKey === undefined) return 0;
+  return agentCalls.filter(
+    (call) =>
+      call.sessionKey !== start.sessionKey && execMatches(call, /(^|[\s;&|(])alproject\s+list\b/),
+  ).length;
 }
 
 function registerProject(

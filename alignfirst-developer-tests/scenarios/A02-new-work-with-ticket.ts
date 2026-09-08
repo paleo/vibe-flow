@@ -43,7 +43,7 @@ export default async function projectDetectionWithTicket(ctx: ScenarioContext): 
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.log({ attachTo: ack.entry, label: "setup ack received" });
   ctx.markScenarioAsEnded("PASS");

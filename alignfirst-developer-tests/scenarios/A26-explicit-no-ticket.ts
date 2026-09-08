@@ -67,7 +67,7 @@ export default async function explicitNoTicket(ctx: ScenarioContext): Promise<vo
   if (delegation.cwd !== worktreeDir) {
     throw new Error(`coding ran from ${delegation.cwd}, expected linked worktree ${worktreeDir}`);
   }
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

@@ -94,7 +94,7 @@ export default async function projectInvestigationQuestion(ctx: ScenarioContext)
     timeoutMs: 240_000,
     label: "investigation-summary",
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

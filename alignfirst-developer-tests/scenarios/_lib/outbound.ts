@@ -12,6 +12,10 @@ import {
 // model-controllable — exempt from the leak sweep.
 const openclawNoticeRe = /^(?:⚠️|LLM request failed\b)/u;
 
+export function isOpenclawNotice(text: string): boolean {
+  return openclawNoticeRe.test(text);
+}
+
 export interface WaitForStarterOptions {
   sinceCursor: number;
   timeoutMs?: number;
@@ -125,7 +129,7 @@ export async function assertNoChannelRootLeak(
     cursor = nextCursor;
     for (const m of messages) {
       if (m.direction !== "outbound" || m.conversation.id !== ctx.conversationId) continue;
-      if (m.threadId !== undefined || openclawNoticeRe.test(m.text)) continue;
+      if (m.threadId !== undefined || isOpenclawNotice(m.text)) continue;
       if (await isMetaNarration(ctx, m.text)) {
         ++tolerated;
         ctx.log(`channel-root narration tolerated: ${JSON.stringify(m.text.slice(0, 80))}`);
@@ -141,6 +145,27 @@ export async function assertNoChannelRootLeak(
       ? "no channel-root post — OK"
       : `no substantive channel-root post — OK (${tolerated} narration tolerated)`,
   );
+}
+
+/**
+ * `NO_REPLY` suppresses delivery only when it is the whole answer. A turn that ends on
+ * "Message posted. NO_REPLY" posts that text verbatim (Sonnet A20 Discord, 2026-09-07, after a
+ * rename post). Sweep every outbound of the conversation since `sinceCursor` for the literal token.
+ */
+export async function assertNoLiteralNoReply(
+  ctx: ScenarioContext,
+  sinceCursor: number,
+): Promise<void> {
+  const { messages } = await ctx.poll({ sinceCursor, timeoutMs: 1_000 });
+  const leaks = messages.filter(
+    (m) =>
+      m.direction === "outbound" &&
+      m.conversation.id === ctx.conversationId &&
+      /\bNO_REPLY\b/u.test(m.text),
+  );
+  for (const m of leaks)
+    ctx.log(`literal NO_REPLY posted: ${JSON.stringify(m.text.slice(0, 120))}`);
+  ctx.assertLength(leaks, 0, "no literal NO_REPLY reached the user");
 }
 
 // The message-tool actions that post content (vs `read`, rename, reactions…).

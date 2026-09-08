@@ -6,6 +6,10 @@ Hard-won notes from tightening the `myclaw` workspace files (`alignfirst-develop
 
 No "Important:", no all-caps emphasis, no triple-bullet restatement of the same point. There are a lot of things that matter. The more you insist, the more diluted later content becomes.
 
+## The seed and the playbook state one rule
+
+The handoff seed (`buildSeed` in the plugin's `service.ts`) and `working-session.md` both tell the thread session when to stay silent. When they disagree, the seed wins: it is the turn's user message. On 2026-09-07 the seed said "End silently **only** when the claim is alreadyClaimed…" while the playbook said a claimed seed turn whose starter already asked a question ends on `NO_REPLY`; Terra obeyed the seed and repeated the question (Terra A05 Slack, artifact `17-51-00-682Z`). When a rule changes in one place, reread the other.
+
 ## Template + variations beats N full examples
 
 A single labelled template plus a short list of variation tails beats four full-example bullets, and stops the agent from compressing the template away. Bad:

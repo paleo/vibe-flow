@@ -67,7 +67,7 @@ export default async function sequentialCodingSessions(ctx: ScenarioContext): Pr
   // post — the exact shape of the trailing-leak incident — so sweep longer.
   await assertNoChannelRootLeak(ctx, { sinceCursor: startCursor, withinMs: 15_000 });
   await assertNoSelfThreadMessagePost(ctx, threadId, startCursor);
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

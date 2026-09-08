@@ -205,7 +205,11 @@ async function commitNovaBootstrap(ctx: ScenarioContext, message: string): Promi
     ],
     { timeoutMs: 30_000 },
   );
-  if (result.exitCode !== 0) throw new Error(`bootstrap commit failed: ${result.stderr}`);
+  if (result.exitCode !== 0) {
+    throw new Error(
+      `bootstrap commit failed (exit ${result.exitCode}): ${result.stderr || result.stdout}`,
+    );
+  }
 }
 
 async function declarePackageManager(ctx: ScenarioContext): Promise<void> {

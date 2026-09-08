@@ -78,6 +78,10 @@ before the parent emits its final `NO_REPLY`, so assertions follow the starter's
 starter delivery. `A28-recoverable-handoff-failure` injects one test-bus delivery failure, then
 requires one successful starter and automatic work without creating a replacement target.
 
+`A01`, `A04`, `A05`, `A21` and `A22` open a thread whose starter asks for a value, then pin the
+silent seed turn (`_lib/silent-seed-turn.ts`): the thread session claims the handoff, posts nothing
+for 90 s and reads no thread history.
+
 Rebuild the alcode package and harness image before focused coverage:
 
 ```sh

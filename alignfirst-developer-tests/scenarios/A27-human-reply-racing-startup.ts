@@ -44,7 +44,7 @@ export default async function humanReplyRacingStartup(ctx: ScenarioContext): Pro
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

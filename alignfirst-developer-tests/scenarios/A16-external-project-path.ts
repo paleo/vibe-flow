@@ -47,7 +47,7 @@ export default async function externalProjectPath(ctx: ScenarioContext): Promise
   if (delegation === undefined) {
     throw new Error(`coding delegation did not run from external worktree ${worktreePath}`);
   }
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

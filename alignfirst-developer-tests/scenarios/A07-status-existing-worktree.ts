@@ -83,7 +83,7 @@ export default async function statusExistingWorktree(ctx: ScenarioContext): Prom
   // lands in the thread, and leaves no stray worktrees / channel leak.
   assertWorktreePaths(ctx, [seededWorktreePath]);
   await assertNoChannelRootLeak(ctx, { sinceCursor: startCursor });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

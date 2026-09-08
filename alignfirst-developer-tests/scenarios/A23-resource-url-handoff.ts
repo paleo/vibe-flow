@@ -63,7 +63,7 @@ export default async function resourceUrlHandoff(ctx: ScenarioContext): Promise<
       "the pull request has already been read.",
     label: "resource-url-deferred-to-working-session",
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   const goAheadCursor = starter.nextCursor;
   const { dir: worktreeDir } = await waitForAnyWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, {

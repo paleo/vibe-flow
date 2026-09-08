@@ -4,6 +4,7 @@ import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const WRONG_PROJECT = "aurora";
@@ -31,7 +32,8 @@ export default async function wrongProject(ctx: ScenarioContext): Promise<void> 
     rubric: unknownProjectRubric(WRONG_PROJECT),
     label: "unknown-project-acknowledgement",
   });
-  alproject.assertListCallCount(1);
+  await expectSilentSeedTurn(ctx, starter);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

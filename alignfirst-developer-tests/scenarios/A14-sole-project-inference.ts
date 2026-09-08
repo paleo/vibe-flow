@@ -37,7 +37,7 @@ export default async function soleProjectInference(ctx: ScenarioContext): Promis
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

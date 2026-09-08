@@ -36,8 +36,10 @@ export default async function statusBranchOnly(ctx: ScenarioContext): Promise<vo
     projectPath: NIMBUS_PROJECT_PATH,
     codingAgent,
   });
+  // Terra reads the playbook chain slowly: the worktree landed 147 s after the starter on
+  // 2026-09-07 (artifact 18-40-45-966Z). Same budget as A11.
   const worktreeDir = await waitForWorktreeDir(NIMBUS_PROJECT_PATH, TICKET_ID, BRANCH_DESC, {
-    timeoutMs: 120_000,
+    timeoutMs: 180_000,
   });
   assertBranch(worktreeDir, BRANCH);
   ctx.log(`worktree appeared at ${worktreeDir} on existing branch`);
@@ -94,7 +96,7 @@ export default async function statusBranchOnly(ctx: ScenarioContext): Promise<vo
   });
 
   await assertNoChannelRootLeak(ctx, { sinceCursor: startCursor });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

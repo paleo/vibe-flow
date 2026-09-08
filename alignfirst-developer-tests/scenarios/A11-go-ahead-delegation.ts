@@ -57,7 +57,7 @@ export default async function threadSessionDelegation(ctx: ScenarioContext): Pro
 
   await runSetupPhaseWithoutDelegation(ctx, codingAgent, starter);
   await runGoAheadPhase(ctx, starter.threadId, startCursor);
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

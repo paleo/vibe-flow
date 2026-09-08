@@ -65,7 +65,7 @@ export default async function statusNoBranch(ctx: ScenarioContext): Promise<void
 
   assertNoWorktreeDirs(ctx);
   await assertNoChannelRootLeak(ctx, { sinceCursor: startCursor });
-  alproject.assertListCallCount(1);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

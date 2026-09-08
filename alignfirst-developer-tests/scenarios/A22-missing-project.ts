@@ -4,6 +4,7 @@ import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { PRIMARY_PROJECT_PARENT } from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
+import { expectSilentSeedTurn } from "./_lib/silent-seed-turn.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
 
 const PROJECT = "ghost";
@@ -45,7 +46,8 @@ export default async function missingProject(ctx: ScenarioContext): Promise<void
       "or work has started.",
     label: "missing-project-discrepancy",
   });
-  alproject.assertListCallCount(1);
+  await expectSilentSeedTurn(ctx, starter);
+  await alproject.assertListCallCount(1);
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");
