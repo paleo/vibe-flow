@@ -32,14 +32,14 @@ The `message` tool serves the starter (Discord `thread-create`, Slack `send` wit
 
 ## Projects
 
-`alproject list --json` is the authoritative project inventory. Keep these values distinct:
+`alproject list --json --root ~/projects` is the authoritative project inventory. Keep these values distinct:
 
 - **PROJECT** — the main-worktree directory name shown to the user.
 - **PROJECT_PATH** — the canonical absolute main-worktree path returned by the inventory.
 
 PROJECT_PATH anchors project-file reads, main-worktree Git commands, workspace tooling, and lifecycle delegation. After workspace setup, use the returned linked-worktree path for branch work and `alcode`. Linked worktrees may live under any configured project parent.
 
-Channel/DM: obtain PROJECT and PROJECT_PATH from `alproject list --json`, following the channel procedure. Never rely on memorized names.
+Channel/DM: obtain PROJECT and PROJECT_PATH from `alproject list --json --root ~/projects`, following the channel procedure. Never rely on memorized names.
 
 Thread: PROJECT and PROJECT_PATH come from the starter, which the seed carries and a human turn re-reads with `message action: "read"`. The working-session procedure resolves the values the starter left open. Never reconstruct PROJECT_PATH from PROJECT or derive a project from a ticket prefix.
 
@@ -48,6 +48,8 @@ Thread: PROJECT and PROJECT_PATH come from the starter, which the seed carries a
 A development task owned by one project needs a TICKET_ID. A project's or deployment's instructions define whether you can create or update tickets. When they provide no ticket-system access, skip those external operations and ask the user for an ID. When the user explicitly says there is no ticket, the working session reserves a side ticket `side-N` before workspace setup. Operational maintenance on existing branches and workspaces does not create a new ticket context.
 
 Use AlignFirst protocols only for work owned by one project. Delegate project bootstrap (creation and repository onboarding), a multi-project request with no main project, workspace cleanup, base-branch refresh, and other operational work to alcode without a protocol. A ticket ID may still identify the project workspaces involved.
+
+Users may name a protocol by its skill alias. Translate it to the alcode `--protocol` value: `alspec` → `spec`, `alplan` → `plan`, `al` or AAD → `aad`, `almerge` → `merge`, `alreview` → `review`, `aldescription` → `description`. `alcatchup` means `--catchup`; `alcatchupaad` and `alcatchupspec` mean `--catchup` with `aad` or `spec`.
 
 ## Who "the user" is depends on where the instruction lives
 

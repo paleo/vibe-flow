@@ -30,14 +30,12 @@ For every skill it updates, `npx skills update` drops a symlink at `~/.openclaw/
 
 Skills install once, into `~/.agents/skills/`, which OpenClaw and the delegated coding agent
 both scan. OpenClaw loads only its `agents.defaults.skills` allowlist, including
-`alignfirst-setup-guide` for project creation; the coding agent loads every skill there. The `al*`
-command skills (`al`, `alplan`, `alspec`, `aldescription`, `alreview`, `alcatchup`, `almerge`) sit
-outside OpenClaw's allowlist and look like orphans in its inventory. They are active skills of the
-coding agent: `skills remove` would delete the canonical copy for both.
+`alignfirst-setup-guide` for project creation; the coding agent loads every skill there.
+`skills remove` deletes the canonical copy for both.
 
 ## Moving a project breaks its workspace registry
 
-`@paleo/workspace` stores each worktree as an absolute path in `.local-wt/workspace-registry/workspaces.json`. After a `mv`, every command fails with `The workspace name "<name>" is already taken by <old-path>`, and no command repairs it: `prune` skips main worktrees, `remove` is destructive. Rewrite the `worktree` string in place, keeping the name key, `createdAt`, `status` and `portIndex` (`portIndex` pins the linked worktrees' ports). `git worktree repair` is still needed for linked worktrees. `alproject` is unaffected: it reads git worktrees directly.
+`@paleo/workspace` stores each worktree as an absolute path in `.local-wt/workspace-registry/workspaces.json`. After a `mv`, every command fails with `The workspace name "<name>" is already taken by <old-path>`, and no command repairs it: `prune` skips main worktrees, `remove` is destructive. Rewrite the `worktree` string in place, keeping the name key, `createdAt`, `status` and `portIndex` (`portIndex` pins the linked worktrees' ports). `git worktree repair` is still needed for linked worktrees. `alproject` reads the repaired git worktrees directly.
 
 ## Heartbeat cost is a main-session problem
 

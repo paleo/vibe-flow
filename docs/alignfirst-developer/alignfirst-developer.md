@@ -24,7 +24,7 @@ The [`@paleo/alignfirst-developer-openclaw-plugin`](../../packages/alignfirst-de
 3. **Regression-test harness** —
    [`alignfirst-developer-tests/`](../../alignfirst-developer-tests/). This standalone Dockerised
    consumer drives the workspace through synthetic Discord and Slack channels and judges the result.
-   It bind-mounts the workspace, playbook skill, and built `@paleo/alcode` package into the gateway.
+   It bind-mounts the workspace, playbook skill, and monorepo root into the gateway, so `alcode`, `alignfirst` and `alproject` run from the checkout.
    The harness intercepts both supported delegated-agent subprocesses.
 
 ## How a turn flows
@@ -43,7 +43,7 @@ Layer 1 is the only thing OpenClaw injects automatically; everything in layer 2 
 
 ## The channel session only bootstraps a thread
 
-A channel session answers ordinary conversation at the root. For project work, it runs `alproject list --json`, records known project paths, ticket, one-line task, URLs, and the full text of a detailed request, then delivers one native thread starter. Discord uses anchored `thread-create`; Slack uses `send` with the triggering timestamp as `threadId`. After confirmed delivery, `thread_handoff start` durably queues a targeted system wake and the channel turn ends. Resource URLs, multi-project requests, and requests that may need no project can leave values for the working session to resolve. Duplicate names and missing paths remain unresolved. The channel session never performs project work.
+A channel session answers ordinary conversation at the root. For project work, it runs `alproject list --json --root ~/projects`, resolves listed projects, records known project paths, ticket, one-line task, URLs, and the full text of a detailed request, then delivers one native thread starter. Discord uses anchored `thread-create`; Slack uses `send` with the triggering timestamp as `threadId`. After confirmed delivery, `thread_handoff start` durably queues a targeted system wake and the channel turn ends. Resource URLs, multi-project requests, and requests that may need no project can leave values for the working session to resolve. Duplicate names and missing paths remain unresolved. The channel session never performs project work.
 
 The fresh regular thread session recognizes the plugin seed, claims its opaque handoff before task effects, combines the seed's exact starter context with thread history, and proceeds without a mechanical user nudge. It waits silently only for genuinely missing input or an explicit hold. Completion and later user turns stay on the same canonical thread session. Project creation and repository onboarding remain exceptions to the initial path requirement. The older manual-follow-up contract and, before it, channel-owned setup both produced avoidable routing failures; the historical artifact at `alignfirst-developer-tests/artifacts/2026-07-15T10-31-39-655Z/` documents the latter.
 

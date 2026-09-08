@@ -1,6 +1,6 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
 import { unknownProjectRubric } from "./_lib/common-constants.ts";
-import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
+import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
@@ -17,7 +17,6 @@ const WRONG_PROJECT = "aurora";
 export default async function wrongProject(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const alproject = setupAlprojectMock(ctx);
   setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
@@ -32,7 +31,7 @@ export default async function wrongProject(ctx: ScenarioContext): Promise<void> 
     label: "unknown-project-acknowledgement",
   });
   await expectSilentSeedTurn(ctx, starter);
-  await alproject.assertListCallCount(1);
+  await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

@@ -13,7 +13,7 @@ export function createClaudeAdapter(): AgentAdapter {
 }
 
 export function buildClaudeArgs(config: RunConfig): string[] {
-  const args = [config.prompt, "-p", "--output-format", "stream-json", "--verbose"];
+  const args = ["-p", "--output-format", "stream-json", "--verbose"];
   if (config.skipPermissions) {
     args.push("--dangerously-skip-permissions");
   } else {

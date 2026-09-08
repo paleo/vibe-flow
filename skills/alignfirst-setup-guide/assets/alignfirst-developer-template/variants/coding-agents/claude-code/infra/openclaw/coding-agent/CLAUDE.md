@@ -20,3 +20,7 @@ Do not use it for refactoring, writing scripts from scratch, debugging business 
 Call `library` first unless a `/org/project` ID was supplied. Keep queries specific and single-topic. Run at most three commands per question. Never include credentials in a query. For a version, use `/org/project/version` from the `library` output.
 
 Authentication is preset through `CONTEXT7_API_KEY`. On a quota or authentication error, note it in your output and continue without Context7; the administrator handles the key.
+
+## AlignFirst
+
+`alignfirst guide <protocol>` prints an AlignFirst protocol to follow: `spec`, `plan`, `aad` (AAD), `description`, `review`, or `merge`.

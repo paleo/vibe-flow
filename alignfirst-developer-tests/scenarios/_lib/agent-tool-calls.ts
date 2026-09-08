@@ -1,6 +1,8 @@
 import type { AgentToolCall } from "@paleo/openclaw-test";
 import { escapeRe } from "./common-constants.ts";
 
+const PROJECT_LIST_JSON_RE = /(^|[\s/;(&|])alproject\s+list\b.*--json/;
+
 export function inputOf(call: AgentToolCall): Record<string, unknown> {
   return call.input && typeof call.input === "object"
     ? (call.input as Record<string, unknown>)
@@ -64,6 +66,26 @@ export function invokesAlcode(call: AgentToolCall): boolean {
     typeof input.command === "string" &&
     ALCODE_INVOCATION_RE.test(input.command)
   );
+}
+
+export function listsProjects(call: AgentToolCall): boolean {
+  const command = execCommandOf(call);
+  return command !== undefined && PROJECT_LIST_JSON_RE.test(command);
+}
+
+/** Counts distinct tool calls across repeated polls of the aggregated transcript. */
+export function nthMatchingCall(
+  predicate: (call: AgentToolCall) => boolean,
+  n: number,
+): (call: AgentToolCall) => boolean {
+  const indexByToolUseId = new Map<string, number>();
+  return (call) => {
+    if (!predicate(call)) return false;
+    const known = indexByToolUseId.get(call.toolUseId);
+    const index = known ?? indexByToolUseId.size + 1;
+    if (known === undefined) indexByToolUseId.set(call.toolUseId, index);
+    return index === n;
+  };
 }
 
 /** True when the call is an `exec` that invokes Claude or Codex directly. */

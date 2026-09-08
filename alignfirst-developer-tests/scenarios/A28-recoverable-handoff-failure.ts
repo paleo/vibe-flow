@@ -1,10 +1,10 @@
 import { failNextQaBusOperation } from "@paleo/openclaw-channel-mock-core";
 import type { ScenarioContext } from "@paleo/openclaw-test";
 import { inputOf } from "./_lib/agent-tool-calls.ts";
-import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
+import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { waitForSetupAck } from "./_lib/setup-ack.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
@@ -17,7 +17,6 @@ const TICKET_ID = "ABC-0280";
 export default async function recoverableHandoffFailure(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const alproject = setupAlprojectMock(ctx);
   const codingAgent = setupCodingAgentMock(ctx);
   setupGhMock(ctx);
   // Slack starters are threaded sends; root narration must not consume the fault.
@@ -59,7 +58,7 @@ export default async function recoverableHandoffFailure(ctx: ScenarioContext): P
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  await alproject.assertListCallCount(1);
+  await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

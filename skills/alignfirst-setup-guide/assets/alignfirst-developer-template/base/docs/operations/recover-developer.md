@@ -46,7 +46,6 @@ A backup at `~/backups/deployment/<stamp>/` is flat. Each file goes back to one 
 | `openclaw.env` | `~/.openclaw/.env` | — |
 | `workspace/*.md` | `~/.openclaw/workspace/` | `workspace` |
 | `environment.d/*.conf` | `~/.config/environment.d/` | — |
-| `alproject-registry.json` | `{{PROJECTS_ROOT}}/alproject-registry.json` | — |
 | `thread-handoff/state.sqlite*` | `~/.openclaw/thread-handoff/` | — |
 
 ```sh
@@ -62,7 +61,7 @@ together while the gateway is stopped. See the package README before retiring cl
 Unpack the OpenClaw archive with `openclaw backup restore <archive> --target <dir>`, then copy the
 needed files under `~/.openclaw/` through the `config` maintenance scope.
 
-Restoring the configuration rarely beats re-seeding: the seed rebuilds `openclaw.json`, `secrets.json`, `~/.openclaw/.env` and `environment.d/` from the repository and `.env`. Prefer the backup for the workspace files and the registry, which the seed does not write.
+Restoring the configuration rarely beats re-seeding: the seed rebuilds `openclaw.json`, `secrets.json`, `~/.openclaw/.env` and `environment.d/` from the repository and `.env`. Prefer the backup for workspace files, which the seed does not write.
 
 ## Re-seed and validate
 
@@ -73,7 +72,7 @@ Follow [configure-developer.md](configure-developer.md) to re-seed through a con
 ```sh
 sudo -i -u {{SERVICE_USER}} -- systemctl --user start openclaw-gateway
 sudo -i -u {{SERVICE_USER}} -- systemctl --user status openclaw-gateway
-sudo -i -u {{SERVICE_USER}} -- alproject list
+sudo -H -u {{SERVICE_USER}} bash -lc 'alproject list --root ~/projects'
 ```
 
 Finish with [08-coding-agent.md § Verification](../installations/08-coding-agent.md#verification) and the smoke test of [07-channel.md](../installations/07-channel.md) before reopening the channel to users.

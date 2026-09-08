@@ -48,7 +48,7 @@ configure_surface() {
   unset_key channels.slack.replyToModeByChatType
   set_json channels.slack.thread \
     '{"historyScope":"thread","inheritParent":false,"initialHistoryLimit":100}'
-  # The name must match the slash command declared in the Slack app manifest (07-channel.md).
+  # The name must match the slash command declared in the Slack app configuration (07-channel.md).
   set_json channels.slack.slashCommand '{"enabled":true,"name":"openclaw"}'
 
   echo "[seed] owner allowlist — admin chat commands and exec approvals"

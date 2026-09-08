@@ -1,6 +1,6 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
 import { assertBranchForTicket, waitForAnyWorktreeDir } from "./_lib/fixture-state.ts";
-import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
+import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { expectCodingDelegation, setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { waitForReport } from "./_lib/outbound.ts";
@@ -18,7 +18,6 @@ const REQUEST = `Sur nimbus, réorganise la page d'export.
 
 export default async function detailedRequestHandoff(ctx: ScenarioContext): Promise<void> {
   await resetFixtures(ctx);
-  const alproject = setupAlprojectMock(ctx);
   const codingAgent = setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
@@ -38,7 +37,7 @@ export default async function detailedRequestHandoff(ctx: ScenarioContext): Prom
       "session without asking for a content-free activation message.",
     label: "detailed-request-preserved",
   });
-  await alproject.assertListCallCount(1);
+  await waitForProjectListing(ctx, "channel session lists the projects");
 
   const firstWakeCursor = starter.nextCursor;
   const ticketQuestion = await waitForReport(

@@ -62,21 +62,16 @@ exit
 
 ### Skills
 
-**Role: operator**, as the service account, after [Authenticate](#authenticate). Three tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent codex` records the same canonical in the lock file for the `codex` CLI, which reads `~/.agents/skills/` too and needs no symlink; the seven command skills go to the `codex` tier only and stay outside OpenClaw's allowlist (`agents.defaults.skills` in `seed/common.sh`). `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
+**Role: operator**, as the service account, after [Authenticate](#authenticate). Two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent codex` records the same canonical in the lock file for the `codex` CLI, which reads `~/.agents/skills/` too and needs no symlink. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
 
 ```sh
 sudo -i -u {{SERVICE_USER}} bash <<'EOS'
 set -e
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent universal --agent codex \
-  --skill alignfirst --skill alignfirst-setup-guide \
-  --skill alignfirst-developer-openclaw-playbook < /dev/null
+  --skill alignfirst-setup-guide --skill alignfirst-developer-openclaw-playbook < /dev/null
 npx -y skills add https://github.com/paleo/skills --global --yes \
   --agent universal --agent codex --skill sharp-writing < /dev/null
-npx -y skills add https://github.com/paleo/alignfirst --global --yes \
-  --agent codex \
-  --skill al --skill alplan --skill alspec --skill aldescription \
-  --skill alreview --skill alcatchup --skill almerge < /dev/null
 EOS
 ```
 
@@ -162,8 +157,8 @@ After the seed and the gateway start (`04-openclaw.md`):
 
 ```sh
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'alcode --guide | head'      # names codex as the agent
-sudo -i -u {{SERVICE_USER}} -- bash -lc 'alproject --guide >/dev/null && echo alproject-ok'
-sudo -i -u {{SERVICE_USER}} -- bash -lc 'npx -y skills list -g --json'   # 11 skills: 4 shared, 7 commands
+sudo -i -u {{SERVICE_USER}} -- bash -lc 'alproject --guide --root ~/projects >/dev/null && echo projects-ok'
+sudo -i -u {{SERVICE_USER}} -- bash -lc 'npx -y skills list -g --json'   # 3 skills
 ```
 
-In an interactive session as the service account (`sudo -i -u {{SERVICE_USER}}`, then `codex` in a project), `$al`, `$alplan`, `$alspec`, `$aldescription`, `$alreview`, `$alcatchup` and `$almerge` are offered. The surface smoke test in `07-channel.md` delegates a read-only run from the channel; its session file under `.plans/**/_alcode/*.md` records `agent: codex`.
+The surface smoke test in `07-channel.md` delegates a read-only run from the channel; its session file under `.plans/**/_alcode/*.md` records `agent: codex`.

@@ -21,7 +21,6 @@ const BASE: RunConfig = {
 describe("Claude adapter", () => {
   it("builds exact normal and dangerous argv", () => {
     expect(buildClaudeArgs(BASE)).toEqual([
-      "do the thing",
       "-p",
       "--output-format",
       "stream-json",
@@ -37,7 +36,6 @@ describe("Claude adapter", () => {
         executableModel: "opus",
       }),
     ).toEqual([
-      "do the thing",
       "-p",
       "--output-format",
       "stream-json",

@@ -21,13 +21,7 @@ const BASE: RunConfig = {
 
 describe("Codex argv", () => {
   it("builds new and resumed commands with normal sandboxing", () => {
-    expect(buildCodexArgs(BASE)).toEqual([
-      "exec",
-      "--json",
-      "--sandbox",
-      "workspace-write",
-      "do the thing",
-    ]);
+    expect(buildCodexArgs(BASE)).toEqual(["exec", "--json", "--sandbox", "workspace-write", "-"]);
     expect(
       buildCodexArgs({ ...BASE, resume: "thread-1", executableModel: "gpt-5.6-terra" }),
     ).toEqual([
@@ -39,7 +33,7 @@ describe("Codex argv", () => {
       "gpt-5.6-terra",
       "resume",
       "thread-1",
-      "do the thing",
+      "-",
     ]);
   });
 
@@ -48,7 +42,7 @@ describe("Codex argv", () => {
       "exec",
       "--json",
       "--dangerously-bypass-approvals-and-sandbox",
-      "do the thing",
+      "-",
     ]);
   });
 });

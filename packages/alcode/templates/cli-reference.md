@@ -2,11 +2,11 @@
 
 ```
 alcode new --protocol <protocol> (--ticket <id> | --no-ticket) [--message "..."]
+alcode new --catchup --ticket <id> [--protocol <protocol>] [--message-file <path|->]
 alcode new --message "..."
 alcode resume <sessionId> [--protocol <protocol>] [--message "..."]
 alcode status <session-file>
 alcode usage
-alcode reserve-side-ticket
 ```
 
 | Command | Description |
@@ -15,26 +15,29 @@ alcode reserve-side-ticket
 | `resume <sessionId>` | Continue an existing session. |
 | `status <session-file>` | Reconcile and show one run's durable status. The path must be under `.plans/**/_alcode/`. Does not start a coding agent. |
 | `usage` | Show the selected coding agent's current usage limits and reset times. Takes no option. |
-| `reserve-side-ticket` | Reserve the next side ticket for work without a ticket: creates `.plans/side-N/` and prints `side-N`. Takes no option. Use it when you need the ticket ID before delegating; otherwise `new --no-ticket` reserves and delegates in one run. |
 
 | Option | Description |
 |--------|-------------|
-| `--protocol <p>` | One of `spec`, `plan`, `aad`, `description`, `catchup`, `review`, `merge`. Optional. |
+| `--protocol <p>` | One of `spec`, `plan`, `aad`, `description`, `review`, `merge`. Optional. |
 | `--ticket <id>` | Ticket ID. `new --protocol` requires it, or `--no-ticket`. |
-| `--no-ticket` | Work without a ticket: `alcode` reserves the next side ticket `side-N` and passes it to the agent. `new` only, with a protocol. The reserved id is in the session file's path and `ticket:` frontmatter; pass it as `--ticket side-N` in later runs. |
-| `--message "..."` | Message to send, written in English. `-m` is the short form. Required for `spec`, `aad`, and when no `--protocol`. |
+| `--no-ticket` | Work without a ticket: `alcode` reserves the next side ticket through `alignfirst ticket --side` and passes it to the agent. `new` only, with a protocol. The reserved id is in the session file's path and `ticket:` frontmatter; pass it as `--ticket side-N` in later runs. |
+| `--message "..."` | Message to send, written in English. `-m` is the short form. Required for `spec`, `aad`, and when neither `--protocol` nor `--catchup` is given. A message file also satisfies this requirement. |
+| `--message-file <path>` | Read a UTF-8 message file; `-` reads stdin. Mutually exclusive with `--message`. |
+| `--catchup` | Load the ticket history before the protocol and message. `new` only, requires a ticket. Alone, it returns a short synthesis. |
 | `--model <model>` | One of {{MODELS}}. Prefer the default model (omit the flag). |
 | `--meta "..."` | Opaque handoff string stored verbatim in the session file's `meta:` frontmatter. `alcode` never reads it — it's for you to stash context the run's later reader needs (e.g. where to report the outcome). |
 
 The current coding agent is `{{AGENT}}`. `ALIGNFIRST_CODE_MODELS` replaces its displayed allowlist. Codex aliases `sol`, `terra`, and `luna` resolve to the newest bundled matching slug only when selected; a configured full slug passes through unchanged.
 
-`alcode status <session-file>` checks that a `running` process still owns its recorded pid. A dead run is sealed as `status: failed`, `exitReason: terminated` before the command reports it. `alcode usage` works without a `.plans` directory and does not start a coding session. Its output follows the selected agent's available account limits. `alcode reserve-side-ticket` needs `.plans/` and no coding agent.
+`alcode status <session-file>` checks that a `running` process still owns its recorded pid. A dead run is sealed as `status: failed`, `exitReason: terminated` before the command reports it. `alcode usage` works without a `.plans` directory and does not start a coding session. Its output follows the selected agent's available account limits.
+
+`alcode` requires the `alignfirst` CLI on `PATH`. The delegated agent runs `alignfirst guide <protocol>` in the project, so the protocols come from the installed CLI.
 
 {{PERMISSIONS}}.
 
 For `new` runs, the `Session ID:` is printed to stdout and written with `agent: {{AGENT}}` in the session file frontmatter. Save it to resume the conversation later. Resume requires the same selected agent; agentless legacy sessions require a new session.
 
-**No protocol:** the message is sent as-is (no AlignFirst command). Use it to answer the agent's questions in an existing session, execute a plan in a new session, or ask a question:
+**No protocol or catchup:** the message is sent as-is (no AlignFirst command). Use it to answer the agent's questions in an existing session, execute a plan in a new session, or ask a question:
 
 ```bash
 alcode resume <sessionId> --message "Your answer"
@@ -87,10 +90,22 @@ Two fresh sessions: one reviews, one fixes.
 
 Skip the fix step when the review is informational.
 
+## Catch up on a ticket
+
+`--catchup` gives a new session the ticket's history (requests, specs, reviews, summaries) before the protocol and message. Use it when the ticket has prior work, for a status synthesis, or to start AAD or spec on an existing ticket:
+
+```bash
+alcode new --ticket AB-123 --catchup                  # short synthesis of the history
+alcode new --ticket AB-123 --catchup --protocol aad --message-file - <<'ALCODE_MESSAGE'
+Investigate `someFunction()` and the literal expression $(example).
+ALCODE_MESSAGE
+```
+
+Prefer `--message-file` for long or multi-line messages. A quoted heredoc delimiter keeps quotes, backticks and dollar signs literal in Bash.
+
 ## Other protocols
 
 - **description** — `alcode new --protocol description --ticket AB-123`. Writes a PR/MR description for committed work. No discussion.
-- **catchup** — `alcode new --protocol catchup --ticket AB-123 [--message "..."]`. Loads the ticket's history from its requests, specs, and summaries and returns a synthesis. To continue the ticket with that history in context, run `alcode resume <sessionId> --protocol aad --message "..."` (or `--protocol spec`) in the same session. Runs are sequential, so the one-protocol-at-a-time rule still holds.
 - **review** — see the review workflow above.
 - **merge** — `alcode new --protocol merge --ticket AB-123`. Resolves conflicts and summarizes tricky resolutions. Pass the incoming branch via `--message` to start the merge.
 

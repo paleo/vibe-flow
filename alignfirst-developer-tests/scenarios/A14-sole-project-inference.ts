@@ -1,8 +1,12 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
-import { setupAlprojectMock, registeredProject } from "./_lib/mock-alproject.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
-import { NIMBUS_PROJECT_PATH, PRIMARY_PROJECT_PARENT } from "./_lib/project-fixtures.ts";
+import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
+import {
+  LUMEN_PROJECT_PATH,
+  NIMBUS_PROJECT_PATH,
+  ORION_PROJECT_PATH,
+} from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { waitForSetupAck } from "./_lib/setup-ack.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
@@ -13,9 +17,7 @@ const TICKET_ID = "ABC-0140";
 
 export default async function soleProjectInference(ctx: ScenarioContext): Promise<void> {
   await resetFixtures(ctx);
-  const alproject = setupAlprojectMock(ctx, {
-    projects: [registeredProject(PROJECT, NIMBUS_PROJECT_PATH, PRIMARY_PROJECT_PARENT)],
-  });
+  await ctx.execInGateway(["rm", "-rf", LUMEN_PROJECT_PATH, ORION_PROJECT_PATH]);
   const codingAgent = setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
@@ -36,7 +38,7 @@ export default async function soleProjectInference(ctx: ScenarioContext): Promis
     ticketId: TICKET_ID,
     prevStep: ack,
   });
-  await alproject.assertListCallCount(1);
+  await waitForProjectListing(ctx, "channel session lists the projects");
 
   ctx.markScenarioAsEnded("PASS");
   ctx.log("PASS");

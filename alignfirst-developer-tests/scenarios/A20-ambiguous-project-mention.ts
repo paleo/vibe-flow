@@ -1,8 +1,8 @@
 import type { ScenarioContext } from "@paleo/openclaw-test";
-import { setupAlprojectMock } from "./_lib/mock-alproject.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { assertNoLiteralNoReply, waitForReport } from "./_lib/outbound.ts";
+import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { ORION_PROJECT_PATH } from "./_lib/project-fixtures.ts";
 import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { bootstrapThreadFromChannel } from "./_lib/thread-bootstrap.ts";
@@ -11,7 +11,7 @@ import type { Step } from "./_lib/types.ts";
 const PROJECT = "orion";
 
 /**
- * A casual message naming a registered project with no work framing. The
+ * A casual message naming a listed project with no work framing. The
  * off-projects contract exempts only messages with no possible project
  * reference, and "orion" is exactly the word the bot cannot classify from
  * memory: it must consult `alproject list --json`, recognize the project, and open a
@@ -26,7 +26,6 @@ const PROJECT = "orion";
 export default async function ambiguousProjectMention(ctx: ScenarioContext): Promise<void> {
   ctx.log(`channel: ${ctx.channel}, conversationId: ${ctx.conversationId}`);
   await resetFixtures(ctx);
-  const alproject = setupAlprojectMock(ctx);
   setupCodingAgentMock(ctx);
   setupGhMock(ctx);
 
@@ -36,9 +35,7 @@ export default async function ambiguousProjectMention(ctx: ScenarioContext): Pro
     project: PROJECT,
     projectPath: ORION_PROJECT_PATH,
   });
-  if (!alproject.calls.some((call) => call.argv[0] === "list" && call.argv[1] === "--json")) {
-    throw new Error("the session routed the project mention without structured inventory lookup");
-  }
+  await waitForProjectListing(ctx, "channel session lists the projects");
   await expectTicketAsk(ctx, starter);
   await assertNoLiteralNoReply(ctx, startCursor);
 
