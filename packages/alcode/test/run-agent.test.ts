@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createClaudeState } from "../src/claude-agent.js";
+import { createClaudeAdapter, createClaudeState } from "../src/claude-agent.js";
 import { createCodexAdapter } from "../src/codex-agent.js";
 import {
   buildAgentEnv,
@@ -75,6 +75,49 @@ describe("shared runner helpers", () => {
       frontmatter: { status: "succeeded", agent: "codex" },
       result: "yes:undefined:undefined",
     });
+  });
+
+  it.each([createClaudeAdapter(), createCodexAdapter()])(
+    "pipes a large literal prompt to $executable without putting it in argv",
+    async (adapter) => {
+      const { config } = makeRun();
+      config.prompt = "`code` $(literal) '$value' \"quotes\" é\n".repeat(20_000);
+      const script = `
+        let prompt = "";
+        process.stdin.setEncoding("utf8");
+        process.stdin.on("data", chunk => prompt += chunk);
+        process.stdin.on("end", () => {
+          const lines = process.argv[1] === "claude"
+            ? [{ type: "result", result: prompt, is_error: false }]
+            : [
+                { type: "item.completed", item: { type: "agent_message", text: prompt } },
+                { type: "turn.completed" },
+              ];
+          process.stdout.write(lines.map(JSON.stringify).join("\\n"));
+        });
+      `;
+      const result = await runAgent(config, adapter, { write() {} }, (command, args, options) => {
+        expect(args).not.toContain(config.prompt);
+        expect(options.stdio[0]).toBe("pipe");
+        return spawn(process.execPath, ["-e", script, command], options);
+      });
+      expect(result.status).toBe("succeeded");
+      expect(result.result).toBe(config.prompt);
+    },
+  );
+
+  it("records a failed prompt pipe without an unhandled stream error", async () => {
+    const { config, sessionFilePath } = makeRun();
+    config.prompt = "x".repeat(2_000_000);
+    const result = await runAgent(
+      config,
+      createCodexAdapter(),
+      { write() {} },
+      nodeFixture('require("node:fs").closeSync(0); setTimeout(() => {}, 10000);'),
+    );
+    expect(result.status).toBe("failed");
+    expect(result.result).toContain("Could not send prompt:");
+    expect(readCompletion(sessionFilePath).frontmatter.status).toBe("failed");
   });
 
   it("uses stderr for an unsuccessful process without a structured error", async () => {

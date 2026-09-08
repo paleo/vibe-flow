@@ -2,6 +2,7 @@ import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 
+import { DEFAULT_ALIGNFIRST_COMMAND, loadCatchup, reserveSideTicket } from "./alignfirst-cli.js";
 import { type CodingAgent, createAgentAdapter, resolveCodingAgent } from "./coding-agent.js";
 import { type GuideVariant, renderGuide } from "./guide.js";
 import { type ExecutableModelResolver, resolveExecutableModel, resolveModels } from "./models.js";
@@ -13,7 +14,6 @@ import {
   listSessionRecords,
   readPidStartTime,
   reconcileSessionFile,
-  reserveSideTicket,
   resolveSessionFilePath,
   type SessionFrontmatter,
   type SessionRecord,
@@ -27,6 +27,8 @@ const EXIT_AUTH_REQUIRED = 2;
 
 const SESSION_OPTIONS = {
   protocol: { type: "string" },
+  catchup: { type: "boolean", default: false },
+  "message-file": { type: "string" },
   ticket: { type: "string" },
   message: { type: "string", short: "m" },
   model: { type: "string" },
@@ -40,6 +42,7 @@ export interface MainOptions {
   stderr?: RunOutput;
   cwd?: string;
   env?: NodeJS.ProcessEnv;
+  alignfirstCommand?: string[];
   modelResolver?: ExecutableModelResolver;
   usageReader?: UsageReader;
 }
@@ -50,7 +53,6 @@ export type AlcodeCommand =
   | { kind: "guide"; variant: GuideVariant }
   | { kind: "status"; sessionFile: string }
   | { kind: "usage" }
-  | { kind: "reserveSideTicket" }
   | { kind: "session"; args: SessionArgs };
 
 // `resume` undefined means a new session.
@@ -59,6 +61,8 @@ export interface SessionArgs {
   ticket?: string;
   noTicket: boolean;
   protocol?: string;
+  catchup?: boolean;
+  messageFile?: string;
   message?: string;
   model?: string;
   meta?: string;
@@ -70,6 +74,7 @@ export async function main(options?: MainOptions): Promise<number> {
   const stderr = options?.stderr ?? process.stderr;
   const cwd = options?.cwd ?? process.cwd();
   const env = options?.env ?? process.env;
+  const alignfirstCommand = options?.alignfirstCommand ?? DEFAULT_ALIGNFIRST_COMMAND;
 
   let command: AlcodeCommand;
   try {
@@ -83,15 +88,6 @@ export async function main(options?: MainOptions): Promise<number> {
     stdout.write(`${readPackageVersion()}\n`);
     return 0;
   }
-  if (command.kind === "reserveSideTicket") {
-    const gateError = assertPlansGate(cwd);
-    if (gateError) {
-      stderr.write(`${gateError}\n`);
-      return 1;
-    }
-    stdout.write(`${reserveSideTicket(cwd)}\n`);
-    return 0;
-  }
   if (command.kind === "status") {
     try {
       const sessionFilePath = resolveStatusSessionFile(cwd, command.sessionFile);
@@ -103,7 +99,6 @@ export async function main(options?: MainOptions): Promise<number> {
       return 1;
     }
   }
-
   let agent: CodingAgent;
   try {
     agent = resolveCodingAgent(env);
@@ -133,6 +128,13 @@ export async function main(options?: MainOptions): Promise<number> {
     return 0;
   }
 
+  try {
+    loadMessage(command.args, cwd);
+  } catch (error) {
+    stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    return 1;
+  }
+
   const validationError = validateSessionArgs(command.args, models);
   if (validationError) {
     stderr.write(`${validationError}\n`);
@@ -144,8 +146,20 @@ export async function main(options?: MainOptions): Promise<number> {
     env,
     stdout,
     stderr,
+    alignfirstCommand,
     modelResolver: options?.modelResolver ?? resolveExecutableModel,
   });
+}
+
+function loadMessage(args: SessionArgs, cwd: string): void {
+  if (args.messageFile === undefined) return;
+  if (args.message !== undefined) {
+    throw new Error("Error: --message and --message-file are mutually exclusive.");
+  }
+  args.message = readFileSync(
+    args.messageFile === "-" ? 0 : resolve(cwd, args.messageFile),
+    "utf8",
+  );
 }
 
 function resolveStatusSessionFile(cwd: string, input: string): string {
@@ -217,8 +231,6 @@ export function parseAlcodeArgs(argv: string[]): AlcodeCommand {
       return parseStatusCommand(tokens);
     case "usage":
       return parseBareCommand(tokens, "usage");
-    case "reserve-side-ticket":
-      return parseBareCommand(tokens, "reserveSideTicket");
     default:
       throw new Error(`Error: unknown command "${command}". Run \`alcode --help\`.`);
   }
@@ -251,6 +263,8 @@ function parseNewCommand(tokens: string[]): AlcodeCommand {
       ticket: values.ticket,
       noTicket: values["no-ticket"],
       protocol: values.protocol,
+      catchup: values.catchup,
+      messageFile: values["message-file"],
       message: values.message,
       model: values.model,
       meta: values.meta,
@@ -276,6 +290,8 @@ function parseResumeCommand(tokens: string[]): AlcodeCommand {
       ticket: values.ticket,
       noTicket: false,
       protocol: values.protocol,
+      catchup: values.catchup,
+      messageFile: values["message-file"],
       message: values.message,
       model: values.model,
       meta: values.meta,
@@ -283,7 +299,7 @@ function parseResumeCommand(tokens: string[]): AlcodeCommand {
   };
 }
 
-function parseBareCommand(tokens: string[], kind: "usage" | "reserveSideTicket"): AlcodeCommand {
+function parseBareCommand(tokens: string[], kind: "usage"): AlcodeCommand {
   const { values } = parseArgs({
     args: tokens,
     options: { help: { type: "boolean", short: "h", default: false } },
@@ -304,8 +320,11 @@ export function validateSessionArgs(
   if (args.model !== undefined && !models.includes(args.model)) {
     return `Error: --model must be one of: ${models.join(", ")}.`;
   }
-  if (args.protocol === undefined && !hasMessage) {
+  if (args.protocol === undefined && !hasMessage && args.catchup !== true) {
     return "Error: --message is required when --protocol is not specified.";
+  }
+  if (!isNew && args.catchup === true) {
+    return "Error: --catchup is for `new` only; a resumed session already holds the history.";
   }
   if (args.ticket !== undefined && args.noTicket) {
     return "Error: --ticket and --no-ticket are mutually exclusive.";
@@ -340,6 +359,7 @@ interface RunContext {
   env: NodeJS.ProcessEnv;
   stdout: RunOutput;
   stderr: RunOutput;
+  alignfirstCommand: string[];
   modelResolver: ExecutableModelResolver;
 }
 
@@ -350,7 +370,7 @@ interface RunContext {
 // session id and status, and the `---- Result ----` block carries the outcome for a waking agent
 // (or a human).
 async function runSession(args: SessionArgs, agent: CodingAgent, ctx: RunContext): Promise<number> {
-  const { cwd, env, stdout, stderr, modelResolver } = ctx;
+  const { cwd, env, stdout, stderr, alignfirstCommand, modelResolver } = ctx;
 
   const gateError = assertPlansGate(cwd);
   if (gateError) {
@@ -367,7 +387,22 @@ async function runSession(args: SessionArgs, agent: CodingAgent, ctx: RunContext
   }
 
   const now = new Date();
-  const ticket = args.noTicket ? reserveSideTicket(cwd) : resolveTicket(args, records);
+  let ticket: string | undefined;
+  let catchupContent: string | undefined;
+  try {
+    ticket = args.noTicket
+      ? reserveSideTicket(alignfirstCommand, cwd, env)
+      : resolveTicket(args, records);
+    if (args.catchup === true) {
+      if (ticket === undefined) {
+        throw new Error("Error: --catchup requires a resolved ticket; provide --ticket <id>.");
+      }
+      catchupContent = loadCatchup(alignfirstCommand, cwd, ticket, env);
+    }
+  } catch (error) {
+    stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    return 1;
+  }
   const sessionFilePath = resolveSessionFilePath(cwd, ticket, now);
   writeInitialSessionFile(sessionFilePath, buildFrontmatter(args, agent, now, realCwd, ticket));
   stdout.write(`Session file: ${relative(cwd, sessionFilePath)}\n\n`);
@@ -392,7 +427,7 @@ async function runSession(args: SessionArgs, agent: CodingAgent, ctx: RunContext
   }
 
   const result = await runAgent(
-    buildRunConfig(args, ticket, cwd, sessionFilePath, env, executableModel),
+    buildRunConfig(args, ticket, cwd, sessionFilePath, env, executableModel, catchupContent),
     createAgentAdapter(agent),
     stdout,
   );
@@ -538,8 +573,13 @@ function formatCommand(args: SessionArgs): string {
   if (args.protocol !== undefined) parts.push("--protocol", args.protocol);
   if (args.ticket !== undefined) parts.push("--ticket", args.ticket);
   if (args.noTicket) parts.push("--no-ticket");
+  if (args.catchup === true) parts.push("--catchup");
   if (args.model !== undefined) parts.push("--model", args.model);
-  if (args.message !== undefined) parts.push("--message", JSON.stringify(args.message));
+  if (args.messageFile !== undefined) {
+    parts.push("--message-file", JSON.stringify(args.messageFile));
+  } else if (args.message !== undefined) {
+    parts.push("--message", JSON.stringify(args.message));
+  }
   if (args.meta !== undefined) parts.push("--meta", JSON.stringify(args.meta));
   return parts.join(" ");
 }
@@ -551,9 +591,10 @@ export function buildRunConfig(
   sessionFilePath: string,
   env: NodeJS.ProcessEnv,
   executableModel: string | undefined,
+  catchupContent?: string,
 ): RunConfig {
   return {
-    prompt: buildPrompt({ protocol: args.protocol, ticket, message: args.message }),
+    prompt: buildPrompt({ protocol: args.protocol, ticket, message: args.message, catchupContent }),
     sessionFilePath,
     cwd,
     resume: args.resume,
@@ -585,11 +626,11 @@ function renderHelp(agent: CodingAgent, models: readonly string[]): string {
 
 Usage:
   alcode new --protocol <protocol> (--ticket <id> | --no-ticket) [--message "..."]
+  alcode new --catchup --ticket <id> [--protocol <protocol>] [--message-file <path|->]
   alcode new --message "..."
   alcode resume <sessionId> [--protocol <protocol>] [--message "..."]
   alcode status <session-file>
   alcode usage
-  alcode reserve-side-ticket
   alcode --guide
   alcode --openclaw-guide
   alcode -h, --help
@@ -600,20 +641,24 @@ Commands:
   resume <sessionId>    Continue an existing session.
   status <session-file> Reconcile and show one run's durable status. Does not start an agent.
   usage                 Show the selected coding agent's current usage limits and reset times.
-  reserve-side-ticket   Reserve the next side ticket for work without a ticket: creates
-                        .plans/side-N/ and prints side-N.
 
 Options (new, resume):
   --protocol <p>        One of: ${PROTOCOLS.join(", ")}.
   --ticket <id>         Ticket ID. \`new --protocol\` requires it, or --no-ticket.
-  --no-ticket           Work without a ticket: reserves the next side ticket (side-N) and passes
-                        it to the agent. new only, requires --protocol.
-  -m, --message "..."   Message to send. Required for spec, aad, and when no --protocol.
+  --no-ticket           Work without a ticket: reserves the next side ticket through
+                        \`alignfirst ticket --side\` and passes it to the agent. new only,
+                        requires --protocol.
+  --catchup             Load the ticket history before the message. new only.
+  -m, --message "..."   Message to send. Required for spec/aad, or without protocol/catchup.
+  --message-file <path> Read the message from a UTF-8 file, or stdin with -. Exclusive with -m.
   --model <model>       Model for a new session: one of ${models.join(", ")}. Omit to use the
                         default model.
   --meta "..."          Opaque handoff string, stored verbatim in the session file frontmatter
                         (\`meta:\`). alcode never interprets it; a later reader of the session file
                         (e.g. the caller reporting the run's outcome) can use it.
+
+Requires: the alignfirst CLI on PATH (npm install -g alignfirst), for side tickets and the
+delegated protocols.
 
 Env:
   ALIGNFIRST_CODE_AGENT            Required coding agent: claude or codex (selected: ${agent}).

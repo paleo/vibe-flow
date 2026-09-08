@@ -1,4 +1,5 @@
 import { basename, dirname } from "node:path";
+import { text } from "node:stream/consumers";
 import type { CliMockEntry, ScenarioContext } from "@paleo/openclaw-test";
 import { FIXTURE_PROJECT_PATHS } from "./project-fixtures.ts";
 
@@ -175,6 +176,7 @@ export interface CodingAgentCall {
   agent: CodingAgent;
   argv: string[];
   cwd: string;
+  stdin: string;
   entry?: CliMockEntry;
 }
 
@@ -234,8 +236,8 @@ export function setupCodingAgentMock(
   const finalizedCalls = new WeakSet<CodingAgentCall>();
 
   for (const agent of ["claude", "codex"] as const) {
-    ctx.mockCli(agent, async ({ argv, cwd, stdout, stderr }) => {
-      const call: CodingAgentCall = { agent, argv, cwd };
+    ctx.mockCli(agent, async ({ argv, cwd, stdin, stdout, stderr }) => {
+      const call: CodingAgentCall = { agent, argv, cwd, stdin: await text(stdin) };
       codingAgentCalls.push(call);
       try {
         if (agent === "codex" && isCodexCatalogCall(call)) {
@@ -243,11 +245,11 @@ export function setupCodingAgentMock(
           return 0;
         }
         const prompt = extractCodingPrompt(call);
-        if (agent === "claude" && (prompt === "--version" || prompt === "-v")) {
+        if (agent === "claude" && (argv[0] === "--version" || argv[0] === "-v")) {
           stdout.write("2.0.0 (Claude Code)\n");
           return 0;
         }
-        if (agent === "claude" && (prompt === "--help" || prompt === "-h")) {
+        if (agent === "claude" && (argv[0] === "--help" || argv[0] === "-h")) {
           stdout.write(
             "Usage: claude <prompt> [-p] [--output-format json] [--permission-mode <mode>]\n",
           );
@@ -430,17 +432,16 @@ export function isAlignfirstWrapperCall(call: CodingAgentCall): boolean {
     return (
       a[0] === "exec" &&
       a[1] === "--json" &&
+      a.at(-1) === "-" &&
       (hasAdjacentArgs(a, "--sandbox", "workspace-write") ||
         a.includes("--dangerously-bypass-approvals-and-sandbox"))
     );
   }
   return (
-    a[0] !== undefined &&
-    a[0] !== "" &&
-    a[1] === "-p" &&
-    a[2] === "--output-format" &&
-    a[3] === "stream-json" &&
-    a[4] === "--verbose" &&
+    a[0] === "-p" &&
+    a[1] === "--output-format" &&
+    a[2] === "stream-json" &&
+    a[3] === "--verbose" &&
     (hasAdjacentArgs(a, "--permission-mode", "auto") ||
       a.includes("--dangerously-skip-permissions"))
   );
@@ -457,9 +458,8 @@ export function isCodexCatalogCall(call: CodingAgentCall): boolean {
 }
 
 export function extractCodingPrompt(call: CodingAgentCall): string | undefined {
-  if (call.agent === "claude") return call.argv[0];
-  if (call.argv[0] !== "exec" || call.argv[1] !== "--json") return;
-  return call.argv.at(-1);
+  if (!isAlignfirstWrapperCall(call)) return;
+  return call.stdin;
 }
 
 function resumeSessionId(call: CodingAgentCall): string | undefined {
@@ -511,7 +511,7 @@ function parseWorktreeRequest(
 }
 
 const CODING_PROTOCOL_RE =
-  /^Run the _(spec|AAD|plan|description|catchup|review|merge)_ protocol from the \*alignfirst\* skill\./;
+  /^Run `alignfirst guide (spec|plan|aad|description|review|merge)` and follow the protocol\./;
 
 // The edit each coding result stands behind, applied to the fixture's
 // `home-page.mjs` with `sed`. A run reports "changes committed on the ticket
@@ -565,16 +565,21 @@ function isFixtureWorktreePath(path: string): boolean {
   });
 }
 
-/** True iff `prompt` opens with an alignfirst coding-protocol header. */
+/** Recognize the active instruction after optional catchup history. */
 export function isCodingProtocolPrompt(prompt: string | undefined): boolean {
-  return prompt !== undefined && CODING_PROTOCOL_RE.test(prompt);
+  if (prompt === undefined) return false;
+  const instruction = prompt.split("\n\n## Current instruction\n\n").at(-1);
+  return instruction !== undefined && CODING_PROTOCOL_RE.test(instruction);
 }
 
 /** Render a captured coding-agent invocation as a single text blob for the judge. */
 export function renderCodingAgentCall(call: CodingAgentCall): string {
-  return [`agent: ${call.agent}`, `cwd: ${call.cwd}`, `argv: ${JSON.stringify(call.argv)}`].join(
-    "\n",
-  );
+  return [
+    `agent: ${call.agent}`,
+    `cwd: ${call.cwd}`,
+    `argv: ${JSON.stringify(call.argv)}`,
+    `stdin: ${call.stdin}`,
+  ].join("\n");
 }
 
 export interface ExpectNoProtocolDelegationOptions {
@@ -628,7 +633,7 @@ export async function expectNoProtocolDelegation(
   ctx.log({
     attachTo: target,
     label: "coding-agent no-protocol delegation call captured",
-    extra: { argv0Length: codingAgentCall.argv[0]?.length ?? 0 },
+    extra: { promptLength: codingAgentCall.stdin.length },
   });
 
   await ctx.judgeLLM({
@@ -684,7 +689,7 @@ export async function expectCodingDelegation(
   ctx.log({
     attachTo: target,
     label: "coding-agent delegation call captured",
-    extra: { argv0Length: codingAgentCall.argv[0]?.length ?? 0 },
+    extra: { promptLength: codingAgentCall.stdin.length },
   });
 
   await ctx.judgeLLM({
@@ -698,5 +703,5 @@ export async function expectCodingDelegation(
 }
 
 function defaultCodingDelegationRubric(ticketId: string): string {
-  return `The message is a prompt sent to a coding agent via the \`alcode\` CLI. Expected: an alignfirst protocol invocation — \`Run the _spec_ protocol …\`, \`Run the _AAD_ protocol …\`, \`Run the _plan_ protocol …\`, etc. — including ticket id ${ticketId} and a description of the actual task: making the export button bold (paraphrases of "passer le bouton d'export en gras" are fine). Reject if: the ticket id is missing or wrong, the task description is missing or unrelated, or the prompt does not look like an alignfirst protocol invocation.`;
+  return `The message is a prompt sent to a coding agent via the \`alcode\` CLI. Expected: an AlignFirst protocol invocation — \`Run \`alignfirst guide spec\` and follow the protocol. Ticket ID = …\`, or the equivalent with another lowercase protocol name — including ticket id ${ticketId} and a description of the actual task: making the export button bold (paraphrases of "passer le bouton d'export en gras" are fine). Reject if: the ticket id is missing or wrong, the task description is missing or unrelated, or the prompt does not look like an AlignFirst protocol invocation.`;
 }

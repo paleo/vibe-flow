@@ -1,0 +1,117 @@
+# alignfirst
+
+The AlignFirst CLI provides collaborative software-development workflows, work files, and documentation discovery. Work files are organized by ticket and kept either git-ignored in the project or synchronized through a team repository.
+
+## Installation
+
+Install it globally:
+
+```sh
+npm install -g alignfirst
+```
+
+Or run the current version without installing it:
+
+```sh
+npx alignfirst
+```
+
+## Setup with your agent
+
+Temporarily install the setup-guide skill:
+
+```sh
+npx skills add https://github.com/paleo/alignfirst --skill alignfirst-setup-guide
+```
+
+Then ask your agent:
+
+```text
+Use your alignfirst-setup-guide skill. Set up AlignFirst in this project. Ask before installing anything globally.
+```
+
+The guide installs the selected components and configures the repository. Remove the setup-guide skill when setup is complete.
+
+## Commands
+
+- `guide` — Print an AlignFirst protocol.
+- `ticket` — Resolve a ticket directory, load its history, or get its next file.
+- `sync` — Synchronize shared plans.
+- `plans` — Set up, check and archive plans.
+- `docmap` — Browse project documentation.
+- `conventions` — Print the effective project conventions.
+- `context` — Print the conventions, the documentation map when `docs/` exists, and the protocol aliases.
+- `config` — Report the effective project configuration.
+- `doctor` — Diagnose an AlignFirst setup.
+
+Run `alignfirst --help` for command usage or `alignfirst guide` to choose a protocol. `alignfirst guide <protocol>` prints the selected protocol followed by the ticket directory and work file rules. Add `--protocol-only` when those rules are already in context.
+
+## Agent skills
+
+Nine optional Agent Skill stubs expose the CLI as commands in Claude Code, Codex, GitHub Copilot, and Cursor. Protocol skills reuse guides already in context and load missing guides through `npx -y alignfirst guide`. Catchup skills load ticket history through `npx -y alignfirst ticket --catchup`.
+
+Install them globally:
+
+```sh
+npx skills add https://github.com/paleo/alignfirst --global \
+  --skill al --skill alplan --skill alspec --skill aldescription \
+  --skill alreview --skill alcatchup --skill almerge \
+  --skill alcatchupaad --skill alcatchupspec
+```
+
+Install the `alignfirst` skill when a project's `AGENTS.md` does not run `npx alignfirst context`; it lets the agent recognize a protocol named in prose:
+
+```sh
+npx skills add https://github.com/paleo/alignfirst --global --skill alignfirst
+```
+
+Start a new agent session to load the skills.
+
+## Workflows
+
+These examples use the `/` form. Replace it with `$` in Codex.
+
+| Workflow | Command | Result |
+| --- | --- | --- |
+| Specification | `/alspec <request>` | Discuss and write a technical specification. |
+| Planning | `/alplan` | Turn a specification into one or more implementation plans. |
+| Align and do | `/al <request>` | Discuss and implement a small change, then write a summary. |
+| Description | `/aldescription` | Summarize the work and propose a commit message. |
+| Review | `/alreview` | Review the current branch against its base. |
+| Merge | `/almerge` | Resolve merge or rebase conflicts. |
+| Catch up | `/alcatchup` | Load the current ticket history and continue. |
+| Catch up and AAD | `/alcatchupaad <request>` | Load ticket history, then start AAD. |
+| Catch up and spec | `/alcatchupspec <request>` | Load ticket history, then start specification. |
+
+To implement a plan, start a fresh agent context and ask it to execute the plan file.
+
+AlignFirst stores specifications, plans, and summaries in `.plans/<ticket-id>/`. It normally derives the ticket ID from the request or branch and asks when none is available. Files use a cycle letter and sequence number, such as `A1-spec.md` and `A2-plan.md`.
+
+## Catchup output
+
+`alignfirst ticket [<id>] --catchup` prints the ticket's Markdown files, plans excluded, each in a `<file>` block carrying its path and modification time. When the history exceeds the output budget, only the entry list is printed, with a notice telling the agent to read the relevant files and skip the plans.
+
+## Updates
+
+```sh
+npm install -g alignfirst@latest
+npx skills update --global --yes
+```
+
+## Upgrade from v1, v2, or v3
+
+Install the setup-guide skill and ask your agent to run its upgrade route:
+
+```sh
+npx skills add https://github.com/paleo/alignfirst --skill alignfirst-setup-guide
+```
+
+```text
+Use your alignfirst-setup-guide skill. Upgrade AlignFirst in this project.
+```
+
+_Note: the setup-guide skill can be removed safely after it's done._
+
+## License
+
+CC0 1.0 Universal.

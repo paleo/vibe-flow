@@ -89,7 +89,7 @@
   },
   "agents": {
     "defaults": {
-      "skills": ["alignfirst", "alignfirst-setup-guide", "alignfirst-developer-openclaw-playbook"],
+      "skills": ["alignfirst-setup-guide", "alignfirst-developer-openclaw-playbook"],
       "heartbeat": {
         "every": "24h",
         "target": "last",
