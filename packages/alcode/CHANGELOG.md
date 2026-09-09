@@ -1,5 +1,11 @@
 # @paleo/alcode
 
+## 0.14.0
+
+### Minor Changes
+
+- dda71dd: Added the `astra` Codex model and limited `alcode usage` to Claude and Codex account limits without enabling Claude telemetry.
+
 ## 0.13.1
 
 ### Patch Changes
