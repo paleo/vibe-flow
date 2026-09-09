@@ -38,7 +38,7 @@ describe("conventions command", () => {
         "Branch names: `{TICKET_ID}/{slug-1-3-words}`.\n" +
         "Commits: `type: [#TICKET_ID] summary`; use `type: summary` for `side-N`. Do not add an agent co-author trailer.\n" +
         "Default branch: main.\n" +
-        "Plans: use `.plans`; keep it out of product commits. Automatic archival is enabled.\n" +
+        "Plans: use `.plans`. Automatic archival is enabled.\n" +
         "Searches: exclude `.plans`, `.local` and `.local-wt` from broad codebase searches.\n",
     );
   });

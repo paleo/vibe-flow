@@ -63,11 +63,12 @@ function renderPlans(ctx: CommandContext): string | undefined {
   try {
     const mode = resolvePlansMode(ctx.cwd, ctx.form);
     const folder = ctx.projectConfig?.config.plans?.folder;
-    const sharedFolder = folder === undefined ? "" : ` (shared folder \`${folder}\`)`;
+    const sharedFolder =
+      folder === undefined ? "" : ` (shared folder \`${folder}\`, a separate git repository)`;
     const base =
       mode.kind === "shared"
-        ? `Plans: use \`.plans\`${sharedFolder}; keep it out of product commits, and run \`${ctx.form} sync\` after changes.`
-        : "Plans: use `.plans`; keep it out of product commits.";
+        ? `Plans: use \`.plans\`${sharedFolder}; run \`${ctx.form} sync\` after changes.`
+        : "Plans: use `.plans`.";
     const archival =
       ctx.projectConfig?.config.plans?.autoArchive === true
         ? " Automatic archival is enabled."
