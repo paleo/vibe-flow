@@ -5,15 +5,15 @@ AlignFirst does not require the standalone docmap package or workspace.
 
 ## Install the CLI
 
-Project files invoke the CLI as `npx alignfirst`, which requires no installation. `npx` resolves the project's `node_modules/.bin`, then `PATH`, and otherwise fetches the CLI from the registry and caches it. The project therefore works on a machine that has never installed AlignFirst.
+Project files invoke the CLI as `npx alignfirst`, which requires no installation. `npx` resolves a project dependency or fetches the CLI from the registry and caches it. The project therefore works on a machine that has never installed AlignFirst.
 
-Installing the CLI globally makes every call resolve from `PATH` instead:
+Installing the CLI globally provides the bare `alignfirst` command:
 
 ```sh
 npm install -g alignfirst
 ```
 
-Offer this in the README as a convenience. Never make the project depend on it.
+Offer this in the README as a convenience and use the bare command when describing it. Project instructions remain on `npx alignfirst` and never depend on the global installation.
 
 ## Install the Skills
 

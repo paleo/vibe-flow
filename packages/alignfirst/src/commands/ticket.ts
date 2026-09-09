@@ -121,10 +121,12 @@ function parseTicketArgs(
     throw new CliError(
       `--catchup cannot be combined with --side, --next, --json, or --dry-run.\n\n${usage}`,
     );
+  const next =
+    values.next === undefined ? undefined : resolveNextRequest(normalized.requests, usage);
   const resolution = resolveTicketId(ctx, positionals[0], values);
   return {
     ...resolution,
-    next: values.next === undefined ? undefined : resolveNextRequest(normalized.requests, usage),
+    next,
     newCycle: values["new-cycle"],
     json: values.json,
     dryRun: values["dry-run"],

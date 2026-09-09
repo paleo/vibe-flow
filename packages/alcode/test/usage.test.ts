@@ -43,7 +43,15 @@ describe("Claude usage", () => {
       ["-p", "/usage", "--tools", "", "--output-format", "json", "--no-session-persistence"],
       {
         cwd: "/project",
-        env: { PATH: "/bin", KEEP: "yes" },
+        env: {
+          PATH: "/bin",
+          KEEP: "yes",
+          DISABLE_TELEMETRY: "1",
+          DISABLE_ERROR_REPORTING: "1",
+          DISABLE_FEEDBACK_COMMAND: "1",
+          DISABLE_BUG_COMMAND: "1",
+          CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY: "1",
+        },
         timeout: 30_000,
       },
     );

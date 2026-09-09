@@ -5,6 +5,13 @@ import type { CodingAgent } from "./coding-agent.js";
 import { buildAgentEnv } from "./run-agent.js";
 
 const USAGE_TIMEOUT_MS = 30_000;
+const CLAUDE_PRIVACY_OPT_OUTS = [
+  "DISABLE_TELEMETRY",
+  "DISABLE_ERROR_REPORTING",
+  "DISABLE_FEEDBACK_COMMAND",
+  "DISABLE_BUG_COMMAND",
+  "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY",
+] as const;
 const execFileAsync = promisify(execFile);
 const DEFAULT_USAGE_PROCESS_ADAPTER: UsageProcessAdapter = {
   execute: executeUsageProcess,
@@ -49,14 +56,18 @@ export function createUsageReader(
   timeoutMs = USAGE_TIMEOUT_MS,
 ): UsageReader {
   return async (agent, context) => {
-    const env = buildAgentEnv(context.env, [
-      ...(context.env.ALIGNFIRST_CODE_UNSET ?? "").split(","),
-      "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
-    ]);
+    const env = buildAgentEnv(context.env, (context.env.ALIGNFIRST_CODE_UNSET ?? "").split(","));
     return agent === "claude"
-      ? readClaudeUsage({ ...context, env }, adapter, timeoutMs)
+      ? readClaudeUsage({ ...context, env: translateClaudePrivacyOptOut(env) }, adapter, timeoutMs)
       : readCodexUsage({ ...context, env }, adapter, timeoutMs);
   };
+}
+
+function translateClaudePrivacyOptOut(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  if (env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC === undefined) return env;
+  delete env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC;
+  for (const name of CLAUDE_PRIVACY_OPT_OUTS) env[name] = "1";
+  return env;
 }
 
 async function readClaudeUsage(

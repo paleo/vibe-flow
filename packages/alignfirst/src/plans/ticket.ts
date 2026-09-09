@@ -172,24 +172,28 @@ export function detectTicketFromBranch(
   if (sideTicket) return { kind: "detected", id: sideTicket[0], branch };
   if (pattern === undefined) return { kind: "noMatch", branch };
   if (template?.includes("{TICKET_ID}")) {
-    const match = branchPatternFromTemplate(template).exec(branch);
-    if (!match || !new RegExp(`^(?:${pattern})$`).test(match[1]))
+    const match = branchPatternFromTemplate(template, unanchorPattern(pattern)).exec(branch);
+    const id = match?.[1];
+    if (id === undefined || !isPathSafeTicketId(id) || !isTicketName(id))
       return { kind: "noMatch", branch };
-    return { kind: "detected", id: match[1], branch };
+    return { kind: "detected", id, branch };
   }
-  const unanchored = pattern.replace(/^\^/, "").replace(/\$$/, "");
-  const match = new RegExp(unanchored).exec(branch);
+  const match = new RegExp(unanchorPattern(pattern)).exec(branch);
   if (!match) return { kind: "noMatch", branch };
   return { kind: "detected", id: match[0], branch };
 }
 
-function branchPatternFromTemplate(template: string): RegExp {
+function unanchorPattern(pattern: string): string {
+  return pattern.replace(/^\^/, "").replace(/\$$/, "");
+}
+
+function branchPatternFromTemplate(template: string, ticketPattern: string): RegExp {
   const placeholder = /\{[^{}]+\}/g;
   let source = "";
   let cursor = 0;
   for (const match of template.matchAll(placeholder)) {
     source += escapeRegexLiteral(template.slice(cursor, match.index));
-    source += match[0] === "{TICKET_ID}" ? "([^/]+)" : ".+";
+    source += match[0] === "{TICKET_ID}" ? `((?:${ticketPattern})|side-\\d+)` : ".+";
     cursor = match.index + match[0].length;
   }
   source += escapeRegexLiteral(template.slice(cursor));
