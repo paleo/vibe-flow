@@ -59,13 +59,17 @@ sudo chattr +i /home/{{SERVICE_USER}}/projects/.alignfirst-projects.json
 
 ## Skills and instructions
 
-The canonical skills at `~/.agents/skills/` feed both OpenClaw and the delegated coding agent, so the tree belongs to the admin account:
+The setup guide and `sharp-writing` under `~/.agents/skills/` feed both OpenClaw and the delegated coding agent. The playbook under OpenClaw's managed `~/.openclaw/skills/` directory feeds OpenClaw only. Both trees belong to the admin account; `~/.openclaw` stays writable for gateway state.
 
 ```sh
 sudo chown -Rh {{SERVER_ADMIN_USER}}:{{SERVER_ADMIN_USER}} /home/{{SERVICE_USER}}/.agents
 sudo find /home/{{SERVICE_USER}}/.agents -type d -exec chmod 755 {} +
 sudo find /home/{{SERVICE_USER}}/.agents -type f -exec chmod 644 {} +
 sudo chattr +i /home/{{SERVICE_USER}}/.agents
+sudo chown -Rh {{SERVER_ADMIN_USER}}:{{SERVER_ADMIN_USER}} /home/{{SERVICE_USER}}/.openclaw/skills
+sudo find /home/{{SERVICE_USER}}/.openclaw/skills -type d -exec chmod 755 {} +
+sudo find /home/{{SERVICE_USER}}/.openclaw/skills -type f -exec chmod 644 {} +
+sudo chattr +i /home/{{SERVICE_USER}}/.openclaw/skills
 ```
 
 The coding agent's own skill directory and global instruction file: [08-coding-agent.md § Hardening](08-coding-agent.md#hardening).
@@ -104,8 +108,9 @@ As the service account, every write must fail with `Operation not permitted` or 
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/.openclaw/workspace/AGENTS.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/.openclaw/openclaw.json'
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/projects/.alignfirst-projects.json'
-sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md'
+sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.agents ~/.agents-x'
+sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.openclaw/skills ~/.openclaw/skills-x'
 sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g cowsay
 ```
 

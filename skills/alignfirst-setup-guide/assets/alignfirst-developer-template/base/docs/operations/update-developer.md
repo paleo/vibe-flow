@@ -64,11 +64,37 @@ sudo -i -u {{SERVICE_USER}} -- bash -lc 'openclaw --version && alignfirst --vers
 
 ## Skills
 
-The canonical skills tree is admin-owned and immutable. The `skills` scope also covers Claude Code's symlink tier when selected.
+The shared `~/.agents` tree and OpenClaw's managed `~/.openclaw/skills` tree are admin-owned and immutable. The `skills` scope also covers Claude Code's symlink tier when selected.
+
+### Move the playbook to OpenClaw's skill directory
+
+A deployment created before the playbook became OpenClaw-only runs this migration once, before the normal skill update. Removing the old entry deletes its canonical copy and every agent link. The second command copies it directly into OpenClaw's managed directory.
+
+```sh
+sudo /usr/local/sbin/alignfirst-developer-maintenance skills -- bash <<'EOS'
+set -e
+npx -y skills remove alignfirst-developer-openclaw-playbook -g -y </dev/null
+npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+  --agent openclaw --copy --skill alignfirst-developer-openclaw-playbook </dev/null
+EOS
+```
+
+Apply [update-workspace.md](update-workspace.md) so `AGENTS.md` reads the playbook from its new path. The maintenance wrapper restores `/home/{{SERVICE_USER}}/.openclaw/skills` with admin ownership, directory mode `755`, file mode `644` and the immutable flag, as specified in [06-security-hardening.md](../installations/06-security-hardening.md#skills-and-instructions).
+
+### Update skills
 
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance skills -- \
   bash -lc 'npx -y skills update -g -y </dev/null'
+```
+
+The CLI does not retain the copied OpenClaw target during an update. Restore the playbook copy after every update:
+
+```sh
+sudo /usr/local/sbin/alignfirst-developer-maintenance skills -- bash -lc '
+npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+  --agent openclaw --copy --skill alignfirst-developer-openclaw-playbook </dev/null
+'
 ```
 
 Then make sure every target exists. If an entry is missing, repeat the idempotent `skills add` block of [08-coding-agent.md § Skills](../installations/08-coding-agent.md#skills), replacing its opening command with:
@@ -80,10 +106,11 @@ sudo /usr/local/sbin/alignfirst-developer-maintenance skills -- bash <<'EOS'
 Sweep the escaped symlinks the `skills` CLI writes into `~/.openclaw/skills/` ([gotchas.md](../gotchas.md#skills-cli-writes-escaped-symlinks-under-openclawskills)). Run it as a separate command: the symlink writes lag the CLI's return, so a sweep chained in the same heredoc deletes nothing.
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- find /home/{{SERVICE_USER}}/.openclaw/skills -maxdepth 1 -type l -print -delete
+sudo /usr/local/sbin/alignfirst-developer-maintenance skills -- \
+  find /home/{{SERVICE_USER}}/.openclaw/skills -maxdepth 1 -type l -print -delete
 ```
 
-`~/.agents/skills/` is shared between OpenClaw and the coding agent; `skills remove` deletes a skill for both — see [gotchas.md](../gotchas.md#agentsskills-is-shared-between-openclaw-and-the-coding-agent).
+The setup guide and `sharp-writing` remain shared through `~/.agents/skills/`. The playbook lives in OpenClaw's managed directory and reaches no coding agent. See [gotchas.md](../gotchas.md#shared-skills-live-under-agentsskills).
 
 ## Seed snapshot and projects marker
 

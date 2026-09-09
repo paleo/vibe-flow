@@ -132,6 +132,10 @@ unlock_packages() {
 unlock_skills() {
   chattr -i "$SERVICE_HOME/.agents"
   chown -Rh "$SERVICE_USER:$SERVICE_USER" "$SERVICE_HOME/.agents"
+  if [ -d "$SERVICE_HOME/.openclaw/skills" ]; then
+    chattr -i "$SERVICE_HOME/.openclaw/skills"
+    chown -Rh "$SERVICE_USER:$SERVICE_USER" "$SERVICE_HOME/.openclaw/skills"
+  fi
   if [ "$CODING_AGENT" = claude ]; then
     chattr -i "$AGENT_SKILLS_DIR"
     chown -Rh "$SERVICE_USER:$SERVICE_USER" "$AGENT_SKILLS_DIR"
@@ -212,6 +216,9 @@ restore_packages() {
 restore_skills() {
   local status=0
   restore_tree "$SERVICE_HOME/.agents" || status=1
+  if [ -d "$SERVICE_HOME/.openclaw/skills" ]; then
+    restore_tree "$SERVICE_HOME/.openclaw/skills" || status=1
+  fi
   if [ "$CODING_AGENT" = claude ]; then restore_tree "$AGENT_SKILLS_DIR" || status=1; fi
   return "$status"
 }

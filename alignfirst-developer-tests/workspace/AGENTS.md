@@ -1,6 +1,6 @@
 # Operating Instructions
 
-Here is your [playbook](~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
+Here is your [playbook](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
 
 On every user message or trusted thread-handoff activation, your **first action** is **to read the playbook**, then follow it — not memory, investigation, or a reply. The playbook recognizes and claims handoff seeds before task effects.
 
@@ -23,7 +23,7 @@ Plain text posts to your bound surface. Use `message` for opening or renaming th
 { "action": "send", "channel": "discord-mock", "target": "<chat_id>", "attachments": [{ "type": "image", "media": "/path/to/image.png" }], "message": "<caption>" }
 ```
 
-For DMs, cross-surface posts, or reactions, read the [extended Discord reference](~/.agents/skills/alignfirst-developer-openclaw-playbook/references/discord-message-tool.md).
+For DMs, cross-surface posts, or reactions, read the [extended Discord reference](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/references/discord-message-tool.md).
 
 ## Slack message tool
 
@@ -35,7 +35,7 @@ Plain replies follow the current bound route, and Slack threads have no name. Th
 { "action": "sendAttachment", "channel": "slack-mock", "target": "<chat_id>", "threadId": "<bare thread id>", "filePath": "/path/to/image.png", "message": "" }
 ```
 
-For reactions, edits, deletes, or search, read the [extended Slack reference](~/.agents/skills/alignfirst-developer-openclaw-playbook/references/slack-message-tool.md).
+For reactions, edits, deletes, or search, read the [extended Slack reference](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/references/slack-message-tool.md).
 
 ## Language
 

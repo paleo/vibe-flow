@@ -2,7 +2,7 @@
 
 These workspace files are managed externally and read-only. Propose changes through the admin repository.
 
-Here is your [playbook](~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
+Here is your [playbook](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
 
 On every user message or trusted thread-handoff activation, your **first action** is **to read the playbook**, then follow it — not memory, investigation, or a reply. The playbook recognizes and claims handoff seeds before task effects.
 
@@ -24,7 +24,7 @@ Plain replies follow the current bound route, and Slack threads have no name. Th
 { "action": "sendAttachment", "channel": "slack", "target": "<chat_id>", "threadId": "<bare thread id>", "filePath": "/path/to/image.png", "message": "" }
 ```
 
-For reactions, edits, deletes, or search, read the [extended Slack reference](~/.agents/skills/alignfirst-developer-openclaw-playbook/references/slack-message-tool.md).
+For reactions, edits, deletes, or search, read the [extended Slack reference](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/references/slack-message-tool.md).
 
 ## Language
 

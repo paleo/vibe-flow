@@ -2,7 +2,7 @@
 
 These workspace files are managed externally and read-only. Propose changes through the admin repository.
 
-Here is your [playbook](~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
+Here is your [playbook](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
 
 On every user message or trusted thread-handoff activation, your **first action** is **to read the playbook**, then follow it — not memory, investigation, or a reply. The playbook recognizes and claims handoff seeds before task effects.
 
@@ -25,7 +25,7 @@ Plain text posts to your bound surface. Use `message` for opening or renaming th
 { "action": "send", "channel": "discord", "target": "<chat_id>", "attachments": [{ "type": "image", "media": "/path/to/image.png" }], "message": "<caption>" }
 ```
 
-For DMs, cross-surface posts, or reactions, read the [extended Discord reference](~/.agents/skills/alignfirst-developer-openclaw-playbook/references/discord-message-tool.md).
+For DMs, cross-surface posts, or reactions, read the [extended Discord reference](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/references/discord-message-tool.md).
 
 ## Language
 

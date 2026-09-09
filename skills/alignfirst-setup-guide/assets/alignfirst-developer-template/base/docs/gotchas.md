@@ -24,14 +24,13 @@ A bare `docker …` without `DOCKER_HOST` fails on `unix:///var/run/docker.sock`
 
 ## `skills` CLI writes escaped symlinks under `~/.openclaw/skills/`
 
-For every skill it updates, `npx skills update` drops a symlink at `~/.openclaw/skills/<name>` pointing outside that directory, to the canonical `~/.agents/skills/<name>`. OpenClaw's path-safety check rejects it and `openclaw doctor` logs `Skipping escaped skill path …`. Discovery works through the `~/.agents/skills/` tier anyway. [update-developer.md](operations/update-developer.md) sweeps the links after each update.
+For every skill it updates, `npx skills update` drops a symlink at `~/.openclaw/skills/<name>` pointing outside that directory, to the canonical `~/.agents/skills/<name>`. OpenClaw's path-safety check rejects it and `openclaw doctor` logs `Skipping escaped skill path …`. Discovery of shared skills works through the `~/.agents/skills/` tier. [update-developer.md](operations/update-developer.md) sweeps the links inside the `skills` maintenance scope because the managed directory is locked. The copied playbook is a directory, so the `-type l` sweep leaves it in place.
 
-## `~/.agents/skills` is shared between OpenClaw and the coding agent
+## Shared skills live under `~/.agents/skills`
 
-Skills install once, into `~/.agents/skills/`, which OpenClaw and the delegated coding agent
-both scan. OpenClaw loads only its `agents.defaults.skills` allowlist, including
-`alignfirst-setup-guide` for project creation; the coding agent loads every skill there.
-`skills remove` deletes the canonical copy for both.
+The setup guide and `sharp-writing` install once under `~/.agents/skills/`. OpenClaw loads only its `agents.defaults.skills` allowlist, including `alignfirst-setup-guide` for project creation. The coding agent receives the shared skills through its own tier. `skills remove` deletes a shared skill for both.
+
+The playbook lives under OpenClaw's managed `~/.openclaw/skills/` directory and reaches no coding agent.
 
 ## Moving a project breaks its workspace registry
 

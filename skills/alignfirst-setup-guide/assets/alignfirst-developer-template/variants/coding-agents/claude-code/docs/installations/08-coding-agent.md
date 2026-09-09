@@ -69,14 +69,16 @@ Trusting `~/projects` once covers every project cloned under it; `alcode` starts
 
 ### Skills
 
-**Role: operator**, as the service account, after [Authenticate](#authenticate). Two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent claude-code` adds the `~/.claude/skills/<name>` symlink that the `claude` CLI reads. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
+**Role: operator**, as the service account, after [Authenticate](#authenticate). The setup guide and `sharp-writing` use two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent claude-code` adds the `~/.claude/skills/<name>` symlink that the `claude` CLI reads. The playbook is copied to OpenClaw's managed `~/.openclaw/skills/` directory because its operating instructions would only cost tokens in the coding agent's context. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
 
 ```sh
 sudo -i -u {{SERVICE_USER}} bash <<'EOS'
 set -e
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent universal --agent claude-code \
-  --skill alignfirst-setup-guide --skill alignfirst-developer-openclaw-playbook < /dev/null
+  --skill alignfirst-setup-guide < /dev/null
+npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+  --agent openclaw --copy --skill alignfirst-developer-openclaw-playbook < /dev/null
 npx -y skills add https://github.com/paleo/skills --global --yes \
   --agent universal --agent claude-code --skill sharp-writing < /dev/null
 EOS

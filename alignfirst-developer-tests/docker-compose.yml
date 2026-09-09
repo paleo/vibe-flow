@@ -24,10 +24,10 @@ services:
     volumes:
       - ${OPENCLAW_CODEX_HOME:-openclaw-codex-home}:/home/claw/.codex:ro
       - fixture-projects:/home/claw/projects
-      # Live-mount the playbook skill over its baked copy so playbook edits
-      # iterate without an image rebuild. Set in .env.local (relative to this
-      # dir, e.g. ../skills/alignfirst-developer-openclaw-playbook).
-      - ${ALIGNFIRST_DEVELOPER_PLAYBOOK_SKILL_DIR}:/home/claw/.agents/skills/alignfirst-developer-openclaw-playbook
+      # Live-mount the playbook skill over its copy in OpenClaw's managed skill
+      # directory. Set in .env.local (relative to this dir, e.g.
+      # ../skills/alignfirst-developer-openclaw-playbook).
+      - ${ALIGNFIRST_DEVELOPER_PLAYBOOK_SKILL_DIR}:/home/claw/.openclaw/skills/alignfirst-developer-openclaw-playbook
       # Live-mount the built monorepo so the alcode and alignfirst wrappers resolve
       # to this checkout. Run `npm run build` at the root first so alcode, alignfirst,
       # and docmap have built output.

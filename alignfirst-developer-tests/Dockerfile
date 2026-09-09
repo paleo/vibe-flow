@@ -88,10 +88,13 @@ COPY --chown=claw:claw projects-fixture/template/ /opt/alignfirst-developer-test
 RUN cd /opt/alignfirst-developer-tests/fixtures/template && \
     pnpm install --frozen-lockfile
 
-# Install AlignFirst skills under /home/claw/.agents/skills/ (the path OpenClaw scans).
+# Install the shared setup guide under /home/claw/.agents/skills/ and the
+# OpenClaw-only playbook under OpenClaw's managed /home/claw/.openclaw/skills/.
 RUN npx -y skills add https://github.com/paleo/alignfirst --global --yes \
       --agent universal --agent claude-code \
-      --skill alignfirst-setup-guide \
+      --skill alignfirst-setup-guide && \
+    npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+      --agent openclaw --copy \
       --skill alignfirst-developer-openclaw-playbook
 
 USER root

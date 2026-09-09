@@ -12,7 +12,8 @@ Three roles, named as the runbooks name them:
 
 The service account never reads the admin repository. It works from a snapshot at `~{{SERVICE_USER}}/seed/`, an `rsync` of `infra/openclaw/` with `.env` included, refreshed by the root-owned maintenance wrapper before every protected change. The wrapper contains the service account, unlocks only named scopes, runs one command as that account, and restores hardening through an exit trap. From there:
 
-- `~/.openclaw/` — `openclaw.json` (written by the seed through `openclaw config set`), `workspace/` (applied from `~/seed/workspace/`), `secrets/secrets.json` (every credential, referenced from `openclaw.json` as file SecretRefs), `.env` (the gateway env file, `CONTEXT7_API_KEY` only), and `thread-handoff/state.sqlite` (the plugin's durable handoff state).
+- `~/.openclaw/` — `openclaw.json` (written by the seed through `openclaw config set`), `workspace/` (applied from `~/seed/workspace/`), `skills/` (the OpenClaw-only playbook), `secrets/secrets.json` (every credential, referenced from `openclaw.json` as file SecretRefs), `.env` (the gateway env file, `CONTEXT7_API_KEY` only), and `thread-handoff/state.sqlite` (the plugin's durable handoff state).
+- `~/.agents/skills/` — the setup guide and `sharp-writing`, shared with the delegated coding agent.
 - `~/.config/environment.d/` — the non-secret variables `systemd --user` injects into the gateway and `~/.bash_profile` sources for login shells.
 - The gateway unit, written by `openclaw gateway install`, enabled under lingering.
 - `~/projects` — the managed projects, their `.alignfirst-projects.json` marker and, with team plans, the service account's own clone of the plans repository (a repository, never a project).

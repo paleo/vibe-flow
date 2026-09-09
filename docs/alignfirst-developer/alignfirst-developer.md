@@ -24,7 +24,7 @@ The [`@paleo/alignfirst-developer-openclaw-plugin`](../../packages/alignfirst-de
 3. **Regression-test harness** —
    [`alignfirst-developer-tests/`](../../alignfirst-developer-tests/). This standalone Dockerised
    consumer drives the workspace through synthetic Discord and Slack channels and judges the result.
-   It bind-mounts the workspace, playbook skill, and monorepo root into the gateway, so `alcode`, `alignfirst` and `alproject` run from the checkout.
+   It bind-mounts the workspace, the playbook at `/home/claw/.openclaw/skills/alignfirst-developer-openclaw-playbook`, and the monorepo root into the gateway, so `alcode`, `alignfirst` and `alproject` run from the checkout. The managed skill path keeps the playbook out of the mock coding agent's context.
    The harness intercepts both supported delegated-agent subprocesses.
 
 ## How a turn flows

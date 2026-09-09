@@ -63,6 +63,8 @@ The consumer-owned `Dockerfile` (dropped by `init`) does:
 4. `npx openclaw plugins registry --refresh` so the gateway sees the loaded channels.
 5. Optional consumer customizations (extra system packages, skills install, etc.).
 
+The AlignFirst Developer consumer copies its OpenClaw-only playbook to `/home/claw/.openclaw/skills/alignfirst-developer-openclaw-playbook`. Its Compose overlay bind-mounts the checkout at that managed skill path, while shared skills remain under `/home/claw/.agents/skills/`.
+
 `openclaw-test run` does **not** rebuild. Re-run `npm run env:build` after edits to `openclaw.json` or the consumer `Dockerfile`, or after bumping any `@paleo/openclaw-*` dependency.
 
 `Dockerfile.base` overrides `/etc/profile`. OpenClaw's `exec` tool spawns `/bin/sh -lc <command>`, which sources `/etc/profile`. Alpine's stock profile resets PATH to a "safe" default that drops `/opt/openclaw-test/mocks/bin`, silently bypassing the shim — so only commands missing from the default PATH (e.g. `git`, not installed in Alpine) would end up shimmed. Overriding the profile keeps the shim first for every command.
