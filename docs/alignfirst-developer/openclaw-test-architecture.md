@@ -150,9 +150,7 @@ Both channels register together on every gateway boot. The runner selects which 
 - `discord-mock` — `surface: "discord"`, `autoThread: false`. Full Discord-shaped surface (`send`, `thread-create`, `thread-reply`, `react`, `read`, `edit`, `delete`, `search`). `thread-create` posts an optional `text`/`message`/`content` atomically with the new thread. Free-form agent text without a tool call lands in the parent channel.
 - `slack-mock` — `surface: "slack"`, `autoThread: true`. Slack-shaped surface with `send`,
   `react`, `read`, `edit`, `delete`, `reactions`, and `search`; fake thread creation/rename actions
-  remain disabled. `replyToMode: "all"` is the compatibility default and routes an eligible root
-  plus later replies through one thread session keyed by the root message ID. `"off"` keeps roots
-  in the channel session and routes only explicit replies through a thread session.
+  remain disabled. Its action adapter prepares `send` for core delivery through the mock's message adapter. `replyToMode: "all"` is the compatibility default and routes an eligible root plus later replies through one thread session keyed by the root message ID. `"off"` keeps roots in the channel session and routes only explicit replies through a thread session.
 
 Inbound metadata claims `Provider` / `Surface` / `OriginatingChannel` = the registered channel id, so the SDK routes tool-schema discovery back to the right plugin. Envelope targets follow the native surface: a Discord thread is `channel:<thread-id>`, while a Slack thread is `thread:<channel-id>/<thread-ts>`. The bus keeps its own composite thread target so scenario traffic remains attributable to the parent conversation.
 
@@ -177,11 +175,7 @@ Canonical destination param is `to`. Accepted shapes:
 
 Resolved in the order `to → target → channelId` to match the normalizer's output.
 
-Plugin actions and `send` route through different handlers in `message-action-runner.ts`. The mocks
-preserve that distinction. Slack `send` reports `{ ok: true, result: { messageId, channelId,
-threadTs? } }`; Discord `thread-create` reports `{ ok: true, thread }` and retains its parent-message
-anchor. A Discord starter-delivery failure is returned as an explicit partial result. The handoff
-plugin accepts only confirmed native results and never infers success from requested arguments.
+Plugin actions and prepared sends route through different handlers in `message-action-runner.ts`. Slack `send` uses `prepareSendPayload`, then core delivers it through the mock's message adapter and returns a `MessageSendResult` with `deliveryStatus`, `result.target`, `result.receipt.threadId`, and `messageDelivery`. Discord `thread-create` stays on the plugin path, reports `{ ok: true, thread }`, and retains its parent-message anchor. A Discord starter-delivery failure is an explicit partial result. The handoff plugin accepts only confirmed native results.
 
 The AlignFirst Developer consumer sets Slack to `replyToMode: "off"`. Its parent channel session
 posts one explicit native starter, then calls `thread_handoff start`. The plugin durably records and

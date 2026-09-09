@@ -14,7 +14,7 @@ USER root
 # the project's dev scripts). Plus the per-command mock-cli shim symlinks
 # this consumer wants intercepted. `claude`, `codex`, and `gh` are shimmed. `alcode` runs for real,
 # and its selected coding-agent subprocess resolves back to the shim via PATH order.
-RUN apk add --no-cache git curl && \
+RUN apk add --no-cache git curl sqlite && \
     npm install --global corepack@0.36.0 && \
     corepack enable && corepack prepare pnpm@latest --activate && \
     for name in claude codex gh; do ln -sf mock-cli-shim "/opt/openclaw-test/mocks/bin/$name"; done && \

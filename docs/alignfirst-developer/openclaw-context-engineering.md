@@ -111,6 +111,12 @@ Two supported shapes handle a Discord thread:
 
 The channel session opens a Discord thread through `message thread-create`, or populates a Slack thread through `message send` with explicit `threadId`. Native Slack automatic root routing would also derive the thread key, but it is disabled so ordinary channel conversation stays at root. The handoff plugin derives that same public canonical route and wakes it; later user messages resolve to it normally. Ordinary replies in the active thread use normal delivery, not another message-tool send.
 
+#### Delivery receipt shapes
+
+A Slack `send` is prepared by `extensions/slack/src/channel-actions.ts` and handled by core in `src/infra/outbound/outbound-send-service.ts`. Its result details are a `MessageSendResult`: `channel`, `to`, `via`, `result.target`, `result.messageId`, optional `result.receipt.threadId`, and `deliveryStatus`. `src/agents/embedded-agent-message-delivery.ts` adds `messageDelivery`; `details.ok` is absent. A team-qualified target stays on the plugin path and returns `{ ok, result }`, which the handoff plugin does not accept.
+
+Discord `thread-create` stays on the plugin action path and returns `{ ok: true, thread }`, or a partial result when the initial message fails. `after_tool_call` receives the sanitized result plus `sessionKey` and `sessionId`; it receives no channel identity. The handoff plugin joins the event to the source context cached when `src/thread-handoff/tool.ts` instantiated the tool for that session (`src/thread-handoff/index.ts`, `src/thread-handoff/receipts.ts`).
+
 The `message`, `browser`, and optional `thread_handoff` tools are profile-gated. The supported widening knob is `tools.alsoAllow` (merged in `src/agents/agent-tools.policy.ts`):
 
 ```jsonc

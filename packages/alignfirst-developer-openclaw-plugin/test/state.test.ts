@@ -47,6 +47,25 @@ describe("handoff SQLite state", () => {
     store.close();
   });
 
+  it("lists active receipts in insertion order and prunes expired rows", () => {
+    const store = createHandoffStore(temporaryStateDir());
+    store.insertReceipt(receipt({ receiptKey: "first", expiresAt: 3_000 }), 1_000);
+    store.insertReceipt(
+      receipt({ receiptKey: "expired", threadId: "expired", expiresAt: 2_000 }),
+      1_000,
+    );
+    store.insertReceipt(
+      receipt({ receiptKey: "second", threadId: "second", expiresAt: 4_000 }),
+      1_000,
+    );
+
+    expect(store.listReceipts(2_000).map((record) => record.receiptKey)).toEqual([
+      "first",
+      "second",
+    ]);
+    store.close();
+  });
+
   it("claims atomically across independent connections", async () => {
     const stateDir = temporaryStateDir();
     const first = createHandoffStore(stateDir);

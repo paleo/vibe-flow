@@ -2,9 +2,7 @@
 
 Synthetic Slack-shaped OpenClaw channel plugin. Registers as channel `slack-mock`. Its
 Slack-shaped action surface includes `send`, `read`, `edit`, `delete`, `react`, `reactions`, and
-`search`; fake thread creation, replies, and renames stay unavailable. `send` returns Slack's native
-`{ ok: true, result: { messageId, channelId, threadTs? } }` receipt shape and preserves starter text
-exactly.
+`search`; fake thread creation, replies, and renames stay unavailable. `send` is prepared for OpenClaw core, which delivers through the mock's message adapter and shapes `deliveryStatus`, `result.target`, `result.receipt.threadId`, and `messageDelivery`. Starter text is preserved exactly.
 
 Backed by [`@paleo/openclaw-channel-mock-core`](https://www.npmjs.com/package/@paleo/openclaw-channel-mock-core) (`surface: "slack"`, `autoThread: true`). Pair with [`@paleo/openclaw-test`](https://www.npmjs.com/package/@paleo/openclaw-test) for the test harness.
 

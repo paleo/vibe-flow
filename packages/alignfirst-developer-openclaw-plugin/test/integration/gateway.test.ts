@@ -102,8 +102,8 @@ describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
       expect(providerContentIncludes(fixture, '"status": "alreadyStarted"')).toBe(true);
       expect(
         surface === "slack"
-          ? providerContentIncludes(fixture, '"result"') &&
-              providerContentIncludes(fixture, '"threadTs"')
+          ? providerContentIncludes(fixture, '"receipt"') &&
+              providerContentIncludes(fixture, '"deliveryStatus"')
           : providerContentIncludes(fixture, '"thread"') &&
               providerContentIncludes(fixture, '"parentMessageId"'),
       ).toBe(true);
@@ -136,7 +136,8 @@ describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
   );
 
   it("recovers one pending Slack startup across abrupt and post-claim restarts", async () => {
-    const fixture = await startFixture("slack", { holdFirstSeed: true });
+    const options = { holdFirstSeed: true };
+    const fixture = await startFixture("slack", options);
     await injectQaBusInboundMessage({
       baseUrl: serverUrl(fixture.busServer),
       input: {
@@ -158,6 +159,7 @@ describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
     expect(pending).toHaveLength(1);
     expect(pending[0]?.state).toBe("pending");
 
+    options.holdFirstSeed = false;
     await restartGateway(fixture, "SIGKILL");
     await waitForMessage(fixture, (message) => message.text === MARKER, 45_000);
     expect(await handoffStates(fixture)).toEqual(["claimed"]);
@@ -340,7 +342,6 @@ function createProviderScript(
 ) {
   let callSequence = 0;
   let repeatedStart = false;
-  let heldFirstSeed = false;
   return (body: Record<string, unknown>) => {
     const messages = Array.isArray(body.messages) ? body.messages : [];
     const tailMessages = messages.slice(-4) as Array<{ role?: unknown; content?: unknown }>;
@@ -355,10 +356,7 @@ function createProviderScript(
       return { content: "SAME_SESSION_CONTINUED" };
     }
     if (tail.includes("[thread-handoff:v1]")) {
-      if (options.holdFirstSeed && !heldFirstSeed) {
-        heldFirstSeed = true;
-        return { content: "NO_REPLY" };
-      }
+      if (options.holdFirstSeed) return { content: "NO_REPLY" };
       const snapshot = bus.state.getSnapshot();
       if (snapshot.messages.some((message) => message.text === MARKER)) {
         return { content: "NO_REPLY" };

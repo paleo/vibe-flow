@@ -1,6 +1,7 @@
 import {
   createChannelMockAccountHelpers,
   createChannelMockMessageActions,
+  createChannelMockPlugin,
 } from "@paleo/openclaw-channel-mock-core";
 import { createServer, type Server } from "node:http";
 import { createBus } from "@paleo/openclaw-channel-mock-core";
@@ -14,12 +15,14 @@ const actions = createChannelMockMessageActions({
   helpers,
 });
 
-if (!actions.handleAction || !actions.describeMessageTool) {
-  throw new Error("slack-mock actions missing handleAction/describeMessageTool");
+if (!actions.handleAction || !actions.describeMessageTool || !actions.prepareSendPayload) {
+  throw new Error("slack-mock actions missing required adapters");
 }
 const handleAction: NonNullable<typeof actions.handleAction> = actions.handleAction;
 const describeMessageTool: NonNullable<typeof actions.describeMessageTool> =
   actions.describeMessageTool;
+const prepareSendPayload: NonNullable<typeof actions.prepareSendPayload> =
+  actions.prepareSendPayload;
 
 let server: Server;
 let baseUrl: string;
@@ -84,41 +87,52 @@ describe("slack-mock action surface", () => {
     }
   });
 
-  it("returns the native Slack receipt and preserves explicit thread text", async () => {
-    const result = (await run("send", {
-      to: "channel:Sample-Project",
-      threadId: "171.0001",
-      text: "  exact starter\nbody  ",
-    })) as { content: Array<{ text: string }> };
-    const payload = JSON.parse(result.content[0].text);
-    expect(payload).toMatchObject({
-      ok: true,
-      result: {
-        channelId: "Sample-Project",
-        threadTs: "171.0001",
+  it("prepares sends for core delivery and rejects the plugin send path", async () => {
+    const payload = { text: "  exact starter\nbody  " };
+    expect(
+      await prepareSendPayload({ ctx: { action: "send" }, payload } as unknown as Parameters<
+        typeof prepareSendPayload
+      >[0]),
+    ).toBe(payload);
+    expect(
+      await prepareSendPayload({ ctx: { action: "read" }, payload } as unknown as Parameters<
+        typeof prepareSendPayload
+      >[0]),
+    ).toBeNull();
+    await expect(run("send", { to: "channel:Sample-Project", text: payload.text })).rejects.toThrow(
+      /must use OpenClaw core delivery/,
+    );
+  });
+
+  it("returns the bus-resolved target and thread from the message adapter", async () => {
+    const plugin = createChannelMockPlugin({
+      channelId: CHANNEL_ID,
+      label: "Slack Mock",
+      surface: "slack",
+      autoThread: true,
+      getRuntime: () => {
+        throw new Error("runtime is not used by the message adapter");
       },
     });
-    expect(payload.result.messageId).toBeTruthy();
+    const sendText = plugin.message?.send?.text;
+    if (!sendText) throw new Error("slack-mock message adapter missing send.text");
+    const result = await sendText({
+      cfg: cfg(),
+      accountId: "default",
+      to: "channel:Sample-Project",
+      text: "  exact starter\nbody  ",
+      threadId: "171.0001",
+    } as unknown as Parameters<typeof sendText>[0]);
+
+    expect(result).toMatchObject({
+      target: { kind: "channel", id: "Sample-Project" },
+      receipt: { threadId: "171.0001" },
+    });
     expect(bus.state.getSnapshot().messages[0]).toMatchObject({
       conversation: { id: "Sample-Project" },
       threadId: "171.0001",
       text: "  exact starter\nbody  ",
     });
-  });
-
-  it("supports ordinary root sends", async () => {
-    const result = (await run("send", { to: "channel:sample-project", text: "root" })) as {
-      content: Array<{ text: string }>;
-    };
-    const payload = JSON.parse(result.content[0].text);
-    expect(payload.result.threadTs).toBeUndefined();
-    expect(bus.state.getSnapshot().messages[0].threadId).toBeUndefined();
-  });
-
-  it("requires both destination and starter text", async () => {
-    await expect(run("send", { to: "channel:sample-project" })).rejects.toThrow(
-      /requires a destination.*message\/text/,
-    );
   });
 
   it("continues to reject fake Slack creation and rename actions", async () => {

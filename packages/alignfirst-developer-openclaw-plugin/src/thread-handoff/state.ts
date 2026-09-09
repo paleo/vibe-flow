@@ -12,6 +12,7 @@ const STORE_CAPACITY = 10_000;
 export interface HandoffStore {
   insertReceipt(receipt: DeliveryReceipt, now: number): void;
   findReceipt(identity: ReceiptIdentity, now: number): DeliveryReceipt | undefined;
+  listReceipts(now: number): DeliveryReceipt[];
   findHandoffByRoute(routeKey: string): HandoffRecord | undefined;
   insertHandoff(record: HandoffRecord): { inserted: boolean; record: HandoffRecord };
   claimHandoff(identity: ClaimIdentity, now: number): ClaimResult;
@@ -115,6 +116,7 @@ function createStoreOperations(database: DatabaseSync): HandoffStore {
   return {
     insertReceipt: (receipt, now) => insertReceipt(database, receipt, now),
     findReceipt: (identity, now) => findReceipt(database, identity, now),
+    listReceipts: (now) => listReceipts(database, now),
     findHandoffByRoute: (routeKey) => findHandoffByRoute(database, routeKey),
     insertHandoff: (record) => insertHandoff(database, record),
     claimHandoff: (identity, now) => claimHandoff(database, identity, now),
@@ -299,6 +301,16 @@ function listPending(database: DatabaseSync, query: PendingQuery): HandoffRecord
       )
       .all(query.maxEnqueues, query.now - query.retryIntervalMs) as unknown as StoredJsonRow[];
     return rows.map((row) => parseHandoff(row.record_json));
+  });
+}
+
+function listReceipts(database: DatabaseSync, now: number): DeliveryReceipt[] {
+  return runStateOperation("list receipts", () => {
+    database.prepare("DELETE FROM receipts WHERE expires_at <= ?").run(now);
+    const rows = database
+      .prepare("SELECT record_json FROM receipts WHERE expires_at > ? ORDER BY rowid")
+      .all(now) as unknown as StoredJsonRow[];
+    return rows.map((row) => parseReceipt(row.record_json));
   });
 }
 

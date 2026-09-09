@@ -47,6 +47,8 @@ A channel session answers ordinary conversation at the root. For project work, i
 
 The fresh regular thread session recognizes the plugin seed, claims its opaque handoff before task effects, combines the seed's exact starter context with thread history, and proceeds without a mechanical user nudge. It waits silently only for genuinely missing input or an explicit hold. Completion and later user turns stay on the same canonical thread session. Project creation and repository onboarding remain exceptions to the initial path requirement. The older manual-follow-up contract and, before it, channel-owned setup both produced avoidable routing failures; the historical artifact at `alignfirst-developer-tests/artifacts/2026-07-15T10-31-39-655Z/` documents the latter.
 
+A regular agent turn could alternatively start the thread session through the gateway `agent` RPC behind `openclaw agent --session-key`, or through in-process `runtime.agent.runEmbeddedAgent` if external plugins can access it. That availability is unverified; the seed would arrive as a user message, and delivery routing to a Slack thread target remains untested. The current wake path stays `enqueueSystemEvent` plus `requestHeartbeat` with `source: "notifications-event"`, `intent: "immediate"`, and `reason: "wake"`: the production failure occurred before any wake. Revisit the alternative only after reproducing a wake failure.
+
 ## Reading order for maintainers
 
 - [`openclaw-context-engineering.md`](./openclaw-context-engineering.md) — what OpenClaw auto-loads, the surface/session/subagent model, Discord thread routing, debug env vars. Read this first before touching layer 1 or 2.

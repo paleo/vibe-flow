@@ -42,8 +42,7 @@ their IDs to the corresponding native contract:
 
 The plugin observes successful native `message` actions but never creates a thread itself.
 
-- Slack evidence is a successful `send` to the current parent channel with an explicit `threadId`,
-  nonempty body, and confirmed message ID.
+- Slack evidence is a `send` to the current parent channel with an explicit `threadId`, nonempty body, `deliveryStatus: "sent"`, and `messageDelivery: { status: "settled", partialDelivery: false }`. The result must include a channel-kind `target` naming the parent and a nonempty `messageId`; `result.receipt.threadId`, when present, must match the requested thread. The plugin-path `{ ok, result }` shape used by team-qualified Slack sends is rejected.
 - Discord evidence is a successful anchored `thread-create` in the current parent channel with a
   nonempty starter and returned thread ID. A partial result is rejected.
 - `thread_handoff { "action": "start", "threadId": "..." }` returns `queued` or
@@ -54,6 +53,7 @@ The plugin observes successful native `message` actions but never creates a thre
 Inputs are strict. Errors begin with a stable reason code: `unsupportedContext`,
 `unverifiedThreadDelivery`, `conflictingHandoff`, `invalidTarget`, or
 `unavailablePersistentState`. A capacity failure preserves `STORE_LIMIT_EXCEEDED` as its cause.
+Rejected eligible delivery observations emit one debug line with `notSent`, `partialDelivery`, `channelMismatch`, `threadMismatch`, `missingMessageId`, `missingThread`, `missingStarter`, or `accountMismatch`. The line contains no starter text or result payload.
 
 Starts are limited to distinct regular parent-channel sessions. DMs, group DMs, Slack Agent View,
 ACP, subagent, cron, global/shared, already-threaded, and ambiguous cross-account routes are not
@@ -75,9 +75,7 @@ record parks: the plugin logs one warning, stops waking the target, and keeps th
 for the next human message in the thread. Claimed records remain as duplicate-start protection;
 native OpenClaw recovery, not this plugin, owns interrupted work after claim.
 
-Use `openclaw thread-handoff list [--json]` to inspect records, with their wake counts, and
-`openclaw thread-handoff retire <handoff-id>` to remove a claimed record. Add `--force` to retire a
-pending record, typically a parked one.
+Use `openclaw thread-handoff list [--json]` to inspect handoffs with their wake counts and `openclaw thread-handoff receipts [--json]` to inspect active delivery receipts without starter text. `openclaw thread-handoff retire <handoff-id>` removes a claimed record; add `--force` for a pending record, typically a parked one.
 
 For a backup, stop the gateway and let the plugin close/checkpoint its connection, then copy the
 database together with any WAL/SHM crash-state files; alternatively use a SQLite-consistent backup.
