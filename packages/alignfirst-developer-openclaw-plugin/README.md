@@ -96,7 +96,7 @@ npm run lint --workspace @paleo/alignfirst-developer-openclaw-plugin
 ```
 
 The ordinary test command excludes the real-gateway suite. To exercise the package as an external
-plugin against the pinned OpenClaw 2026.9.2 runtime, including Slack/Discord delivery, duplicate
+plugin against the pinned OpenClaw 2026.9.3 runtime, including Slack/Discord delivery, duplicate
 starts, same-session continuation, and abrupt restart recovery:
 
 ```bash

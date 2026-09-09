@@ -51,7 +51,7 @@ Healthchecks gate `gateway` on `bus`, and the one-shot `runner` invocation on `g
 
 ## Two-Dockerfile pattern
 
-`openclaw-test` ships `Dockerfile.base` (consumer-agnostic): Node 24 Alpine, `claw` user with host-matched UID/GID, the mock-CLI **shim binary** at `/opt/openclaw-test/mocks/bin/mock-cli-shim` (no per-command symlinks — consumers add their own), `/etc/profile` rewritten to keep `/opt/openclaw-test/mocks/bin` first in PATH, and the exec watcher binary at `/usr/local/bin/exec-watcher`. Anything else the fixture needs at runtime (`git`, `pnpm` via Corepack, reset scripts, per-command shim symlinks) is the consumer's responsibility.
+`openclaw-test` ships `Dockerfile.base` (consumer-agnostic): Node 26 Alpine, `claw` user with host-matched UID/GID, the mock-CLI **shim binary** at `/opt/openclaw-test/mocks/bin/mock-cli-shim` (no per-command symlinks — consumers add their own), `/etc/profile` rewritten to keep `/opt/openclaw-test/mocks/bin` first in PATH, and the exec watcher binary at `/usr/local/bin/exec-watcher`. Anything else the fixture needs at runtime (`git`, `pnpm` via Corepack, reset scripts, per-command shim symlinks) is the consumer's responsibility.
 
 The CLI's `env build` builds the base locally as `paleo/openclaw-test-base:<pkg-version>` and injects the tag into the consumer image via the `OPENCLAW_TEST_BASE_TAG` build arg.
 
@@ -158,7 +158,7 @@ Inbound metadata claims `Provider` / `Surface` / `OriginatingChannel` = the regi
 
 The mocks are external plugins, so the host's exact-current gate applies to their conversation-read actions. In a heartbeat turn, the handoff seed included, that gate denies `read` for any target; bundled Slack and Discord skip it through `providerOwnedReadGates` (see "Heartbeat turns deny external-plugin reads" in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md)). The playbook keeps the thread read out of the seed turn for that reason; do not chase a mock fix.
 
-Discord renames an existing thread through `send` with `threadName`, targeting the thread's own channel ID. `thread-reply` ignores `threadName` in OpenClaw 2026.9.2 (`extensions/discord/src/actions/handle-action.guild-admin.ts` and `actions/runtime.messaging.send.ts`). The mock follows that distinction; rename assertions must check the stored thread title.
+Discord renames an existing thread through `send` with `threadName`, targeting the thread's own channel ID. `thread-reply` ignores `threadName` in OpenClaw 2026.9.3 (`extensions/discord/src/actions/handle-action.guild-admin.ts` and `actions/runtime.messaging.send.ts`). The mock follows that distinction; rename assertions must check the stored thread title.
 
 **Delivery semantics are the generic kernel's, and that is faithful.** The mocks dispatch through `runtime.channel.inbound.dispatchReply` with `replyPipeline: {}`; every payload the kernel hands to `delivery.deliver` becomes a bus message. Do not chase "missing" mid-turn posts in the mock: with an Anthropic model, OpenClaw itself withholds pre-tool narration (`phase: "commentary"`) from every channel — only turn finals and `message` tool-posts land, and the real Discord/Slack plugins get no more (investigated and settled 2026-07-28; see "Auto-stream delivers turn finals only on Anthropic" in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md)). qwen/glm text is unphased and does stream mid-turn, so per-provider outbound counts legitimately differ.
 
@@ -189,7 +189,7 @@ wakes the canonical target session; that session claims before work. Scenario as
 tool calls by `AgentToolCall.sessionKey`, because target work may start before the parent turn's
 final `NO_REPLY`.
 
-The deterministic external-plugin suite uses the real OpenClaw 2026.9.2 executable, a scripted
+The deterministic external-plugin suite uses the real OpenClaw 2026.9.3 executable, a scripted
 local provider, the synthetic bus, and disposable state. Run it with
 `KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace
 @paleo/alignfirst-developer-openclaw-plugin`. Retained `/tmp/thread-handoff-*` fixtures include gateway and
@@ -256,7 +256,7 @@ Prefer structural assertions over `judgeLLM`; reserve the judge for free-form co
 
 ## Scenario loading
 
-Scenarios are `.ts` files under `scenarios/`, default-export `async (ctx: ScenarioContext) => void`. Loaded at runtime by Node 24's built-in TypeScript stripping (the image uses Node 24). Stick to the strip-compatible subset: type annotations, `as`, `satisfies`, generics, interfaces. Avoid `enum`, `namespace`, constructor parameter properties, decorators, `import =`.
+Scenarios are `.ts` files under `scenarios/`, default-export `async (ctx: ScenarioContext) => void`. Loaded at runtime by Node 26's built-in TypeScript stripping (the image uses Node 26). Stick to the strip-compatible subset: type annotations, `as`, `satisfies`, generics, interfaces. Avoid `enum`, `namespace`, constructor parameter properties, decorators, `import =`.
 
 `discoverScenarios()` filters on `.ts` suffix on file entries only — directories under `scenarios/` (e.g. `_lib/`) are ignored, which is the idiomatic place for shared scenario helpers.
 

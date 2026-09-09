@@ -10,6 +10,7 @@ const REPO_ROOT = resolve(import.meta.dirname, "../../../..");
 const OPENCLAW = resolve(REPO_ROOT, "node_modules/.bin/openclaw");
 const STARTER = "Project: Project-X\nTask: preserve this exact starter.";
 const MARKER = "TARGET_SESSION_STARTED";
+const RESTART_RECOVERY_PROMPT = "Your previous turn was interrupted by a gateway restart";
 
 type Surface = "slack" | "discord";
 
@@ -42,7 +43,7 @@ afterEach(async () => {
   }
 });
 
-describe("OpenClaw 2026.9.2 external-plugin gateway", () => {
+describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
   it.each(["slack", "discord"] as const)(
     "starts and continues the canonical %s thread without a human nudge",
     async (surface) => {
@@ -347,6 +348,9 @@ function createProviderScript(
     const latestToolResult = tailMessages.findLast((message) => message.role === "tool")?.content;
     const latestToolText =
       typeof latestToolResult === "string" ? latestToolResult : JSON.stringify(latestToolResult);
+    if (tail.includes(RESTART_RECOVERY_PROMPT) && !tail.includes("[thread-handoff:v1]")) {
+      return { content: "NO_REPLY" };
+    }
     if (tail.includes("Continue in this same thread.")) {
       return { content: "SAME_SESSION_CONTINUED" };
     }

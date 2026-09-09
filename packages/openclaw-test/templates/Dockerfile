@@ -19,7 +19,8 @@ RUN npm ci --include=dev && \
 #
 # * System tools the fixtures invoke (under USER root):
 #     RUN apk add --no-cache git
-#     RUN corepack enable && corepack prepare pnpm@latest --activate
+#     RUN npm install --global corepack@0.36.0 && \
+#         corepack enable && corepack prepare pnpm@latest --activate
 #
 # * Per-command mock-CLI symlinks (the base ships only the bare shim;
 #   consumers pick which commands to intercept):
