@@ -31,10 +31,10 @@ source ~/.bashrc
 
 ### Install
 
-**Role: operator**, during `03-toolchain.md`, once `~/.npmrc` points at the shared prefix. The seed in `04-openclaw.md` refuses to run without the binary.
+**Role: operator**, during `03-toolchain.md`, once `admin-npm` is installed. The seed in `04-openclaw.md` refuses to run without the binary.
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g @openai/codex
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @openai/codex
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'which codex && codex --version'
 # Expected: /home/{{SERVICE_USER}}/.npm-system-global/bin/codex
 ```
@@ -142,7 +142,13 @@ Run the coding-agent package update through its own package-scoped maintenance w
 
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- \
-  /usr/bin/npm install -g @openai/codex@latest
+  /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @openai/codex@latest
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=codex \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
 ```
 
 A Codex upgrade changes the system-skills marker, so repeat the post-hardening maintenance command in [Skills](#skills). Then verify the marker took: a second session prints nothing.

@@ -34,10 +34,10 @@ tmp=$(mktemp) && jq '. + {disableClaudeAiConnectors: true, autoMemoryEnabled: fa
 
 ### Install
 
-**Role: operator**, during `03-toolchain.md`, once `~/.npmrc` points at the shared prefix. The seed in `04-openclaw.md` refuses to run without the binary.
+**Role: operator**, during `03-toolchain.md`, once `admin-npm` is installed. The seed in `04-openclaw.md` refuses to run without the binary.
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g @anthropic-ai/claude-code
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @anthropic-ai/claude-code
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'which claude && claude --version'
 # Expected: /home/{{SERVICE_USER}}/.npm-system-global/bin/claude
 ```
@@ -125,7 +125,13 @@ Run the coding-agent package update through its own package-scoped maintenance w
 
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- \
-  /usr/bin/npm install -g @anthropic-ai/claude-code@latest
+  /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @anthropic-ai/claude-code@latest
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=claude \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
 ```
 
 The `skills` scope of `update-developer.md` includes `~/.claude/skills`, so the symlink tier is restored with the canonical tree.

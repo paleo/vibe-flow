@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+export PATH=/usr/bin:/usr/local/bin:/bin
+exec /usr/bin/node /usr/lib/node_modules/npm/bin/npm-cli.js \
+  --prefix /home/{{SERVICE_USER}}/.npm-system-global "$@"

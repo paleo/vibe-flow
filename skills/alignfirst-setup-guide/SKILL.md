@@ -6,7 +6,7 @@ description: >-
 license: CC0 1.0
 metadata:
   author: Paleo
-  version: "0.34.0"
+  version: "0.35.0"
   repository: https://github.com/paleo/alignfirst
 ---
 
@@ -85,12 +85,13 @@ Inspect the repository before changing it. A prepared project has all of these:
    [docmap-bootstrapping.md](references/docmap-bootstrapping.md) as part of the preparation.
 5. workspace, adapted to the project's runtime and development lifecycle, meeting
    [the AlignFirst Developer contract](references/workspace-setup.md#the-alignfirst-developer-contract).
-6. A project-specific `DEVELOPERS.md` for an unfamiliar developer: commands, architecture,
+6. A Node version declaration (`.nvmrc`, `.node-version` or `engines.node`) so fnm selects the project runtime. Ask which version to declare when the repository has none.
+7. A project-specific `DEVELOPERS.md` for an unfamiliar developer: commands, architecture,
    documentation map, development workflow, and verification procedures.
 
 Detect and verify the package manager, runtime, build, test, lint, dev-server, ports, shared
 directories, seeded configuration files, and team-plan details. Write only facts confirmed from the
-repository. Follow each selected tool reference above, then complete `DEVELOPERS.md`.
+repository. Follow each selected tool reference above, then complete `DEVELOPERS.md`, naming the Node version declaration.
 
 ## Create an AlignFirst Developer
 
@@ -115,7 +116,7 @@ Detect existing footprints before proposing changes:
   bootstrap line running `alignfirst context`, an AlignFirst instruction
   section, or a canonical skill installation.
 - team plans: a `.plans` symlink or `plans.folder` in `.alignfirst.json`.
-- AlignFirst Developer preparation: the complete five-part contract above.
+- AlignFirst Developer preparation: the complete seven-part contract above.
 
 Require a clean working tree immediately before project mutations. Read-only discovery and
 recommendations do not require one.

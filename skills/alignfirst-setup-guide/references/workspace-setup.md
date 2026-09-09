@@ -219,6 +219,7 @@ An AlignFirst Developer creates every worktree through the workspace system and 
 2. A setup profile named `remote` *(dev server)*, below.
 3. A `dev up` summary printing the public URL *(dev server)*: `formatSummary` in `dev-server.mjs` reads it from the patched config file, so the developer reports an address that works from the user's browser.
 4. A README section on remote access, below.
+5. A Node version declaration (`.nvmrc`, `.node-version` or `engines.node`) named in `DEVELOPERS.md`, so fnm selects the project runtime. Ask which version to declare when the repository has none.
 
 ### The `remote` setup profile
 

@@ -42,7 +42,7 @@ sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- bash -lc '
 openclaw update --yes --no-restart --accept-capabilities
 openclaw plugins list --json | grep -q "\"alignfirst-developer\"" &&
   openclaw plugins update alignfirst-developer --accept-capabilities
-/usr/bin/npm install -g alignfirst@latest @paleo/alcode@latest @paleo/alproject@latest ctx7@latest
+/opt/{{SERVICE_USER}}/libexec/admin-npm install -g alignfirst@latest @paleo/alcode@latest @paleo/alproject@latest ctx7@latest
 '
 ```
 
@@ -59,7 +59,14 @@ Update the coding agent through its package-scoped command: [08-coding-agent.md 
 Verify — the listing must show exactly six packages (`openclaw`, the coding agent, `alignfirst`, `@paleo/alcode`, `@paleo/alproject`, `ctx7`); anything else is a stray from a mistyped install, to remove through another `packages` maintenance window:
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- bash -lc 'openclaw --version && alignfirst --version && alcode --help >/dev/null && echo alcode-ok && alproject --version && ctx7 --version && npm ls -g --depth=0'
+sudo -i -u {{SERVICE_USER}} -- bash -lc 'openclaw --version && alignfirst --version && alcode --help >/dev/null && echo alcode-ok && alproject --version && ctx7 --version'
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm ls -g --depth=0
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=<claude|codex> \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
 ```
 
 ## Skills
@@ -158,10 +165,12 @@ A new OpenClaw release can retire keys the seed sets, turn on new defaults and w
 After an OpenClaw version bump, doctor may report a unit installed by an older version. `ExecStart` already points at the updated code. Refresh the unit, then start the contained gateway. The installer refuses group-writable paths ([gotchas.md](../gotchas.md#gateway-install-refuses-group-writable-systemd-paths)), hence the `chmod`:
 
 ```sh
-sudo -H -u {{SERVICE_USER}} bash -lc 'chmod go-w ~/.config ~/.config/systemd ~/.config/systemd/user ~/.config/systemd/user/openclaw-gateway.service'
+sudo -H -u {{SERVICE_USER}} bash -lc 'chmod go-w ~/.config ~/.config/systemd ~/.config/systemd/user ~/.config/systemd/user/openclaw-gateway.service ~/.config/systemd/user/openclaw-gateway.service.d'
 sudo /usr/local/sbin/alignfirst-developer-maintenance config -- \
   openclaw gateway install --force
 sudo -i -u {{SERVICE_USER}} -- systemctl --user daemon-reload
+sudo -i -u {{SERVICE_USER}} -- systemctl --user cat openclaw-gateway.service
+# Expected: the surviving drop-in sets SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell and a PATH without fnm
 sudo -i -u {{SERVICE_USER}} -- systemctl --user start openclaw-gateway
 ```
 

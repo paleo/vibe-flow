@@ -75,7 +75,7 @@ The `alignfirst` CLI is installed globally. From a project root, `alignfirst con
 
 ### Node
 
-`/usr/bin/node`, with **npm**. `gcc`/`g++`/`make` are available for packages with native bindings.
+Your shells initialize **fnm**: it picks Node from `.nvmrc`, `.node-version` or `engines.node` on entry and on every `cd`, its LTS default elsewhere. `fnm use <version>` switches the current shell, and children inherit it, but each exec call is a fresh shell, so keep a switch and the commands needing it in the same call. A declared version that isn't installed stops the command: ask an administrator. **OpenClaw** always runs on system Node 26. `gcc`/`g++`/`make` are available for packages with native bindings.
 
 ### Adding dependencies
 
@@ -85,9 +85,9 @@ Prefer established, widely used packages, whatever the ecosystem. Flag a new, un
 
 - **No sudo, no apt.** If you need a system package, ask an administrator.
 - **No skill installation from ClawHub.** Your skill allowlist is fixed (`agents.defaults.skills` in `openclaw.json`); the `clawhub` skill is intentionally absent. To add a skill, ask an administrator.
-- **No global npm installs.** The global prefix is read-only — `npm install -g` fails with `EACCES`. Project-level installs work normally.
+- **Globals stay inside your Node runtime.** `npm i -g` installs into the fnm version you selected, fine for a dev tool. It can neither modify nor shadow OpenClaw and the admin CLIs.
 - **No editing your workspace files, config, skills, or the coding agent's global instructions.** They are read-only at the OS level — writes fail with `Operation not permitted`.
-- **Don't repair Node yourself.** Don't install a Node version manager, reinstall OpenClaw under another prefix, or edit `~/.bash_profile` or the gateway unit. Ask an administrator when Node looks wrong.
+- **Don't repair Node yourself.** Don't install a Node version manager, reinstall OpenClaw under another prefix, or edit `~/.bash_profile`, the gateway unit, or the launchers under `/opt/{{SERVICE_USER}}/`. Ask an administrator when Node looks wrong.
 
 These limits are deliberate rules, and you follow the rules. When one blocks you, say so without looking for a way around.
 

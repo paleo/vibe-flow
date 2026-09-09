@@ -137,21 +137,22 @@ echo 'fs.inotify.max_user_instances=1024'   | sudo tee -a /etc/sysctl.conf
 
 ## 6. Node
 
-One system Node, from NodeSource, backs the gateway, every CLI of the service account and the managed projects. `openclaw doctor` rejects version-manager Nodes as a gateway runtime, and a single `npm` on `PATH` is what keeps `openclaw update` safe (it installs into whichever prefix that `npm` owns). Pin an exact version and hold the package so `apt upgrade` leaves it alone:
+Install the newest Node 26 from NodeSource. OpenClaw supports `>=24.16.0 <25 || >=26.1.0`; this deployment keeps the admin account, OpenClaw and its companion CLIs on the pinned system runtime. The admin account uses no version manager.
 
 ```sh
-curl -fsSL https://deb.nodesource.com/setup_<node-major>.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_26.x | sudo -E bash -
 sudo apt install -y nodejs=<node-version>-1nodesource1
 sudo apt-mark hold nodejs
 /usr/bin/node --version
 /usr/bin/npm --version
 ```
 
-npm releases on its own schedule; bump the bundled one in place. Reinstalling the `nodejs` package resets it, so re-run this after the recipe below:
+Node 26 bundles a current npm. Put the admin account's global packages under `~/.local`; Ubuntu includes `~/.local/bin` in the account's default PATH:
 
 ```sh
-sudo /usr/bin/npm install -g npm@<npm-version>
-/usr/bin/npm --version
+npm config set prefix ~/.local --location=user
+npm config get prefix
+# Expected: /home/{{SERVER_ADMIN_USER}}/.local
 ```
 
 To move to another pinned version later:

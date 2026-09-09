@@ -257,7 +257,7 @@ collect_workspace_files() {
 run_as_service() {
   local uid path
   uid=$(id -u "$SERVICE_USER")
-  path="/usr/bin:/bin:$SERVICE_HOME/.npm-system-global/bin:$SERVICE_HOME/.local/bin"
+  path="/usr/bin:/opt/{{SERVICE_USER}}/bin:/bin:$SERVICE_HOME/.npm-system-global/bin:$SERVICE_HOME/.local/bin"
   runuser -u "$SERVICE_USER" -- env HOME="$SERVICE_HOME" USER="$SERVICE_USER" \
     LOGNAME="$SERVICE_USER" XDG_RUNTIME_DIR="/run/user/$uid" PATH="$path" \
     bash -c 'cd "$HOME" && exec "$@"' bash "${COMMAND[@]}"
