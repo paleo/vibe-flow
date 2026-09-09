@@ -4,8 +4,14 @@ import { basename, dirname, join, resolve } from "node:path";
 import { runAlignfirst } from "./alignfirst-cli.js";
 import { errorMessage, isNodeError } from "./errors.js";
 import { formatRange } from "./format.js";
-import { type PortRange, type ProjectsMarker, readMarker } from "./markers.js";
-import { containsRange, rangesOverlap } from "./ports.js";
+import {
+  containsRange,
+  type MarkerPortRange,
+  type PortRange,
+  type ProjectsMarker,
+  rangesOverlap,
+  readMarker,
+} from "./markers.js";
 
 const PROJECT_CONFIG_FILENAME = ".alignfirst.json";
 
@@ -19,7 +25,7 @@ export interface ProjectInventory {
 export interface ProjectsDirectory {
   path: string;
   description?: string;
-  portRange?: PortRange;
+  portRanges?: MarkerPortRange[];
   others: string[];
 }
 
@@ -29,6 +35,7 @@ export interface DiscoveredProject {
   directory: string;
   description: ProjectDescription;
   portRange?: PortRange;
+  portRangeCode?: string;
   workspaces: string[];
 }
 
@@ -76,7 +83,7 @@ interface DirectoryCandidate {
   name: string;
   directory: string;
   path: string;
-  enclosingRange?: PortRange;
+  enclosingRanges?: MarkerPortRange[];
 }
 
 interface MainCandidate extends DirectoryCandidate {
@@ -115,31 +122,31 @@ export function buildInventory(
 function walkProjectsDirectory(
   path: string,
   marker: ProjectsMarker,
-  enclosingRange: PortRange | undefined,
+  enclosingRanges: MarkerPortRange[] | undefined,
   state: WalkState,
 ): void {
-  const effectiveRange = marker.portRange ?? enclosingRange;
+  const effectiveRanges = marker.portRanges ?? enclosingRanges;
   state.directories.push({
     path,
     ...(marker.description === undefined ? {} : { description: marker.description }),
-    ...(marker.portRange === undefined ? {} : { portRange: marker.portRange }),
+    ...(marker.portRanges === undefined ? {} : { portRanges: marker.portRanges }),
     others: [],
   });
   for (const candidate of readDirectoryCandidates(path)) {
     const childMarker = readMarker(candidate.path);
     if (childMarker === undefined) {
-      state.candidates.push({ ...candidate, enclosingRange: effectiveRange });
+      state.candidates.push({ ...candidate, enclosingRanges: effectiveRanges });
       continue;
     }
-    reportOutsideRange(candidate.path, childMarker.portRange, effectiveRange, state.issues);
-    if (childMarker.portRange !== undefined) {
+    for (const portRange of childMarker.portRanges ?? []) {
+      reportOutsideRange(candidate.path, portRange, effectiveRanges, state.issues);
       state.directoryClaims.push({
         scope: path,
         path: candidate.path,
-        portRange: childMarker.portRange,
+        portRange,
       });
     }
-    walkProjectsDirectory(candidate.path, childMarker, effectiveRange, state);
+    walkProjectsDirectory(candidate.path, childMarker, effectiveRanges, state);
   }
 }
 
@@ -203,6 +210,8 @@ function classifyCandidate(
       : { portRange: description.config.portRange }),
     workspaces: [],
   };
+  const enclosingRange = findEnclosingRange(candidate.enclosingRanges, project.portRange);
+  if (enclosingRange?.code !== undefined) project.portRangeCode = enclosingRange.code;
   if (mainWorktreeGitDirectory(candidate.path) === undefined) {
     state.issues.push({ path: candidate.path, message: "not a git main worktree" });
   }
@@ -214,7 +223,7 @@ function classifyCandidate(
         description.cli.range,
     });
   }
-  reportOutsideRange(project.path, project.portRange, candidate.enclosingRange, state.issues);
+  reportOutsideRange(project.path, project.portRange, candidate.enclosingRanges, state.issues);
   return [project];
 }
 
@@ -379,16 +388,25 @@ function addOther(directories: ProjectsDirectory[], directoryPath: string, name:
 function reportOutsideRange(
   path: string,
   range: PortRange | undefined,
-  enclosingRange: PortRange | undefined,
+  enclosingRanges: MarkerPortRange[] | undefined,
   issues: InventoryIssue[],
 ): void {
-  if (range === undefined || enclosingRange === undefined || containsRange(enclosingRange, range)) {
-    return;
-  }
+  if (range === undefined || enclosingRanges === undefined) return;
+  if (findEnclosingRange(enclosingRanges, range) !== undefined) return;
   issues.push({
     path,
-    message: `port range ${formatRange(range)} is outside enclosing range ${formatRange(enclosingRange)}`,
+    message:
+      `port range ${formatRange(range)} is outside the enclosing ranges ` +
+      enclosingRanges.map(formatRange).join(", "),
   });
+}
+
+function findEnclosingRange(
+  ranges: MarkerPortRange[] | undefined,
+  claim: PortRange | undefined,
+): MarkerPortRange | undefined {
+  if (claim === undefined) return;
+  return ranges?.find((range) => containsRange(range, claim));
 }
 
 function reportOverlappingClaims(

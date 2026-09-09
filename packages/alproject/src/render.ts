@@ -1,6 +1,6 @@
 import type { InventoryIssue, ProjectInventory } from "./discovery.js";
 import { escapeAdditionalJsonCharacters, escapeControlCharacters, formatRange } from "./format.js";
-import type { PortRange } from "./markers.js";
+import type { MarkerPortRange, PortRange } from "./markers.js";
 import type { ProjectDetails } from "./status.js";
 
 export function renderProjectList(inventory: ProjectInventory): string {
@@ -11,7 +11,7 @@ export function renderProjectList(inventory: ProjectInventory): string {
       `- Name: ${renderOutputValue(project.name)}`,
       `  Path: ${renderOutputValue(project.path)}`,
       `  Directory: ${renderOutputValue(project.directory)}`,
-      `  Port range: ${renderRange(project.portRange)}`,
+      `  Port range: ${renderProjectRange(project.portRange, project.portRangeCode)}`,
       `  Workspaces: ${renderValues(project.workspaces)}`,
     );
   }
@@ -22,10 +22,12 @@ export function renderProjectList(inventory: ProjectInventory): string {
     if (directory.description !== undefined) {
       lines.push(`  Description: ${renderOutputValue(directory.description)}`);
     }
-    lines.push(
-      `  Port range: ${renderRange(directory.portRange)}`,
-      `  Others: ${renderValues(directory.others)}`,
-    );
+    if (directory.portRanges === undefined) lines.push("  Port ranges: (none)");
+    else {
+      lines.push("  Port ranges:");
+      for (const range of directory.portRanges) lines.push(`    ${renderMarkerRange(range)}`);
+    }
+    lines.push(`  Others: ${renderValues(directory.others)}`);
   }
   lines.push("", "Issues:");
   if (inventory.issues.length === 0) lines.push("  (none)");
@@ -41,7 +43,7 @@ export function renderProjectListJson(inventory: ProjectInventory): string {
     directories: inventory.directories.map((directory) => ({
       path: directory.path,
       description: directory.description ?? null,
-      portRange: directory.portRange ?? null,
+      portRanges: directory.portRanges ?? [],
       others: directory.others,
     })),
     projects: inventory.projects.map((project) => ({
@@ -49,6 +51,7 @@ export function renderProjectListJson(inventory: ProjectInventory): string {
       path: project.path,
       directory: project.directory,
       portRange: project.portRange ?? null,
+      portRangeCode: project.portRangeCode ?? null,
       workspaces: project.workspaces,
     })),
     issues: inventory.issues.map(({ path, message }) => ({ path, message })),
@@ -95,7 +98,7 @@ export function renderProjectStatus(details: ProjectDetails): string {
     `  Path: ${renderOutputValue(details.path)}`,
     `  Directory: ${renderOutputValue(details.directory)}`,
     `  Remote host: ${renderNullableValue(details.remoteHost)}`,
-    `  Port range: ${renderRange(details.portRange ?? undefined)}`,
+    `  Port range: ${renderProjectRange(details.portRange ?? undefined, details.portRangeCode ?? undefined)}`,
     `  Plans folder: ${renderNullableValue(details.plansFolder)}`,
     `  Ticket id pattern: ${renderNullableValue(details.ticketIdPattern)}`,
     `  Workspaces: ${renderValues(details.workspaces)}`,
@@ -126,6 +129,18 @@ function renderJson(value: unknown): string {
 
 function renderRange(range: PortRange | undefined): string {
   return range === undefined ? "(none)" : formatRange(range);
+}
+
+function renderProjectRange(range: PortRange | undefined, code: string | undefined): string {
+  if (range === undefined) return "(none)";
+  return `${formatRange(range)}${code === undefined ? "" : ` (${code})`}`;
+}
+
+function renderMarkerRange(range: MarkerPortRange): string {
+  const code = range.code ?? "default";
+  const description =
+    range.description === undefined ? "" : ` — ${escapeControlCharacters(range.description)}`;
+  return `${formatRange(range)} (${code})${description}`;
 }
 
 function renderValues(values: string[]): string {

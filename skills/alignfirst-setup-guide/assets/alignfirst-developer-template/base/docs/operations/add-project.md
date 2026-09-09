@@ -61,7 +61,7 @@ alproject free-ports --root ~/projects --size <size>
 '
 ```
 
-Record the returned first and last ports as `portRange` in `.alignfirst.json` while preparing the clone. The workspace kernel checks the claim against its port scheme on every command.
+When the projects directory declares several ranges, inspect `alproject --guide --root ~/projects` and pass `--range <code>` for the project kind. Record the returned first and last ports as `portRange` in `.alignfirst.json` while preparing the clone. The workspace kernel checks the claim against its port scheme on every command.
 
 ## Check the inventory
 
