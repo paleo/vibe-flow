@@ -36,7 +36,7 @@ alcode usage
 
 See `alcode --help` for all commands and options.
 
-A new protocol session needs a ticket. `--no-ticket` makes `alcode` reserve the next side ticket through `alignfirst ticket --side` and pass it to the agent.
+A new protocol session needs a ticket. `--no-ticket` reserves the next side ticket through `alignfirst ticket --side` and passes it to the agent. "No ticket" and "side ticket" are the same request.
 
 `alcode status <session-file>` reconciles and shows a run's durable status. If a recorded process is gone, the command seals the session file as `status: failed`, `exitReason: terminated`. New Linux records also store the process start time to detect pid reuse. The command accepts session files under the current project's `.plans/**/_alcode/` tree and does not start a coding agent.
 
@@ -48,7 +48,7 @@ A new protocol session needs a ticket. `--no-ticket` makes `alcode` reserve the 
 
 Normal runs use Claude's `--permission-mode auto` or Codex's `--sandbox workspace-write`. `ALIGNFIRST_CODE_SKIP_PERMISSIONS=1` selects each CLI's dangerous permission-bypass flag.
 
-Claude's default model list is `fable,opus,sonnet,haiku`. Codex's is `sol,terra,luna`; alcode resolves a selected Codex alias against `codex debug models --bundled`. Set `ALIGNFIRST_CODE_MODELS` to narrow the selected agent's list or to advertise an explicit Codex slug such as `gpt-5.6-terra`.
+Claude's default model list is `fable,opus,sonnet,haiku`. Codex's is `astra,sol,terra,luna`; alcode resolves a selected Codex alias against `codex debug models --bundled`. Set `ALIGNFIRST_CODE_MODELS` to narrow the selected agent's list or to advertise an explicit Codex slug such as `gpt-5.6-terra`.
 
 New session files record `agent`. A session can only be resumed with the same selected agent. Agentless legacy sessions remain readable but require a new session.
 

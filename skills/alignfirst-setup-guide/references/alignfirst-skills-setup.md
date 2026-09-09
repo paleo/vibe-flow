@@ -5,13 +5,15 @@ AlignFirst does not require the standalone docmap package or workspace.
 
 ## Install the CLI
 
-Install the CLI globally on the developer's machine:
+Project files invoke the CLI as `npx alignfirst`, which requires no installation. `npx` resolves a project dependency or fetches the CLI from the registry and caches it. The project therefore works on a machine that has never installed AlignFirst.
+
+Installing the CLI globally provides the bare `alignfirst` command:
 
 ```sh
 npm install -g alignfirst
 ```
 
-Add `npm install -g alignfirst` to the README prerequisites so teammates install the same command.
+Offer this in the README as a convenience and use the bare command when describing it. Project instructions remain on `npx alignfirst` and never depend on the global installation.
 
 ## Install the Skills
 
@@ -86,7 +88,7 @@ _Ticket ID format:_ `{DETECTED_TICKET_FORMAT}`
 ```
 
 Omit any convention that repository evidence cannot establish. When the project uses a team plans
-repository, add: After every change in `.plans/`, run `alignfirst sync`. Add `--skill alignfirst` to
+repository, add: After every change in `.plans/`, run `npx alignfirst sync`. Add `--skill alignfirst` to
 the skills command above, since no bootstrap line describes the protocols.
 
 ### With `.alignfirst.json`
@@ -98,11 +100,15 @@ expression; alternatives go inside a group, as in `^(ABC|XYZ)-\d+$`. Detect the 
 `git ls-remote --symref origin HEAD`; use the sole remote when `origin` is absent, and ask the user
 when several non-`origin` remotes exist.
 
-Write `.alignfirst.json` with the agreed fields. Never add `cli`:
+Write `.alignfirst.json` with the agreed fields. When the project declares no `alignfirst` dependency,
+set `cli` to its supported version range. Without this field, each machine runs whichever version it
+fetched. The version guard reports a mismatch and gives the exact
+`npx -y alignfirst@"<range>"` command to run:
 
 ```json
 {
   "schemaVersion": 1,
+  "cli": "<supported-range>",
   "ticketIdPattern": "^\\d+$",
   "plans": { "folder": "acme-web", "autoArchive": true },
   "portRange": { "first": 8100, "last": 8299 },
@@ -122,19 +128,20 @@ documentation map when `docs/` exists, and the protocol aliases:
 ```markdown
 ## AlignFirst
 
-Before inspecting or changing this repository, run `alignfirst context` once from the repository root and follow its output.
+Before inspecting or changing this repository, run `npx alignfirst context` once from the repository root and follow its output.
 ```
 
 ### Local installation
 
-Use this only when the user requests a project-local CLI. Add the exact current `alignfirst` version
-as a dev dependency with the project package manager and install dependencies before invoking it.
-Write `npx alignfirst context` in the instruction file and local skill stubs. A global installation
-is the default. No npm script is required.
+By default a project declares no `alignfirst` dependency. Add one only when the user asks for a pinned CLI, or when the repository gates installation on publication age or provenance and so cannot accept an on-demand fetch.
+
+Add the exact current `alignfirst` version as a dev dependency with the project package manager, and install dependencies before invoking it. The instruction file keeps `npx alignfirst context`, which then resolves the pinned binary. No npm script is required.
+
+The CLI brings `@paleo/docmap`, `arktype` and `semver` into the project's dependency graph. A repository with such gates must allow the transitive `@paleo/docmap` too, since the CLI tracks its releases closely. Where `arktype` is an optional peer of an existing dependency, expect the lockfile to record it as one.
 
 Continue with [plans-setup.md](plans-setup.md) when the team has a plans repository. Finish with:
 
 ```sh
-alignfirst config
-alignfirst doctor
+npx alignfirst config
+npx alignfirst doctor
 ```

@@ -166,9 +166,10 @@ function buildGuidePlaceholders(
   protocol: GuideOptions["protocol"],
 ): GuidePlaceholders {
   const pattern = ctx.projectConfig?.config.ticketIdPattern;
-  const detection = pattern === undefined ? undefined : detectTicketFromBranch(ctx.cwd, pattern);
+  const template = ctx.projectConfig?.config.git?.branchNameTemplate;
+  const detection = detectTicketFromBranch(ctx.cwd, pattern, template);
   return {
-    ticketCommand: detection?.kind === "detected" ? "{{CMD}} ticket" : "{{CMD}} ticket <id>",
+    ticketCommand: detection.kind === "detected" ? "{{CMD}} ticket" : "{{CMD}} ticket <id>",
     ticketDetection: renderTicketDetection(pattern, detection),
     plansState: renderPlansState(ctx),
     commitRule: renderCommitRule(ctx),
@@ -176,14 +177,11 @@ function buildGuidePlaceholders(
   };
 }
 
-function renderTicketDetection(
-  pattern: string | undefined,
-  detection: TicketDetection | undefined,
-): string {
-  if (pattern === undefined) return "Ask the user for the ticket ID when it is not given.";
-  if (detection?.kind === "detected")
+function renderTicketDetection(pattern: string | undefined, detection: TicketDetection): string {
+  if (detection.kind === "detected")
     return `Current ticket: \`${detection.id}\` (from branch \`${detection.branch}\`). The id argument of \`{{CMD}} ticket\` is optional and defaults to it; pass an id only when the user names another ticket.`;
-  if (detection?.kind === "noMatch")
+  if (pattern === undefined) return "Ask the user for the ticket ID when it is not given.";
+  if (detection.kind === "noMatch")
     return `No ticket id on branch \`${detection.branch}\`. Ask the user for the id.`;
   return "No ticket id: detached HEAD. Ask the user for the id.";
 }

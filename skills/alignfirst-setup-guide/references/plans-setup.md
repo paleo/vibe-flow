@@ -22,9 +22,9 @@ the folder named by `plans.folder` in `.alignfirst.json`. Linked worktrees conti
 worktree's symlink.
 
 A contributor without access to the plans repository uses a plain `.plans` directory. The CLI
-accepts both modes. Run `alignfirst plans check` to report the current mode.
+accepts both modes. Run `npx alignfirst plans check` to report the current mode.
 
-`alignfirst sync` publishes changes. Set `plans.autoArchive` to `true` in `.alignfirst.json` to archive
+`npx alignfirst sync` publishes changes. Set `plans.autoArchive` to `true` in `.alignfirst.json` to archive
 stale ticket directories and no-ticket session files under `_archives/` on every synchronization.
 `ALIGNFIRST_ARCHIVE_DAYS` sets the threshold in days and defaults to `7`.
 
@@ -42,12 +42,12 @@ Write the project folder into `.alignfirst.json`:
 When `.alignfirst.json` already exists without `plans.folder`, supply the folder once while linking:
 
 ```sh
-alignfirst plans setup <plans-clone-path> --folder project-a
+npx alignfirst plans setup <plans-clone-path> --folder project-a
 ```
 
 With the `alignfirst context` bootstrap line, the CLI delivers the sync instruction. Otherwise, ensure the instruction file says:
 
-> After every change in `.plans/`, run `alignfirst sync`.
+> After every change in `.plans/`, run `npx alignfirst sync`.
 
 For a project prepared for an AlignFirst Developer, the `.plans/` entry in `DEVELOPERS.md` also
 names the shared repository and the sync command.
@@ -58,11 +58,11 @@ Clone the plans repository with the developer's own credentials. From the projec
 
 ```sh
 git clone <plans-repository-url> ../myteam-plans
-alignfirst plans setup ../myteam-plans
-alignfirst sync
+npx alignfirst plans setup ../myteam-plans
+npx alignfirst sync
 ```
 
-`alignfirst plans setup` creates the configured project folder in the clone, migrates an existing
+`npx alignfirst plans setup` creates the configured project folder in the clone, migrates an existing
 local `.plans`, and replaces it with a relative symlink. Re-run it after moving the clone.
 
 For local mode, create the directory instead:
@@ -78,7 +78,7 @@ When the project also uses workspace, check the link before setting up the main 
 ```js
 preSetup: ({ isMainWorktree, currentWorktree }) => {
   if (!isMainWorktree) return;
-  execFileSync("alignfirst", ["plans", "check"], {
+  execFileSync("npx", ["alignfirst", "plans", "check"], {
     cwd: currentWorktree,
     stdio: "inherit",
   });
@@ -92,18 +92,16 @@ directory.
 Document these new-machine steps in `README.md` before workspace setup:
 
 ```sh
-npm install -g alignfirst
 npm install
 git clone <plans-repository-url> <plans-clone-path>
-alignfirst plans setup <plans-clone-path>
+npx alignfirst plans setup <plans-clone-path>
 npm run workspace -- setup
 ```
 
 For a public repository, make local mode the default and avoid naming a private repository:
 
 ```sh
-npm install -g alignfirst
 npm install
-mkdir .plans   # or run alignfirst plans setup with the team plans clone
+mkdir .plans   # or run npx alignfirst plans setup with the team plans clone
 npm run workspace -- setup
 ```

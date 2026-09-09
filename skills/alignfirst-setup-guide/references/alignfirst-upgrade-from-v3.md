@@ -5,12 +5,17 @@ migration leaves no plans compatibility package or npm-script wrappers.
 
 ## Install the CLI
 
-Install the CLI globally on each developer machine. An AlignFirst Developer host also replaces the
-retired project-discovery package:
+The migrated project invokes the CLI as `npx alignfirst` and declares no dependency on it.
+
+Installing the CLI globally on a developer machine is a convenience:
 
 ```sh
 npm install -g alignfirst
-# AlignFirst Developer host only
+```
+
+An AlignFirst Developer host installs the CLI globally and replaces the retired project-discovery package:
+
+```sh
 npm install -g alignfirst @paleo/alcode @paleo/alproject
 ```
 
@@ -63,8 +68,8 @@ path used `--auto-archive`, preserve that behavior with `plans.autoArchive: true
 ```
 
 Keep only applicable plans fields. `plans.autoArchive` works in local mode without `plans.folder`.
-Add `portRange` when the workspace wrapper declares a port scheme. Update the README prerequisite
-and install the stubs.
+Add `portRange` when the workspace wrapper declares a port scheme. Update the README guidance and
+install the stubs.
 
 ## Replace Every Legacy Command
 
@@ -72,15 +77,15 @@ Use these replacements throughout the repository:
 
 | Legacy command or setting | Replacement |
 | --- | --- |
-| `plans-share setup <clone> --folder <folder>` | Set `plans.folder`, then run `alignfirst plans setup <clone>` |
-| `plans-share sync` | `alignfirst sync` |
-| `plans-share sync --auto-archive` | Set `plans.autoArchive: true`, then run `alignfirst sync` |
-| `plans-share check` | `alignfirst plans check` |
-| `plans-share archive <ticket>` | `alignfirst plans archive <ticket>` |
-| `plans-share auto-archive` | `alignfirst plans auto-archive` |
+| `plans-share setup <clone> --folder <folder>` | Set `plans.folder`, then run `npx alignfirst plans setup <clone>` |
+| `plans-share sync` | `npx alignfirst sync` |
+| `plans-share sync --auto-archive` | Set `plans.autoArchive: true`, then run `npx alignfirst sync` |
+| `plans-share check` | `npx alignfirst plans check` |
+| `plans-share archive <ticket>` | `npx alignfirst plans archive <ticket>` |
+| `plans-share auto-archive` | `npx alignfirst plans auto-archive` |
 | `PLANS_SHARE_ARCHIVE_DAYS` | `ALIGNFIRST_ARCHIVE_DAYS` |
 
-Replace every caller of the deleted npm scripts with the direct `alignfirst` command. Repeat the
+Replace every caller of the deleted npm scripts with the direct `npx alignfirst` command. Repeat the
 repository-wide search after editing. No active legacy command, package reference, script name, or
 environment variable may remain; report any historical reference retained on purpose.
 
@@ -95,7 +100,7 @@ In `workspace.mjs`, replace the main-worktree plans check with:
 ```js
 preSetup: ({ isMainWorktree, currentWorktree }) => {
   if (!isMainWorktree) return;
-  execFileSync("alignfirst", ["plans", "check"], {
+  execFileSync("npx", ["alignfirst", "plans", "check"], {
     cwd: currentWorktree,
     stdio: "inherit",
   });
@@ -116,10 +121,10 @@ Use `--project` instead of `--global` for a project-local installation. Finish b
 effective project and the plans workflow:
 
 ```sh
-alignfirst config
-alignfirst plans check
-alignfirst sync
-alignfirst doctor
+npx alignfirst config
+npx alignfirst plans check
+npx alignfirst sync
+npx alignfirst doctor
 ```
 
 Inspect the complete doctor output. Its exit status does not reflect reported problems; resolve every

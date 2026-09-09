@@ -52,7 +52,7 @@ describe("renderGuide", () => {
     for (const variant of ["generic", "openclaw"] as const) {
       const guide = renderGuide(variant, "codex", CODEX_DEFAULT_MODELS);
       expect(guide).not.toContain("{{");
-      expect(guide).toContain("`sol`, `terra`, `luna`");
+      expect(guide).toContain("`astra`, `sol`, `terra`, `luna`");
       expect(guide).not.toContain("`fable`");
       expect(guide).not.toContain("claude");
     }

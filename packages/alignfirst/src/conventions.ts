@@ -28,8 +28,8 @@ export function renderConventions(ctx: CommandContext): string {
 function renderTicketIds(ctx: CommandContext): string {
   const pattern = ctx.projectConfig?.config.ticketIdPattern;
   if (pattern === undefined)
-    return "Ticket IDs: no configured format; ask the user for the ID. Without an external ticket, use the next `side-N`.";
-  return `Ticket IDs: \`${pattern}\`; infer a matching ID from the branch. Without an external ticket, use the next \`side-N\`.`;
+    return "Ticket IDs: no configured format; ask the user for the ID. Without a ticket, or when the user asks for a side ticket, use the next `side-N`.";
+  return `Ticket IDs: \`${pattern}\`; infer a matching ID from the branch. Without a ticket, or when the user asks for a side ticket, use the next \`side-N\`.`;
 }
 
 function renderBranchNames(ctx: CommandContext): string | undefined {
@@ -63,11 +63,12 @@ function renderPlans(ctx: CommandContext): string | undefined {
   try {
     const mode = resolvePlansMode(ctx.cwd, ctx.form);
     const folder = ctx.projectConfig?.config.plans?.folder;
-    const sharedFolder = folder === undefined ? "" : ` (shared folder \`${folder}\`)`;
+    const sharedFolder =
+      folder === undefined ? "" : ` (shared folder \`${folder}\`, a separate git repository)`;
     const base =
       mode.kind === "shared"
-        ? `Plans: use \`.plans\`${sharedFolder}; keep it out of product commits, and run \`${ctx.form} sync\` after changes.`
-        : "Plans: use `.plans`; keep it out of product commits.";
+        ? `Plans: use \`.plans\`${sharedFolder}; run \`${ctx.form} sync\` after changes.`
+        : "Plans: use `.plans`.";
     const archival =
       ctx.projectConfig?.config.plans?.autoArchive === true
         ? " Automatic archival is enabled."

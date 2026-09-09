@@ -62,7 +62,7 @@ Project-workspace cleanup is not physical project removal; follow "Cleanup reque
 
 Skip this step for project lifecycle and operational work. A new project's bootstrap through its initial commit stays in the lifecycle procedure.
 
-For new single-project work where the user explicitly says there is no ticket:
+For new single-project work where the user explicitly says there is no ticket or asks for a side ticket:
 
 1. Read `{PROJECT_PATH}/DEVELOPERS.md` and run `alignfirst context` from PROJECT_PATH.
 2. Run `alignfirst sync`, so identifier selection sees the current shared task set.

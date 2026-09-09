@@ -6,7 +6,7 @@ Choose one adoption form. Both expose the same documentation tree under `docs/`.
 
 Use this form when the project already requires the AlignFirst CLI. It adds no project dependency.
 
-1. Add `npm install -g alignfirst` to the README prerequisites.
+1. Nothing to install: project files invoke `npx alignfirst`. Offer `npm install -g alignfirst` in the README as a convenience.
 2. Ensure `docs/` exists. When preparing a project for an AlignFirst Developer, populate a newly
    created directory through [docmap-bootstrapping.md](docmap-bootstrapping.md).
 3. Remove any existing docmap section and add the AlignFirst bootstrap to `AGENTS.md` or
@@ -15,12 +15,12 @@ Use this form when the project already requires the AlignFirst CLI. It adds no p
    ```markdown
    ## AlignFirst
 
-   Before inspecting or changing this repository, run `alignfirst context` once from the repository root and follow its output.
+   Before inspecting or changing this repository, run `npx alignfirst context` once from the repository root and follow its output.
    ```
 
-4. Read the authoring guide with `alignfirst docmap --guide`.
+4. Read the authoring guide with `npx alignfirst docmap --guide`.
 
-CI can validate the documentation without relying on the machine's global version:
+CI can pin a version range while validating the documentation:
 
 ```sh
 npx -y alignfirst@<range> docmap --check
