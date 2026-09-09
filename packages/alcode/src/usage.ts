@@ -5,6 +5,13 @@ import type { CodingAgent } from "./coding-agent.js";
 import { buildAgentEnv } from "./run-agent.js";
 
 const USAGE_TIMEOUT_MS = 30_000;
+const CLAUDE_PRIVACY_OPT_OUTS = [
+  "DISABLE_TELEMETRY",
+  "DISABLE_ERROR_REPORTING",
+  "DISABLE_FEEDBACK_COMMAND",
+  "DISABLE_BUG_COMMAND",
+  "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY",
+] as const;
 const execFileAsync = promisify(execFile);
 const DEFAULT_USAGE_PROCESS_ADAPTER: UsageProcessAdapter = {
   execute: executeUsageProcess,
@@ -41,8 +48,6 @@ interface RateLimitWindow {
 }
 
 interface RateLimitBucket {
-  id: string | null;
-  name: string | null;
   windows: RateLimitWindow[];
 }
 
@@ -53,9 +58,16 @@ export function createUsageReader(
   return async (agent, context) => {
     const env = buildAgentEnv(context.env, (context.env.ALIGNFIRST_CODE_UNSET ?? "").split(","));
     return agent === "claude"
-      ? readClaudeUsage({ ...context, env }, adapter, timeoutMs)
+      ? readClaudeUsage({ ...context, env: translateClaudePrivacyOptOut(env) }, adapter, timeoutMs)
       : readCodexUsage({ ...context, env }, adapter, timeoutMs);
   };
+}
+
+function translateClaudePrivacyOptOut(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  if (env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC === undefined) return env;
+  delete env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC;
+  for (const name of CLAUDE_PRIVACY_OPT_OUTS) env[name] = "1";
+  return env;
 }
 
 async function readClaudeUsage(
@@ -87,9 +99,10 @@ export function parseClaudeUsage(stdout: string): string {
   if (value.is_error === true || value.subtype !== "success" || typeof result !== "string") {
     throw new Error("Claude Code could not read the current usage limits.");
   }
-  const trimmed = result.trim();
-  if (trimmed === "") throw new Error("Claude Code returned an empty usage report.");
-  return trimmed;
+  const insightsStart = result.search(/^What's contributing to your limits usage\?/m);
+  const limits = (insightsStart === -1 ? result : result.slice(0, insightsStart)).trimEnd();
+  if (!/\d+% used/.test(limits)) throw new Error("Claude Code returned no usage limits.");
+  return limits;
 }
 
 async function readCodexUsage(
@@ -274,35 +287,26 @@ export function formatCodexUsage(
   response: unknown,
   formatTime: (timestampSeconds: number) => string = formatLocalTime,
 ): string {
-  const buckets = parseCodexBuckets(response);
-  const rendered = buckets.map((bucket) => formatBucket(bucket, formatTime));
-  return `Codex usage\n\n${rendered.join("\n\n")}`;
+  const bucket = parseCodexBucket(response);
+  return `Codex usage\n\n${formatBucket(bucket, formatTime)}`;
 }
 
-function parseCodexBuckets(response: unknown): RateLimitBucket[] {
+function parseCodexBucket(response: unknown): RateLimitBucket {
   if (!isRecord(response)) throw new Error("Codex returned an unexpected usage response.");
-  const multiBucket = response.rateLimitsByLimitId;
-  const values = isRecord(multiBucket) ? Object.values(multiBucket) : [response.rateLimits];
-  const buckets = values.flatMap(parseBucket);
-  if (buckets.length === 0) {
+  const bucket = parseBucket(response.rateLimits);
+  if (bucket === undefined) {
     throw new Error("Codex returned no usage windows for the current account.");
   }
-  return buckets;
+  return bucket;
 }
 
-function parseBucket(value: unknown): RateLimitBucket[] {
-  if (!isRecord(value)) return [];
+function parseBucket(value: unknown): RateLimitBucket | undefined {
+  if (!isRecord(value)) return;
   const windows = [parseWindow(value.primary), parseWindow(value.secondary)].filter(
     (window): window is RateLimitWindow => window !== undefined,
   );
-  if (windows.length === 0) return [];
-  return [
-    {
-      id: typeof value.limitId === "string" ? value.limitId : null,
-      name: typeof value.limitName === "string" ? value.limitName : null,
-      windows,
-    },
-  ];
+  if (windows.length === 0) return;
+  return { windows };
 }
 
 function parseWindow(value: unknown): RateLimitWindow | undefined {
@@ -319,13 +323,12 @@ function formatBucket(
   bucket: RateLimitBucket,
   formatTime: (timestampSeconds: number) => string,
 ): string {
-  const name = bucket.name ?? (bucket.id === "codex" ? "Codex" : bucket.id) ?? "Codex";
   const windows = bucket.windows.map((window, index) => {
     const duration = formatDuration(window.windowDurationMins, index);
     const reset = window.resetsAt === null ? "" : ` · resets ${formatTime(window.resetsAt)}`;
     return `  ${duration}: ${window.usedPercent}% used${reset}`;
   });
-  return `${name}\n${windows.join("\n")}`;
+  return `Codex\n${windows.join("\n")}`;
 }
 
 function formatDuration(minutes: number | null, index: number): string {

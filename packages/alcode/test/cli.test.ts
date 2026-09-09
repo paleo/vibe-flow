@@ -79,7 +79,7 @@ describe("coding-agent selection", () => {
         modelResolver,
       }),
     ).toBe(0);
-    expect(stdout.text()).toContain("sol, terra, luna");
+    expect(stdout.text()).toContain("astra, sol, terra, luna");
     expect(stdout.text()).not.toContain("reserve-side-ticket");
     expect(stdout.text()).not.toContain("fable");
   });

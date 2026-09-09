@@ -1,5 +1,15 @@
 # alignfirst
 
+## 0.2.0
+
+### Minor Changes
+
+- dda71dd: Detected side tickets from branches, used branch templates for ticket detection, accepted explicit ticket IDs outside the configured pattern, and validated `--next` filenames before reserving side tickets.
+
+### Patch Changes
+
+- dda71dd: Reworded the plans convention in `context`: dropped the misleading "keep it out of product commits" and explained why shared plans need `sync`.
+
 ## 0.1.1
 
 ### Patch Changes

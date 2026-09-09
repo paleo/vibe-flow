@@ -620,7 +620,7 @@ function renderHelp(agent: CodingAgent, models: readonly string[]): string {
       : "--sandbox workspace-write (dangerous opt-out: --dangerously-bypass-approvals-and-sandbox)";
   const modelBehavior =
     agent === "codex"
-      ? "Codex aliases sol, terra, and luna resolve on demand; configured full slugs pass through."
+      ? "Codex aliases astra, sol, terra, and luna resolve on demand; configured full slugs pass through."
       : "Claude model values pass through unchanged.";
   return `alcode — run a coding agent through AlignFirst protocols.
 
@@ -644,8 +644,9 @@ Commands:
 
 Options (new, resume):
   --protocol <p>        One of: ${PROTOCOLS.join(", ")}.
-  --ticket <id>         Ticket ID. \`new --protocol\` requires it, or --no-ticket.
-  --no-ticket           Work without a ticket: reserves the next side ticket through
+  --ticket <id>         Ticket ID. \`new --protocol\` requires it or a side ticket through
+                        --no-ticket.
+  --no-ticket           Side ticket, for work without a ticket: reserves the next one through
                         \`alignfirst ticket --side\` and passes it to the agent. new only,
                         requires --protocol.
   --catchup             Load the ticket history before the message. new only.

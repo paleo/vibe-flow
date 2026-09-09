@@ -27,7 +27,15 @@ describe("resolveModels", () => {
 
 describe("Codex executable model resolution", () => {
   it("orders major and minor versions numerically and narrows by alias", () => {
-    const slugs = ["gpt-5.9-terra", "gpt-5.10-terra", "gpt-6.1-luna", "gpt-99.1-sol"];
+    const slugs = [
+      "gpt-5.9-astra",
+      "gpt-6-astra",
+      "gpt-5.9-terra",
+      "gpt-5.10-terra",
+      "gpt-6.1-luna",
+      "gpt-99.1-sol",
+    ];
+    expect(selectNewestCodexModel(slugs, "astra")).toBe("gpt-6-astra");
     expect(selectNewestCodexModel(slugs, "terra")).toBe("gpt-5.10-terra");
     expect(selectNewestCodexModel(slugs, "luna")).toBe("gpt-6.1-luna");
   });

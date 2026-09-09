@@ -32,6 +32,7 @@ describe("Claude usage", () => {
           PATH: "/bin",
           KEEP: "yes",
           SECRET: "remove",
+          CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1",
           ALIGNFIRST_CODE_AGENT: "claude",
           ALIGNFIRST_CODE_UNSET: "SECRET",
         },
@@ -42,7 +43,15 @@ describe("Claude usage", () => {
       ["-p", "/usage", "--tools", "", "--output-format", "json", "--no-session-persistence"],
       {
         cwd: "/project",
-        env: { PATH: "/bin", KEEP: "yes" },
+        env: {
+          PATH: "/bin",
+          KEEP: "yes",
+          DISABLE_TELEMETRY: "1",
+          DISABLE_ERROR_REPORTING: "1",
+          DISABLE_FEEDBACK_COMMAND: "1",
+          DISABLE_BUG_COMMAND: "1",
+          CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY: "1",
+        },
         timeout: 30_000,
       },
     );
@@ -74,17 +83,37 @@ describe("Claude usage", () => {
           result: "  Current session: 25% used  ",
         }),
       ),
-    ).toBe("Current session: 25% used");
+    ).toBe("  Current session: 25% used");
   });
 
-  it("rejects malformed, failed, and empty responses", () => {
+  it("omits the local insights section", () => {
+    expect(
+      parseClaudeUsage(
+        JSON.stringify({
+          subtype: "success",
+          is_error: false,
+          result:
+            "Current session: 25% used\nCurrent week: 40% used\n\n" +
+            "What's contributing to your limits usage?\nLocal session details",
+        }),
+      ),
+    ).toBe("Current session: 25% used\nCurrent week: 40% used");
+  });
+
+  it("rejects malformed, failed, and limit-free responses", () => {
     expect(() => parseClaudeUsage("nope")).toThrow("malformed usage JSON");
     expect(() =>
       parseClaudeUsage(JSON.stringify({ subtype: "error", is_error: true, result: "failed" })),
     ).toThrow("could not read");
     expect(() =>
-      parseClaudeUsage(JSON.stringify({ subtype: "success", is_error: false, result: " " })),
-    ).toThrow("empty usage report");
+      parseClaudeUsage(
+        JSON.stringify({
+          subtype: "success",
+          is_error: false,
+          result: "What's contributing to your limits usage?\nLocal session details",
+        }),
+      ),
+    ).toThrow("no usage limits");
   });
 });
 
@@ -187,9 +216,13 @@ describe("Codex usage", () => {
     ).rejects.toThrow("Codex timed out while reading usage limits");
   });
 
-  it("renders every structured bucket and window", () => {
+  it("renders only the account bucket and both windows", () => {
     const response = {
-      rateLimits: {},
+      rateLimits: {
+        limitId: "codex",
+        primary: { usedPercent: 7, windowDurationMins: 10_080, resetsAt: 100 },
+        secondary: { usedPercent: 8, windowDurationMins: 300, resetsAt: 200 },
+      },
       rateLimitsByLimitId: {
         codex: {
           limitId: "codex",
@@ -199,7 +232,7 @@ describe("Codex usage", () => {
         },
         spark: {
           limitId: "spark",
-          limitName: "Spark",
+          limitName: "GPT-5.3-Codex-Spark",
           primary: { usedPercent: 12, windowDurationMins: 300, resetsAt: 200 },
           secondary: { usedPercent: 34, windowDurationMins: 10_080, resetsAt: 300 },
         },
@@ -209,10 +242,8 @@ describe("Codex usage", () => {
     expect(formatCodexUsage(response, (timestamp) => `time-${timestamp}`)).toBe(
       "Codex usage\n\n" +
         "Codex\n" +
-        "  1 week: 7% used · resets time-100\n\n" +
-        "Spark\n" +
-        "  5 hours: 12% used · resets time-200\n" +
-        "  1 week: 34% used · resets time-300",
+        "  1 week: 7% used · resets time-100\n" +
+        "  5 hours: 8% used · resets time-200",
     );
   });
 

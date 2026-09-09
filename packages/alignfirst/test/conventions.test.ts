@@ -34,21 +34,25 @@ describe("conventions command", () => {
     );
     const result = await runMain(["conventions"], { cwd });
     expect(result.stdout).toBe(
-      "Ticket IDs: `^\\d+$`; infer a matching ID from the branch. Without an external ticket, use the next `side-N`.\n" +
+      "Ticket IDs: `^\\d+$`; infer a matching ID from the branch. Without a ticket, or when the user asks for a side ticket, use the next `side-N`.\n" +
         "Branch names: `{TICKET_ID}/{slug-1-3-words}`.\n" +
         "Commits: `type: [#TICKET_ID] summary`; use `type: summary` for `side-N`. Do not add an agent co-author trailer.\n" +
         "Default branch: main.\n" +
-        "Plans: use `.plans`; keep it out of product commits. Automatic archival is enabled.\n" +
+        "Plans: use `.plans`. Automatic archival is enabled.\n" +
         "Searches: exclude `.plans`, `.local` and `.local-wt` from broad codebase searches.\n",
     );
   });
 
   it("renders cached and unresolved default branches and omits absent plans", async () => {
     const cwd = makeProject();
-    expect((await runMain(["conventions"], { cwd })).stdout).toContain(
+    const unresolved = await runMain(["conventions"], { cwd });
+    expect(unresolved.stdout).toContain(
+      "Ticket IDs: no configured format; ask the user for the ID. Without a ticket, or when the user asks for a side ticket, use the next `side-N`.",
+    );
+    expect(unresolved.stdout).toContain(
       "Default branch: unresolved; ask before default-branch operations.",
     );
-    expect((await runMain(["conventions"], { cwd })).stdout).not.toContain("Plans:");
+    expect(unresolved.stdout).not.toContain("Plans:");
 
     const remote = join(cwd, "remote.git");
     git(cwd, "init", "--quiet", "--bare", remote);

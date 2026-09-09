@@ -18,9 +18,10 @@ import { archivesDir, isTicketName, plansDir } from "./layout.js";
 
 const FILE_PREFIX = /^([A-Z])(\d+)-/;
 const SIDE_TICKET = /^side-(\d+)$/;
+const BRANCH_SEPARATORS = "[/_.-]";
+const SIDE_TICKET_BRANCH = new RegExp(`^side-\\d+(?=$|${BRANCH_SEPARATORS})`);
 const PATH_SAFE_TICKET = /^[A-Za-z0-9._-]+$/;
 const ENTRY_ORDER = new Intl.Collator("en", { numeric: true });
-const BRANCH_SEPARATORS = "[/_.-]";
 const LISTED_TICKETS = 10;
 
 export interface ResolvedTicketDir {
@@ -156,19 +157,51 @@ export function isPathSafeTicketId(id: string): boolean {
   return id !== "." && !id.includes("..") && PATH_SAFE_TICKET.test(id);
 }
 
-export function validateTicketId(id: string, pattern?: string): void {
+export function validateTicketId(id: string): void {
   if (!isPathSafeTicketId(id) || !isTicketName(id)) throw new CliError(`Invalid ticket id: ${id}`);
-  if (pattern !== undefined && !new RegExp(pattern).test(id) && !SIDE_TICKET.test(id))
-    throw new CliError(`Ticket id "${id}" does not match ticketIdPattern "${pattern}".`);
 }
 
-export function detectTicketFromBranch(cwd: string, pattern: string): TicketDetection {
+export function detectTicketFromBranch(
+  cwd: string,
+  pattern?: string,
+  template?: string,
+): TicketDetection {
   const branch = currentBranch(cwd);
   if (branch === undefined) return { kind: "noBranch" };
-  const unanchored = pattern.replace(/^\^/, "").replace(/\$$/, "");
-  const match = new RegExp(unanchored).exec(branch);
+  const sideTicket = SIDE_TICKET_BRANCH.exec(branch);
+  if (sideTicket) return { kind: "detected", id: sideTicket[0], branch };
+  if (pattern === undefined) return { kind: "noMatch", branch };
+  if (template?.includes("{TICKET_ID}")) {
+    const match = branchPatternFromTemplate(template, unanchorPattern(pattern)).exec(branch);
+    const id = match?.[1];
+    if (id === undefined || !isPathSafeTicketId(id) || !isTicketName(id))
+      return { kind: "noMatch", branch };
+    return { kind: "detected", id, branch };
+  }
+  const match = new RegExp(unanchorPattern(pattern)).exec(branch);
   if (!match) return { kind: "noMatch", branch };
   return { kind: "detected", id: match[0], branch };
+}
+
+function unanchorPattern(pattern: string): string {
+  return pattern.replace(/^\^/, "").replace(/\$$/, "");
+}
+
+function branchPatternFromTemplate(template: string, ticketPattern: string): RegExp {
+  const placeholder = /\{[^{}]+\}/g;
+  let source = "";
+  let cursor = 0;
+  for (const match of template.matchAll(placeholder)) {
+    source += escapeRegexLiteral(template.slice(cursor, match.index));
+    source += match[0] === "{TICKET_ID}" ? `((?:${ticketPattern})|side-\\d+)` : ".+";
+    cursor = match.index + match[0].length;
+  }
+  source += escapeRegexLiteral(template.slice(cursor));
+  return new RegExp(`^${source}$`);
+}
+
+function escapeRegexLiteral(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function currentBranch(cwd: string): string | undefined {
@@ -224,7 +257,7 @@ function newestModification(dir: string): Date {
 }
 
 function branchNamesTicket(branch: string, id: string): boolean {
-  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escaped = escapeRegexLiteral(id);
   return new RegExp(`(^|${BRANCH_SEPARATORS})${escaped}($|${BRANCH_SEPARATORS})`).test(branch);
 }
 
@@ -243,15 +276,4 @@ function renderMissingTicketId(tickets: ExistingTicket[], sideAllowed: boolean):
   const rest = tickets.length - listed.length;
   if (rest > 0) lines.push(`  … ${rest} more`);
   return `No ticket id given. Existing tickets:\n${lines.join("\n")}\n${hint}`;
-}
-
-export function deduceTicketFromBranch(cwd: string, pattern: string): DeducedTicket {
-  const result = detectTicketFromBranch(cwd, pattern);
-  if (result.kind === "noBranch")
-    throw new CliError("Cannot deduce a ticket id from a detached HEAD.");
-  if (result.kind === "noMatch")
-    throw new CliError(
-      `Cannot deduce a ticket id from branch "${result.branch}" with pattern "${pattern}".`,
-    );
-  return result;
 }
