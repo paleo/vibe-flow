@@ -4,7 +4,7 @@
 
 You need:
 
-- the TICKET_DIR and ticket directory context — run `{{TICKET_CMD}}` once (`{{CMD}} ticket --side` when there is no external ticket)
+- the TICKET_DIR and ticket directory context — run `{{TICKET_CMD}}` once (`{{CMD}} ticket --side` for a side ticket, when there is no ticket)
 - {{BASE_BRANCH_RULE}}
 
 Identify TICKET_DIR and the base branch before starting the protocol.

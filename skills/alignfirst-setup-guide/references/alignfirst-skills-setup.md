@@ -100,11 +100,15 @@ expression; alternatives go inside a group, as in `^(ABC|XYZ)-\d+$`. Detect the 
 `git ls-remote --symref origin HEAD`; use the sole remote when `origin` is absent, and ask the user
 when several non-`origin` remotes exist.
 
-Write `.alignfirst.json` with the agreed fields. Never add `cli`:
+Write `.alignfirst.json` with the agreed fields. When the project declares no `alignfirst` dependency,
+set `cli` to its supported version range. Without this field, each machine runs whichever version it
+fetched. The version guard reports a mismatch and gives the exact
+`npx -y alignfirst@"<range>"` command to run:
 
 ```json
 {
   "schemaVersion": 1,
+  "cli": "<supported-range>",
   "ticketIdPattern": "^\\d+$",
   "plans": { "folder": "acme-web", "autoArchive": true },
   "portRange": { "first": 8100, "last": 8299 },

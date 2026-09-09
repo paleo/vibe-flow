@@ -8,7 +8,7 @@ import { parseCommandArgs } from "../parse-args.js";
 import { renderCatchup } from "../plans/catchup.js";
 import { assertPlansGate } from "../plans/layout.js";
 import {
-  deduceTicketFromBranch,
+  detectTicketFromBranch,
   deduceTicketFromExisting,
   nextFilePosition,
   peekSideTicket,
@@ -196,16 +196,25 @@ function resolveTicketId(
 ): TicketResolution {
   const pattern = ctx.projectConfig?.config.ticketIdPattern;
   if (positional !== undefined) {
-    validateTicketId(positional, pattern);
+    validateTicketId(positional);
     return { id: positional };
   }
   if (flags.side)
     return { id: flags["dry-run"] ? peekSideTicket(ctx.cwd) : reserveSideTicket(ctx.cwd) };
+  const template = ctx.projectConfig?.config.git?.branchNameTemplate;
+  const detection = detectTicketFromBranch(ctx.cwd, pattern, template);
+  if (detection.kind === "detected") {
+    validateTicketId(detection.id);
+    return detection;
+  }
   if (pattern === undefined)
     return deduceTicketFromExisting(ctx.cwd, { sideAllowed: !flags.catchup });
-  const deduced = deduceTicketFromBranch(ctx.cwd, pattern);
-  validateTicketId(deduced.id, pattern);
-  return deduced;
+  if (detection.kind === "noBranch")
+    throw new CliError("Cannot deduce a ticket id from a detached HEAD.");
+  const templateDetail = template?.includes("{TICKET_ID}") ? ` and template "${template}"` : "";
+  throw new CliError(
+    `Cannot deduce a ticket id from branch "${detection.branch}" with pattern "${pattern}"${templateDetail}.`,
+  );
 }
 
 function resolveTicket(ctx: CommandContext, options: TicketOptions): ResolvedTicketDir {

@@ -28,8 +28,8 @@ export function renderConventions(ctx: CommandContext): string {
 function renderTicketIds(ctx: CommandContext): string {
   const pattern = ctx.projectConfig?.config.ticketIdPattern;
   if (pattern === undefined)
-    return "Ticket IDs: no configured format; ask the user for the ID. Without an external ticket, use the next `side-N`.";
-  return `Ticket IDs: \`${pattern}\`; infer a matching ID from the branch. Without an external ticket, use the next \`side-N\`.`;
+    return "Ticket IDs: no configured format; ask the user for the ID. Without a ticket, or when the user asks for a side ticket, use the next `side-N`.";
+  return `Ticket IDs: \`${pattern}\`; infer a matching ID from the branch. Without a ticket, or when the user asks for a side ticket, use the next \`side-N\`.`;
 }
 
 function renderBranchNames(ctx: CommandContext): string | undefined {

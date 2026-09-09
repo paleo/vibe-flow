@@ -293,7 +293,11 @@ describe("ticket command", () => {
     git(cwd, "checkout", "-q", "-b", "78/unified-cli");
     writeFileSync(
       join(cwd, ".alignfirst.json"),
-      JSON.stringify({ schemaVersion: 1, ticketIdPattern: "^\\d+$" }),
+      JSON.stringify({
+        schemaVersion: 1,
+        ticketIdPattern: "^\\d+$",
+        git: { branchNameTemplate: "{TICKET_ID}/{slug-1-3-words}" },
+      }),
     );
     const result = await runMain(["ticket", "--json"], { cwd });
     expect(JSON.parse(result.stdout)).toEqual({
@@ -319,6 +323,60 @@ describe("ticket command", () => {
     });
   });
 
+  it("detects side tickets before patterns and follows branch templates", async () => {
+    const cwd = makeProject();
+    const configPath = join(cwd, ".alignfirst.json");
+    git(cwd, "checkout", "-q", "-b", "side-8/slug");
+    writeFileSync(
+      configPath,
+      JSON.stringify({
+        schemaVersion: 1,
+        ticketIdPattern: "^\\d+$",
+        git: { branchNameTemplate: "{TICKET_ID}/{slug-1-3-words}" },
+      }),
+    );
+    expect(
+      JSON.parse((await runMain(["ticket", "--json", "--dry-run"], { cwd })).stdout),
+    ).toMatchObject({ TICKET_ID: "side-8", branch: "side-8/slug" });
+
+    writeFileSync(configPath, JSON.stringify({ schemaVersion: 1, ticketIdPattern: "^\\d+$" }));
+    expect(
+      JSON.parse((await runMain(["ticket", "--json", "--dry-run"], { cwd })).stdout),
+    ).toMatchObject({ TICKET_ID: "side-8" });
+    writeFileSync(configPath, JSON.stringify({ schemaVersion: 1 }));
+    expect(
+      JSON.parse((await runMain(["ticket", "--json", "--dry-run"], { cwd })).stdout),
+    ).toMatchObject({ TICKET_ID: "side-8" });
+
+    git(cwd, "checkout", "-q", "-b", "feature/78-fix");
+    writeFileSync(
+      configPath,
+      JSON.stringify({
+        schemaVersion: 1,
+        ticketIdPattern: "^\\d+$",
+        git: { branchNameTemplate: "feature/{TICKET_ID}-{slug}" },
+      }),
+    );
+    expect(
+      JSON.parse((await runMain(["ticket", "--json", "--dry-run"], { cwd })).stdout),
+    ).toMatchObject({ TICKET_ID: "78", branch: "feature/78-fix" });
+
+    git(cwd, "checkout", "-q", "-b", "hotfix/typo");
+    writeFileSync(
+      configPath,
+      JSON.stringify({
+        schemaVersion: 1,
+        ticketIdPattern: "^\\d+$",
+        git: { branchNameTemplate: "{TICKET_ID}/{slug-1-3-words}" },
+      }),
+    );
+    const noMatch = await runMain(["ticket", "--dry-run"], { cwd });
+    expect(noMatch.code).toBe(1);
+    expect(noMatch.stderr).toContain(
+      'branch "hotfix/typo" with pattern "^\\d+$" and template "{TICKET_ID}/{slug-1-3-words}"',
+    );
+  });
+
   it("requires the plans gate and validates configured ids", async () => {
     const cwd = makeProject(false);
     expect((await runMain(["ticket", "78"], { cwd })).stderr).toContain(
@@ -338,7 +396,7 @@ describe("ticket command", () => {
       join(cwd, ".alignfirst.json"),
       JSON.stringify({ schemaVersion: 1, ticketIdPattern: "^\\d+$" }),
     );
-    expect((await runMain(["ticket", "abc"], { cwd })).stderr).toContain("does not match");
+    expect((await runMain(["ticket", "abc"], { cwd })).code).toBe(0);
     expect((await runMain(["ticket", "side-2"], { cwd })).code).toBe(0);
   });
 

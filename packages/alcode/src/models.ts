@@ -3,9 +3,12 @@ import { execFile } from "node:child_process";
 import type { CodingAgent } from "./coding-agent.js";
 
 export const CLAUDE_DEFAULT_MODELS = ["fable", "opus", "sonnet", "haiku"] as const;
-export const CODEX_DEFAULT_MODELS = ["sol", "terra", "luna"] as const;
+export const CODEX_DEFAULT_MODELS = ["astra", "sol", "terra", "luna"] as const;
 
 const CODEX_ALIASES = new Set<string>(CODEX_DEFAULT_MODELS);
+const CODEX_MODEL_PATTERN = new RegExp(
+  `^gpt-([0-9]+)(?:\\.([0-9]+))?-(${CODEX_DEFAULT_MODELS.join("|")})$`,
+);
 const CODEX_CATALOG_MAX_BUFFER = 8 * 1024 * 1024;
 const CODEX_CATALOG_TIMEOUT_MS = 30_000;
 
@@ -76,11 +79,11 @@ export function selectNewestCodexModel(
   alias: string,
 ): string | undefined {
   const matches = slugs
-    .map((slug) => ({ slug, match: slug.match(/^gpt-([0-9]+)\.([0-9]+)-(sol|terra|luna)$/) }))
+    .map((slug) => ({ slug, match: slug.match(CODEX_MODEL_PATTERN) }))
     .filter((candidate) => candidate.match?.[3] === alias)
     .sort((a, b) => {
       const major = Number(b.match?.[1]) - Number(a.match?.[1]);
-      return major !== 0 ? major : Number(b.match?.[2]) - Number(a.match?.[2]);
+      return major !== 0 ? major : Number(b.match?.[2] ?? 0) - Number(a.match?.[2] ?? 0);
     });
   return matches[0]?.slug;
 }

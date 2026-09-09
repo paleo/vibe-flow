@@ -176,7 +176,18 @@ describe("guide command", () => {
     expect(detected.stdout).toContain("Current ticket: `78`");
     expect(detected.stdout).toContain("alignfirst ticket --next spec.md --new-cycle");
 
+    git(cwd, "checkout", "-q", "-b", "side-8/x");
+    const sideWithPattern = await runMain(["guide", "spec"], { cwd });
+    expect(sideWithPattern.stdout).toContain("Current ticket: `side-8`");
+    writeFileSync(join(cwd, ".alignfirst.json"), '{"schemaVersion":1}');
+    const sideWithoutPattern = await runMain(["guide", "spec"], { cwd });
+    expect(sideWithoutPattern.stdout).toContain("Current ticket: `side-8`");
+
     git(cwd, "checkout", "-q", "main");
+    writeFileSync(
+      join(cwd, ".alignfirst.json"),
+      JSON.stringify({ schemaVersion: 1, ticketIdPattern: "^\\d+$" }),
+    );
     const noMatch = await runMain(["guide", "spec"], { cwd });
     expect(noMatch.stdout).toContain("No ticket id on branch `main`");
     expect(noMatch.stdout).toContain("alignfirst ticket <id> --next spec.md --new-cycle");

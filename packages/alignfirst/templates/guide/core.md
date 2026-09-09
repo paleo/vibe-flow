@@ -2,7 +2,7 @@
 
 ## Ticket Directory
 
-TICKET_DIR holds a ticket's work files and includes a trailing slash. TICKET_ID is the external ticket ID or `side-N` for work without an external ticket.
+TICKET_DIR holds a ticket's work files and includes a trailing slash. TICKET_ID is the external ticket ID, or `side-N` for a side ticket: work without a ticket.
 
 {{TICKET_DETECTION}}
 
@@ -10,7 +10,7 @@ TICKET_DIR holds a ticket's work files and includes a trailing slash. TICKET_ID 
 
 {{PLANS_STATE}}
 
-When the user says there is no external ticket, run `{{CMD}} ticket --side` and use the returned TICKET_ID in subsequent ticket commands. Reuse an existing `side-N` directory when the user refers to earlier work. Omit the ticket ID from commit messages.
+When the user says there is no ticket or asks for a side ticket, run `{{CMD}} ticket --side` and use the returned TICKET_ID in subsequent ticket commands. Reuse an existing `side-N` directory when the user refers to earlier work. Omit the ticket ID from commit messages.
 
 ## Work Files
 

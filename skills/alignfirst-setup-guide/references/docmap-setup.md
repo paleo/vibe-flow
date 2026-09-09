@@ -20,7 +20,7 @@ Use this form when the project already requires the AlignFirst CLI. It adds no p
 
 4. Read the authoring guide with `npx alignfirst docmap --guide`.
 
-CI can validate the documentation without relying on the machine's global version:
+CI can pin a version range while validating the documentation:
 
 ```sh
 npx -y alignfirst@<range> docmap --check

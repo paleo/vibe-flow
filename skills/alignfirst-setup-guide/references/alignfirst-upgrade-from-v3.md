@@ -5,11 +5,17 @@ migration leaves no plans compatibility package or npm-script wrappers.
 
 ## Install the CLI
 
-The migrated project invokes the CLI as `npx alignfirst` and declares no dependency on it. Installing it globally on a developer machine is a convenience. An AlignFirst Developer host also replaces the retired project-discovery package:
+The migrated project invokes the CLI as `npx alignfirst` and declares no dependency on it.
+
+Installing the CLI globally on a developer machine is a convenience:
 
 ```sh
 npm install -g alignfirst
-# AlignFirst Developer host only
+```
+
+An AlignFirst Developer host installs the CLI globally and replaces the retired project-discovery package:
+
+```sh
 npm install -g alignfirst @paleo/alcode @paleo/alproject
 ```
 
@@ -62,8 +68,8 @@ path used `--auto-archive`, preserve that behavior with `plans.autoArchive: true
 ```
 
 Keep only applicable plans fields. `plans.autoArchive` works in local mode without `plans.folder`.
-Add `portRange` when the workspace wrapper declares a port scheme. Update the README prerequisite
-and install the stubs.
+Add `portRange` when the workspace wrapper declares a port scheme. Update the README guidance and
+install the stubs.
 
 ## Replace Every Legacy Command
 
