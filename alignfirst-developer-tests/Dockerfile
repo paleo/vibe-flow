@@ -10,11 +10,12 @@ FROM paleo/openclaw-test-base:${OPENCLAW_TEST_BASE_TAG}
 USER root
 
 # Fixture runtime deps (git for `git init` / worktree, curl for the playbook's
-# verification step — "confirm the app still serves" — pnpm via Corepack for
+# verification step — "confirm the app still serves" — pnpm through Corepack for
 # the project's dev scripts). Plus the per-command mock-cli shim symlinks
 # this consumer wants intercepted. `claude`, `codex`, and `gh` are shimmed. `alcode` runs for real,
 # and its selected coding-agent subprocess resolves back to the shim via PATH order.
-RUN apk add --no-cache git curl && \
+RUN apk add --no-cache git curl sqlite && \
+    npm install --global corepack@0.36.0 && \
     corepack enable && corepack prepare pnpm@latest --activate && \
     for name in claude codex gh; do ln -sf mock-cli-shim "/opt/openclaw-test/mocks/bin/$name"; done && \
     mkdir -p /home/claw/projects && \
@@ -69,13 +70,13 @@ COPY --chown=claw:claw openclaw.json /home/claw/.openclaw/openclaw.json
 RUN npm ci --include=dev && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins install --force --accept-capabilities \
-        npm:@openclaw/codex@2026.9.2 && \
+        npm:@openclaw/codex@2026.9.3 && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins install --force --accept-capabilities \
-        npm:@openclaw/zai-provider@2026.9.2 && \
+        npm:@openclaw/zai-provider@2026.9.3 && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins install --force --accept-capabilities \
-        npm:@openclaw/perplexity-plugin@2026.9.2 && \
+        npm:@openclaw/perplexity-plugin@2026.9.3 && \
     OPENCLAW_CONFIG_PATH=/home/claw/.openclaw/openclaw.json \
       npx openclaw plugins registry --refresh && \
     npm cache clean --force
@@ -87,10 +88,13 @@ COPY --chown=claw:claw projects-fixture/template/ /opt/alignfirst-developer-test
 RUN cd /opt/alignfirst-developer-tests/fixtures/template && \
     pnpm install --frozen-lockfile
 
-# Install AlignFirst skills under /home/claw/.agents/skills/ (the path OpenClaw scans).
+# Install the shared setup guide under /home/claw/.agents/skills/ and the
+# OpenClaw-only playbook under OpenClaw's managed /home/claw/.openclaw/skills/.
 RUN npx -y skills add https://github.com/paleo/alignfirst --global --yes \
       --agent universal --agent claude-code \
-      --skill alignfirst-setup-guide \
+      --skill alignfirst-setup-guide && \
+    npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+      --agent openclaw --copy \
       --skill alignfirst-developer-openclaw-playbook
 
 USER root

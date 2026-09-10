@@ -203,6 +203,11 @@ export function createChannelMockMessageActions(params: {
       }
       return null;
     },
+    ...(surface === "slack"
+      ? {
+          prepareSendPayload: ({ ctx, payload }) => (ctx.action === "send" ? payload : null),
+        }
+      : {}),
     handleAction: async (context) => {
       const { action, cfg, accountId, params: actionParams, toolContext } = context;
       if (surface === "slack" && SLACK_DISABLED_ACTIONS.has(action)) {
@@ -213,6 +218,9 @@ export function createChannelMockMessageActions(params: {
 
       switch (action) {
         case "send": {
+          if (surface === "slack") {
+            throw new Error(`${channelId} Slack send must use OpenClaw core delivery`);
+          }
           const to = resolveDestination(actionParams);
           const text = readSendText(actionParams);
           if (!to || text === undefined) {
@@ -244,17 +252,6 @@ export function createChannelMockMessageActions(params: {
             threadId: message.threadId,
             actionParams,
           });
-          if (surface === "slack") {
-            return jsonResult({
-              ok: true,
-              result: {
-                messageId: message.id,
-                channelId: parsed.conversationId,
-                ...(threadId ? { threadTs: threadId } : {}),
-              },
-              ...threadRename,
-            });
-          }
           return jsonResult({ message, ...threadRename });
         }
         case "thread-create": {

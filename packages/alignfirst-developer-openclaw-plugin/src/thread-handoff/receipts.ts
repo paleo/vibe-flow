@@ -39,6 +39,19 @@ interface CachedContext {
   capturedAt: number;
 }
 
+type RejectionReason =
+  | "unsupportedResultShape"
+  | "notSent"
+  | "partialDelivery"
+  | "channelMismatch"
+  | "threadMismatch"
+  | "missingMessageId"
+  | "missingThread"
+  | "missingStarter"
+  | "accountMismatch";
+
+type ReceiptParseResult = DeliveryReceipt | RejectionReason;
+
 export function createReceiptCoordinator(params: {
   configuration: PluginConfiguration;
   getStore: () => HandoffStore;
@@ -58,13 +71,21 @@ export function createReceiptCoordinator(params: {
     observe(event, context) {
       const source = readCachedSource(contexts, context, now());
       if (!source || event.toolName !== "message" || event.error !== undefined) return;
+      const surface = params.configuration.channelSurfaces[source.channelId];
       const receipt = parseDeliveryReceipt({
         event,
         source,
-        surface: params.configuration.channelSurfaces[source.channelId],
+        surface,
         now: now(),
       });
       if (!receipt) return;
+      if (typeof receipt === "string") {
+        const threadId = readObservedThreadId(event, surface);
+        params.logger.debug?.(
+          `thread-handoff receipt rejected: surface=${surface} session=${source.sessionKey} thread=${threadId ?? "-"} reason=${receipt}`,
+        );
+        return;
+      }
       const key = lookupKey(receipt.sessionKey, receipt.sessionId, receipt.threadId);
       try {
         params.getStore().insertReceipt(receipt, now());
@@ -117,9 +138,13 @@ function parseDeliveryReceipt(params: {
   source: SourceContext;
   surface?: "slack" | "discord";
   now: number;
-}): DeliveryReceipt | undefined {
-  if (params.surface === "slack") return parseSlackReceipt(params);
-  if (params.surface === "discord") return parseDiscordReceipt(params);
+}): ReceiptParseResult | undefined {
+  if (params.surface === "slack" && params.event.params.action === "send") {
+    return parseSlackReceipt(params);
+  }
+  if (params.surface === "discord" && params.event.params.action === "thread-create") {
+    return parseDiscordReceipt(params);
+  }
   return;
 }
 
@@ -127,28 +152,40 @@ function parseSlackReceipt(params: {
   event: ToolObservation;
   source: SourceContext;
   now: number;
-}): DeliveryReceipt | undefined {
+}): ReceiptParseResult {
   const { event, source } = params;
-  if (event.params.action !== "send") return;
   const threadId = nonempty(event.params.threadId);
+  if (!threadId) return "missingThread";
   const starterText = readStarter(event.params);
+  if (starterText === undefined) return "missingStarter";
   const destination = readDestination(event.params);
   const details = readResultDetails(event.result);
   const result = asRecord(details?.result);
+  const target = asRecord(result?.target);
+  const targetKind = nonempty(target?.kind);
+  const targetId = nonempty(target?.id);
+  if (targetKind === undefined || targetId === undefined) return "unsupportedResultShape";
   if (
-    !threadId ||
-    starterText === undefined ||
-    details?.ok !== true ||
-    details.partial === true ||
-    !result ||
     !matchesConversation(destination, source.parentConversationId) ||
-    nonempty(result.channelId)?.toLowerCase() !== source.parentConversationId.toLowerCase() ||
-    (nonempty(result.threadTs) !== undefined && nonempty(result.threadTs) !== threadId)
+    targetKind !== "channel" ||
+    targetId.toLowerCase() !== source.parentConversationId.toLowerCase()
   ) {
-    return;
+    return "channelMismatch";
   }
-  const starterMessageId = nonempty(result.messageId);
-  if (!starterMessageId || !accountMatches(event.params, source.accountId)) return;
+  const messageDelivery = asRecord(details?.messageDelivery);
+  if (
+    nonempty(details?.deliveryStatus) !== "sent" ||
+    nonempty(messageDelivery?.status) !== "settled"
+  ) {
+    return "notSent";
+  }
+  if (messageDelivery?.partialDelivery !== false) return "partialDelivery";
+  const starterMessageId = nonempty(result?.messageId);
+  if (!starterMessageId) return "missingMessageId";
+  const deliveryReceipt = asRecord(result?.receipt);
+  const returnedThreadId = nonempty(deliveryReceipt?.threadId);
+  if (returnedThreadId !== undefined && returnedThreadId !== threadId) return "threadMismatch";
+  if (!accountMatches(event.params, source.accountId)) return "accountMismatch";
   return createReceipt({
     source,
     threadId,
@@ -163,33 +200,28 @@ function parseDiscordReceipt(params: {
   event: ToolObservation;
   source: SourceContext;
   now: number;
-}): DeliveryReceipt | undefined {
+}): ReceiptParseResult {
   const { event, source } = params;
-  if (event.params.action !== "thread-create") return;
   const starterText = readStarter(event.params);
   const destination = readDestination(event.params);
   const anchorMessageId = nonempty(event.params.messageId);
   const details = readResultDetails(event.result);
   const thread = asRecord(details?.thread);
   const threadId = nonempty(thread?.id);
-  if (
-    starterText === undefined ||
-    !anchorMessageId ||
-    details?.ok !== true ||
-    details.partial === true ||
-    !threadId ||
-    !matchesConversation(destination, source.parentConversationId) ||
-    !accountMatches(event.params, source.accountId)
-  ) {
-    return;
-  }
+  if (!threadId) return "missingThread";
+  if (starterText === undefined) return "missingStarter";
+  if (!anchorMessageId) return "missingMessageId";
   const returnedParent = nonempty(thread?.parent_id) ?? nonempty(thread?.parentId);
   if (
-    returnedParent &&
-    returnedParent.toLowerCase() !== source.parentConversationId.toLowerCase()
+    !matchesConversation(destination, source.parentConversationId) ||
+    (returnedParent !== undefined &&
+      returnedParent.toLowerCase() !== source.parentConversationId.toLowerCase())
   ) {
-    return;
+    return "channelMismatch";
   }
+  if (details?.ok !== true) return "notSent";
+  if (details.partial === true) return "partialDelivery";
+  if (!accountMatches(event.params, source.accountId)) return "accountMismatch";
   return createReceipt({
     source,
     threadId,
@@ -197,6 +229,17 @@ function parseDiscordReceipt(params: {
     toolCallId: event.toolCallId,
     now: params.now,
   });
+}
+
+function readObservedThreadId(
+  event: ToolObservation,
+  surface: "slack" | "discord" | undefined,
+): string | undefined {
+  if (surface === "slack") return nonempty(event.params.threadId);
+  if (surface !== "discord") return;
+  const details = readResultDetails(event.result);
+  const thread = asRecord(details?.thread);
+  return nonempty(thread?.id);
 }
 
 function createReceipt(params: {

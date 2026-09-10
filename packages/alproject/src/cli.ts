@@ -9,9 +9,9 @@ import { errorMessage } from "./errors.js";
 import { formatRange } from "./format.js";
 import { renderProjectsGuide } from "./guide.js";
 import {
-  assertValidPortRange,
+  assertValidPortRanges,
   MARKER_FILENAME,
-  type PortRange,
+  type MarkerPortRange,
   type ProjectsMarker,
   readMarker,
   writeMarker,
@@ -32,8 +32,8 @@ const USAGE = `Usage:
   alproject list [--json] [--root <path>]
   alproject doctor [--root <path>]
   alproject status <path> [--json] [--root <path>]
-  alproject init [--root <path>] [--description <text>] [--port-range <first>-<last>]
-  alproject free-ports --size <n> [--json] [--root <path>]
+  alproject init [--root <path>] [--description <text>] [--port-range [<code>=]<first>-<last>]...
+  alproject free-ports --size <n> [--range <code>] [--json] [--root <path>]
   alproject --guide [--root <path>]
   alproject --help
   alproject --version
@@ -70,7 +70,8 @@ interface ProjectsArgs {
   guide: boolean;
   help: boolean;
   description?: string;
-  portRange?: PortRange;
+  portRanges?: MarkerPortRange[];
+  range?: string;
   size?: number;
 }
 
@@ -132,7 +133,7 @@ export function runProjects(ctx: ProjectsContext, tokens: string[]): number {
     return 0;
   }
   if (args.command === "free-ports" && args.size !== undefined) {
-    const range = findFreeBlock(inventory, args.size);
+    const range = findFreeBlock(inventory, args.size, args.range);
     ctx.stdout.write(args.json ? renderPortRangeJson(range) : `${formatRange(range)}\n`);
     return 0;
   }
@@ -158,7 +159,8 @@ function parseProjectsArgs(tokens: string[]): ProjectsArgs {
       root: { type: "string" },
       json: { type: "boolean", default: false },
       description: { type: "string" },
-      "port-range": { type: "string" },
+      "port-range": { type: "string", multiple: true },
+      range: { type: "string" },
       size: { type: "string" },
       guide: { type: "boolean", default: false },
       help: { type: "boolean", short: "h", default: false },
@@ -189,7 +191,8 @@ function parseProjectsArgs(tokens: string[]): ProjectsArgs {
     ...(values.description === undefined ? {} : { description: values.description }),
     ...(values["port-range"] === undefined
       ? {}
-      : { portRange: parsePortRange(values["port-range"]) }),
+      : { portRanges: parsePortRanges(values["port-range"]) }),
+    ...(values.range === undefined ? {} : { range: values.range }),
     ...(values.size === undefined ? {} : { size: parsePositiveInteger("--size", values.size) }),
   };
 }
@@ -198,7 +201,8 @@ interface ParsedOptionValues {
   root?: string;
   json: boolean;
   description?: string;
-  "port-range"?: string;
+  "port-range"?: string[];
+  range?: string;
   size?: string;
   guide: boolean;
   help: boolean;
@@ -219,6 +223,7 @@ function assertGuideArgs(positionals: string[], values: ParsedOptionValues): voi
     values.json ||
     values.description !== undefined ||
     values["port-range"] !== undefined ||
+    values.range !== undefined ||
     values.size !== undefined
   ) {
     throw new Error("--guide accepts only --root");
@@ -230,6 +235,7 @@ function assertNoCommandOptions(values: ParsedOptionValues): void {
     values.json ||
     values.description !== undefined ||
     values["port-range"] !== undefined ||
+    values.range !== undefined ||
     values.size !== undefined
   ) {
     throw new Error("Command options require a projects command");
@@ -264,6 +270,9 @@ function validateOptionPlacement(command: string, values: ParsedOptionValues): v
   ) {
     throw new Error("--description and --port-range are valid only with init");
   }
+  if (values.range !== undefined && command !== "free-ports") {
+    throw new Error("--range is valid only with free-ports");
+  }
   if (command === "free-ports") {
     if (values.size === undefined) throw new Error("free-ports requires --size <n>");
   } else if (values.size !== undefined) {
@@ -271,12 +280,20 @@ function validateOptionPlacement(command: string, values: ParsedOptionValues): v
   }
 }
 
-function parsePortRange(value: string): PortRange {
-  const match = /^(\d+)-(\d+)$/u.exec(value);
-  if (match === null) throw new Error("--port-range must be <first>-<last>");
-  const range = { first: Number(match[1]), last: Number(match[2]) };
-  assertValidPortRange(range, "--port-range");
-  return range;
+function parsePortRanges(values: string[]): MarkerPortRange[] {
+  const ranges = values.map(parsePortRange);
+  assertValidPortRanges(ranges, "--port-range");
+  return ranges;
+}
+
+function parsePortRange(value: string): MarkerPortRange {
+  const match = /^(?:([a-z][a-z0-9-]*)=)?(\d+)-(\d+)$/u.exec(value);
+  if (match === null) throw new Error("--port-range must be [<code>=]<first>-<last>");
+  return {
+    ...(match[1] === undefined ? {} : { code: match[1] }),
+    first: Number(match[2]),
+    last: Number(match[3]),
+  };
 }
 
 function parsePositiveInteger(option: string, value: string): number {
@@ -297,7 +314,7 @@ function initializeProjectsDirectory(root: string, args: ProjectsArgs, stdout: O
   if (readMarker(root) !== undefined) throw new Error(`${markerPath} already exists.`);
   writeMarker(root, {
     ...(args.description === undefined ? {} : { description: args.description }),
-    ...(args.portRange === undefined ? {} : { portRange: args.portRange }),
+    ...(args.portRanges === undefined ? {} : { portRanges: args.portRanges }),
   });
   stdout.write(`Created ${markerPath}\n`);
   return 0;

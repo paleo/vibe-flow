@@ -23,9 +23,50 @@ grep {{SERVICE_USER}} /etc/subuid /etc/subgid
 # Expected: one {{SERVICE_USER}}:<start>:65536 line in each (rootless podman maps container IDs through them)
 ```
 
-## 2. Login profile
+## 2. Project runtimes
 
-`sudo -i` runs no `pam_systemd`, and systemd user services read neither `.bashrc` nor `.profile`. `~/.bash_profile` bridges the two worlds for login shells: `XDG_RUNTIME_DIR` so `systemctl --user` works, the `environment.d` variables the gateway also receives, and the npm prefix on `PATH`.
+Install a pinned fnm release as a root-owned system tool:
+
+```sh
+runtime_tmp=$(mktemp -d)
+curl -fsSL "https://github.com/Schniz/fnm/releases/download/v<fnm-version>/fnm-linux.zip" -o "$runtime_tmp/fnm.zip"
+unzip "$runtime_tmp/fnm.zip" -d "$runtime_tmp"
+sudo install -m 755 -o root -g root "$runtime_tmp/fnm" /usr/local/bin/fnm
+rm -rf "$runtime_tmp"
+```
+
+Create fnm's state directory, install the latest patch of the current Node LTS as the default (at least 24.16.0 for the developer CLIs), then install every version declared by a managed project. Provision without loading profiles so an unavailable default cannot block this step:
+
+```sh
+sudo install -d -m 755 -o {{SERVICE_USER}} -g {{SERVICE_USER}} /home/{{SERVICE_USER}}/.local/share/fnm
+sudo -H -u {{SERVICE_USER}} bash --noprofile --norc -c '
+set -e
+export FNM_DIR="$HOME/.local/share/fnm"
+eval "$(/usr/local/bin/fnm env --shell bash)"
+fnm install --lts
+fnm default <default-node-version>
+fnm install <project-node-version>
+'
+```
+
+Repeat the last command for each distinct project version. Version provisioning is an operator action; a declared version that is absent stops shell startup.
+
+Deploy the root-owned launchers and runtime initialization files from this checkout:
+
+```sh
+sudo install -d -m 755 -o root -g root /opt/{{SERVICE_USER}}/bin /opt/{{SERVICE_USER}}/libexec
+sudo install -m 755 -o root -g root infra/openclaw/bin/openclaw /opt/{{SERVICE_USER}}/bin/openclaw
+sudo install -m 755 -o root -g root \
+  infra/openclaw/node-runtime/project-shell \
+  infra/openclaw/node-runtime/admin-npm \
+  infra/openclaw/node-runtime/check-project-runtimes.sh \
+  /opt/{{SERVICE_USER}}/libexec/
+sudo install -m 644 -o root -g root infra/openclaw/node-runtime/init.bash /opt/{{SERVICE_USER}}/libexec/init.bash
+```
+
+## 3. Login profile
+
+`sudo -i` runs no `pam_systemd`, and systemd user services read neither `.bashrc` nor `.profile`. `~/.bash_profile` bridges the two worlds for login shells, then loads the shared runtime initialization. OpenClaw's `project-shell` reads `.bash_profile`; interactive non-login shells started by the coding agent read `.bashrc`.
 
 ```sh
 sudo -u {{SERVICE_USER}} tee /home/{{SERVICE_USER}}/.bash_profile > /dev/null <<'PROFILE'
@@ -40,17 +81,21 @@ if [ -d "$HOME/.config/environment.d" ]; then
   done
   set +a
 fi
-export PATH="$PATH:$HOME/.npm-system-global/bin"
+. /opt/{{SERVICE_USER}}/libexec/init.bash
 PROFILE
+printf '\ncase $- in *i*) . /opt/{{SERVICE_USER}}/libexec/init.bash ;; esac\n' | \
+  sudo -H -u {{SERVICE_USER}} tee -a /home/{{SERVICE_USER}}/.bashrc > /dev/null
 ```
 
-## 3. npm prefix and global CLIs
+The `environment.d` bridge stays before `init.bash`; the runtime initialization must be the profile's last line. `.bashrc` runs it for interactive non-login shells and avoids initializing fnm twice when `.profile` sources `.bashrc` during login.
 
-The account has no sudo, so npm globals go to `~/.npm-system-global/`. Versions are unpinned: the update runbook installs `@latest` and records the versions in its report.
+## 4. npm prefix and global CLIs
+
+The protected CLIs live in `~/.npm-system-global/`, but no `.npmrc` selects that prefix. `admin-npm` fixes both the system interpreter and the destination. Versions are unpinned: the update runbook installs `@latest` and records the versions in its report.
 
 ```sh
-sudo -H -u {{SERVICE_USER}} bash -c 'printf "prefix=%s\n" "$HOME/.npm-system-global" > ~/.npmrc'
-sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g openclaw alignfirst @paleo/alcode @paleo/alproject ctx7
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm install -g \
+  openclaw alignfirst @paleo/alcode @paleo/alproject ctx7
 ```
 
 Install the selected coding agent under the same prefix: [08-coding-agent.md § Install](08-coding-agent.md#install). The seed in `04` requires it.
@@ -59,10 +104,27 @@ Verify:
 
 ```sh
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'which node npm openclaw alignfirst alcode alproject ctx7'
-# Expected: /usr/bin/node, /usr/bin/npm, then /home/{{SERVICE_USER}}/.npm-system-global/bin/… for the rest
+# Expected: node and npm under $FNM_MULTISHELL_PATH/bin; openclaw under /opt/{{SERVICE_USER}}/bin; the rest under /home/{{SERVICE_USER}}/.npm-system-global/bin
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> \
+PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=<claude|codex> \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
 ```
 
-## 4. Git access
+## 5. Other package managers
+
+Install pnpm or yarn system-wide only when a managed project uses it. These packages live under `/usr/lib/node_modules/` and survive replacement of the `nodejs` package:
+
+```sh
+# Run only the lines needed by the managed projects.
+sudo /usr/bin/npm install -g pnpm
+sudo /usr/bin/npm install -g yarn
+```
+
+## 6. Git access
 
 Two supported paths for `{{GIT_HOSTS}}`; keep the one matching the deployment's access policy. The SSH key is registered here. The host CLI path (the CLI serves an OAuth token to git over HTTPS, so no key is registered) waits for `05`, which installs the CLIs and authenticates them for both paths.
 
@@ -88,7 +150,7 @@ sudo -i -u {{SERVICE_USER}} -- git config --global fetch.prune true
 sudo -i -u {{SERVICE_USER}} -- git config --global pull.rebase true
 ```
 
-## 5. Rootless check
+## 7. Rootless check
 
 ```sh
 sudo -i -u {{SERVICE_USER}} -- podman info --format '{{.Host.Security.Rootless}}'

@@ -1,6 +1,6 @@
 # OpenClaw Context Engineering
 
-How OpenClaw assembles the agent's context — what gets auto-loaded, what doesn't, and the budgets that bound it. Source verified against the upstream repo (`src/agents/workspace.ts`, `bootstrap-cache.ts`, `system-prompt.ts`, `bootstrap-budget.ts`). A read-only clone lives at `.local/openclaw/` for spot-checking.
+How OpenClaw assembles the agent's context — what gets auto-loaded, what doesn't, and the budgets that bound it. Source verified against the upstream repo (`src/agents/workspace.ts`, `bootstrap-cache.ts`, `system-prompt.ts`, `embedded-agent-helpers/bootstrap.ts`). A read-only clone lives at `.local/openclaw/` for spot-checking.
 
 When you actually edit a workspace file, also read [`writing-instructions-for-openclaw.md`](./writing-instructions-for-openclaw.md) — heuristics from past test regressions.
 
@@ -27,13 +27,13 @@ Anything under `workspace/` subdirectories is **not** auto-injected. The agent m
 
 To force-load extra files into the prompt, configure the `bootstrap-extra-files` hook in `openclaw.json`. Caveat: the file basename must be one of the recognized bootstrap names (`AGENTS.md`, `SOUL.md`, …) — you can't smuggle arbitrary content this way.
 
-This is the mechanism the `alignfirst-developer-openclaw-playbook` skill relies on: `AGENTS.md` is a thin pointer that, on each user message or trusted handoff activation, tells the agent to load that skill and read its `SKILL.md` (the dispatcher); the dispatcher in turn reads the surface-specific procedure (`references/working-session.md` or `references/channel-handling.md`). None of those files is auto-loaded — they cost tokens only when a turn actually needs them. Because the catalog injects only name+description (never the body), whichever `SKILL.md` the agent reads *first* sets the turn's frame — which is why the dispatcher is a procedural skill and the delegation manual (`alcode --openclaw-guide`) is only read at delegation time.
+This is the mechanism the `alignfirst-developer-openclaw-playbook` skill relies on: `AGENTS.md` is a thin pointer that, on each user message or trusted handoff activation, tells the agent to load the skill from OpenClaw's managed `~/.openclaw/skills/` directory and read its `SKILL.md` (the dispatcher); the dispatcher in turn reads the surface-specific procedure (`references/working-session.md` or `references/channel-handling.md`). Neither coding agent scans this managed directory. None of those files is auto-loaded — they cost tokens only when a turn actually needs them. Because the catalog injects only name+description (never the body), whichever `SKILL.md` the agent reads *first* sets the turn's frame — which is why the dispatcher is a procedural skill and the delegation manual (`alcode --openclaw-guide`) is only read at delegation time.
 
 ## Character budgets
 
-Defaults in `src/agents/bootstrap-budget.ts`:
+Defaults in `src/agents/embedded-agent-helpers/bootstrap.ts`:
 
-- `agents.defaults.bootstrapMaxChars`: 12 KB per file
+- `agents.defaults.bootstrapMaxChars`: 20 KB per file; `USER.md` is capped at 4 KB
 - `agents.defaults.bootstrapTotalMaxChars`: 60 KB total
 
 Over-budget files are truncated with a marker. Keep workspace files under these limits.
@@ -42,9 +42,9 @@ Over-budget files are truncated with a marker. Keep workspace files under these 
 
 The heartbeat checklist is the scratch of the system-owned `heartbeat:main` cron job (its declaration key; the listing shows it as `Heartbeat (main)`), a row in the shared SQLite store (`src/cron/heartbeat-monitor.ts`, `src/cron/scratch-store.ts`). The gateway creates the job at startup from `agents.defaults.heartbeat.every`; `openclaw cron scratch <job-id>` reads and writes the scratch. The runtime never reads a workspace `HEARTBEAT.md`; `openclaw doctor --fix` imports a leftover file into the scratch and deletes it (`src/commands/doctor-heartbeat-scratch-migration.ts`). A comment-only scratch makes the periodic tick skip its model call (`reason=empty-heartbeat-file`); a missing scratch runs the model.
 
-The workspace and alcode wake convention is `NO_REPLY`, OpenClaw's general silent-reply token. The stock heartbeat prompt (`src/auto-reply/heartbeat.ts`) follows the scratch and ends in `NO_REPLY`, and OpenClaw sends it verbatim as the scheduled user message, so neither the harness nor the deployment seed overrides `agents.defaults.heartbeat.prompt`. The former `agents.defaults.heartbeat.includeSystemPromptSection` key is rejected.
+The general silence convention is `NO_REPLY`, with the heartbeat and wake exception below. The stock heartbeat prompt (`src/auto-reply/heartbeat.ts`) follows the scratch and ends in `NO_REPLY`, and OpenClaw sends it verbatim as the scheduled user message, so neither the harness nor the deployment seed overrides `agents.defaults.heartbeat.prompt`. The former `agents.defaults.heartbeat.includeSystemPromptSection` key is rejected.
 
-OpenClaw still accepts the legacy `HEARTBEAT_OK` acknowledgment and suppresses token-only replies, including stray acknowledgments outside heartbeat turns. Keep new instructions on `NO_REPLY` so scheduled and event-driven wake paths share one convention.
+OpenClaw 2026.9.3 loses a post-tool `NO_REPLY` from its reply accumulator, then mistakes the silent turn for a missing summary. Its isolated finalizer receives no conversation context and can emit an unsolicited answer. Silent heartbeat and event-wake turns use the supported `HEARTBEAT_OK` acknowledgement: handoffs awaiting a human value, duplicate seeds, and coding wakes whose run is still pending or already reported. OpenClaw suppresses this token without triggering finalization. Ordinary channel and human-turn silence stays on `NO_REPLY`. Disabling block streaming does not avoid the defect. The deterministic gateway suite covers both surfaces.
 
 ## Background model runs disabled by the harness and the seed
 
@@ -81,38 +81,43 @@ For Discord today:
 Two regimes coexist:
 
 - **Channel / DM / thread sessions** auto-stream their model text to their bound surface (block-streaming per `channels.discord.streaming`/`channels.slack.streaming`). Just generating text replies works — no tool call needed. For *cross-surface* posting (open a thread, post into a different channel than the bound one, send attachments, react), the session uses the `message` tool with explicit targets.
-- **Subagent sessions** do **not** auto-stream. OpenClaw forces `requireExplicitMessageTarget=true` for subagent sessions (`src/agents/pi-embedded-runner/run/attempt.ts`) and the subagent system prompt actively discourages calling `message`: *"only use the `message` tool when explicitly instructed to contact a specific external recipient; otherwise return plain text and let the parent deliver it"* (`src/agents/subagent-system-prompt.ts`).
+- **Subagent sessions** do **not** auto-stream. OpenClaw defaults `requireExplicitMessageTarget=true` for subagent sessions (`src/agents/command/attempt-execution.ts`) and always denies their `message` tool (`src/agents/agent-tools.policy.ts`). Their model output remains internal until completion routing.
 
-So a thread-bound subagent's intermediate turns produce **no** Discord posts. The only delivery is the **announce-relay**: when the subagent finishes a turn, OpenClaw re-prompts the *parent* in-process with a synthetic `[Internal task completion event] … Action: send a user-facing update now` injection (`src/agents/subagent-announce.ts`), and the parent calls `message` to post into the thread. **One relay per subagent lifecycle.** Anything the subagent emitted along the way is invisible to the user.
+So a thread-bound subagent's intermediate turns produce **no** Discord posts. The only delivery is the **announce-relay**: when the subagent finishes a turn, OpenClaw re-prompts the *parent* in-process with a synthetic `[Internal task completion event]` that asks for parent review and a truthful user-facing update (`src/agents/subagents/announce/subagent-announce.ts`). **One relay per subagent lifecycle.** Anything the subagent emitted along the way is invisible to the user.
 
-This is why "a subagent talks to the user directly" doesn't work without effort — the architecture is **subagent → parent → user**, not **subagent → user**. To get live, multi-turn thread interactivity, don't use a subagent at all (Path 3 below) — use a regular thread session, which has auto-stream.
+This is why "a subagent talks to the user directly" doesn't work — the architecture is **subagent → parent → user**, not **subagent → user**. To get live, multi-turn thread interactivity, don't use a subagent at all (Path 2 below) — use a regular thread session, which has auto-stream.
 
 ### Auto-stream delivers turn finals only on Anthropic (the commentary phase)
 
-"Auto-stream" does not mean every text the model writes becomes a post. OpenClaw phase-tags Anthropic assistant text at the `tool_use` boundary: text followed by a tool call in the same run is `phase: "commentary"` (visible as `textSignature` on the trajectory's `messagesSnapshot` blocks), and the embedded subscriber **withholds commentary from durable block replies by design** — `isPhasePendingAnthropicText` in `src/agents/embedded-agent-subscribe.handlers.messages.ts`, plus the commentary-phase suppression tests (`…withholds-anthropic-pretool-narration.test.ts`, `…suppresses-commentary-phase-output.test.ts`). The channel plugin's deliver callback is never invoked for these texts, so no plugin-side wiring can recover them.
+"Auto-stream" does not mean every text the model writes becomes a post. OpenClaw phase-tags Anthropic assistant text at the `tool_use` boundary: text followed by a tool call in the same run is `phase: "commentary"` (visible as `textSignature` on the trajectory's `messagesSnapshot` blocks), and the embedded subscriber **withholds commentary from durable block replies by design** — `isPhasePendingAnthropicText` in `src/agents/embedded-agent-subscribe.handlers.messages.update.ts`, plus its commentary and stream-phase tests. The channel plugin's deliver callback is never invoked for these texts, so no plugin-side wiring can recover them.
 
 Practical consequences, verified on the harness (2026-07-28, trajectory-vs-bus diff, `claude-sonnet-5`):
 
 - With an Anthropic model, a session's durable posts are its **turn finals** (unphased text ending the run) plus explicit `message` tool-posts. A setup turn that narrates "setting up the workspace", runs tools, then ends on a status line delivers only the status line. Instructions telling the agent to "post" a mid-turn signal produce text that reaches the transcript but never the surface.
-- The real plugins do not change this: Discord forwards commentary only in draft-preview *progress* mode (`commentaryPayloadsEnabled` in `extensions/discord/src/monitor/message-handler.process.ts`, ephemeral previews); Slack never does.
-- The one durable, production-supported outlet is the **verbose lane** (`agents.defaults.verboseDefault: "on"` or `/verbose on`): commentary items become standalone `💬 <text>` progress messages (`deliverCommentaryProgressMessage` in `src/auto-reply/reply/dispatch-from-config.ts`), at the cost of a `🛠️` summary per tool call.
+- The real plugins do not change this: Discord forwards commentary only in draft-preview *progress* mode (`commentaryPayloadsEnabled` in `extensions/discord/src/monitor/message-handler.process-progress.ts`, ephemeral previews); Slack never does.
+- The one durable, production-supported outlet is the **verbose lane** (`agents.defaults.verboseDefault: "on"` or `/verbose on`): commentary items become standalone `💬 <text>` progress messages (`deliverCommentaryProgressMessage` in `src/auto-reply/reply/dispatch-from-config.choose-route.ts`), at the cost of a `🛠️` summary per tool call.
 - Provider asymmetry: `openai-completions` providers (qwen, glm) emit unphased text, so their mid-turn text **does** stream at `text_end`. Delivery shape differs per provider; scenario waits and playbook promises must not depend on mid-turn posts existing (Anthropic) or on their absence (qwen/glm).
 
 ### Patterns for thread work
 
-Three viable shapes for handling a Discord thread, given the above:
+Two supported shapes handle a Discord thread:
 
 1. **Parent-relayed subagent** (matches defaults). Spawn a thread-bound subagent; it works headless; the parent relays its single final summary into the thread. No live progress.
-2. **Subagent uses `message` with explicit target** (against OpenClaw guidance). Pass the thread channel ID into the subagent's bootstrap; have it call `message` for each progress step. Supports live progress, fragile, fights the system prompt.
-3. **Explicit thread plus targeted regular-session wake — no subagent**. Deliver a native starter only when the channel triage selects project work, then enqueue a system event to the canonical thread session. Channel and thread sessions are siblings, each owning its surface.
+2. **Explicit thread plus targeted regular-session wake — no subagent**. Deliver a native starter only when the channel triage selects project work, then enqueue a system event to the canonical thread session. Channel and thread sessions are siblings, each owning its surface.
 
-**Chosen for AlignFirst Developer:** Path 3. Discord keeps channel `autoThread: false` and uses anchored `message thread-create`. Slack keeps `replyToMode: "off"` and uses `message send` with an explicit root timestamp. `@paleo/alignfirst-developer-openclaw-plugin` observes the confirmed native result, persists a pending handoff in its own SQLite database, and queues a targeted system event plus immediate heartbeat request. This starts the regular canonical thread session without `sessions_send`, a bound subagent, a human nudge, or an official-plugin trust exception.
+**Chosen for AlignFirst Developer:** Path 2. Discord keeps channel `autoThread: false` and uses anchored `message thread-create`. Slack keeps `replyToMode: "off"` and uses `message send` with an explicit root timestamp. `@paleo/alignfirst-developer-openclaw-plugin` observes the confirmed native result, persists a pending handoff in its own SQLite database, and queues a targeted system event plus immediate heartbeat request. This starts the regular canonical thread session without `sessions_send`, a bound subagent, a human nudge, or an official-plugin trust exception.
 
 ### Wiring it up
 
 The channel session opens a Discord thread through `message thread-create`, or populates a Slack thread through `message send` with explicit `threadId`. Native Slack automatic root routing would also derive the thread key, but it is disabled so ordinary channel conversation stays at root. The handoff plugin derives that same public canonical route and wakes it; later user messages resolve to it normally. Ordinary replies in the active thread use normal delivery, not another message-tool send.
 
-The `message`, `browser`, and optional `thread_handoff` tools are profile-gated. The supported widening knob is `tools.alsoAllow` (merged in `src/agents/pi-tools.policy.ts`):
+#### Delivery receipt shapes
+
+A Slack `send` is prepared by `extensions/slack/src/channel-actions.ts` and handled by core in `src/infra/outbound/outbound-send-service.ts`. Its result details are a `MessageSendResult`: `channel`, `to`, `via`, `result.target`, `result.messageId`, optional `result.receipt.threadId`, and `deliveryStatus`. `src/agents/embedded-agent-message-delivery.ts` adds `messageDelivery`; `details.ok` is absent. A team-qualified target stays on the plugin path and returns `{ ok, result }`, which the handoff plugin does not accept.
+
+Discord `thread-create` stays on the plugin action path and returns `{ ok: true, thread }`, or a partial result when the initial message fails. `after_tool_call` receives the sanitized result plus `sessionKey` and `sessionId`; it receives no channel identity. The handoff plugin joins the event to the source context cached when `src/thread-handoff/tool.ts` instantiated the tool for that session (`src/thread-handoff/index.ts`, `src/thread-handoff/receipts.ts`).
+
+The `message`, `browser`, and optional `thread_handoff` tools are profile-gated. The supported widening knob is `tools.alsoAllow` (merged in `src/agents/agent-tools.policy.ts`):
 
 ```jsonc
 {
@@ -129,27 +134,26 @@ Without `message` in `alsoAllow`, the channel session falls back to raw Discord 
 
 When a fresh thread session activates on Discord, its transcript starts **empty** — Slack can inject a `ThreadHistoryBody` of up to `thread.initialHistoryLimit` (100), but Discord has no equivalent path (the API capability exists in `readMessagesDiscord()`, just not wired into thread-session init).
 
-Workaround: the handoff seed carries an escaped copy of the exact starter and trusted routing identifiers, so the seed turn needs no history read. On a later human turn the thread playbook calls `message` `action: "read"` so newer answers and the `[WORKSPACE]` state participate. The system prompt's `MESSAGE_TOOL_THREAD_READ_HINT` string (in `src/agents/tools/message-tool.ts`) supports the same read path.
+Workaround: the handoff seed carries an escaped copy of the exact starter and trusted routing identifiers, so the seed turn needs no history read. On a later human turn the thread playbook calls `message` `action: "read"` so newer answers and the `[WORKSPACE]` state participate. The system prompt's `MESSAGE_TOOL_THREAD_READ_HINT` string (in `src/agents/tools/message-tool-description.ts`) supports the same read path.
 
 ### Heartbeat turns deny external-plugin reads
 
-A heartbeat-driven turn, the handoff seed included, forces `requireExplicitMessageTarget` and mints no trusted message-action context (`agent-runner-embedded-candidate.ts`). The host gate in `src/channels/plugins/message-action-dispatch.ts` then rejects every conversation-read action (`read`, `search`, `react`, …) of an **external** channel plugin, whatever target the model passes: `Delegated <channel>:read requires the exact current conversation and account for this plugin.` Bundled Slack and Discord declare `providerOwnedReadGates: true`, skip that gate, and fall back to their own channel allow policy. This is why the seed turn must not read the thread, and why the mock channels cannot show what a real deployment would return there.
+A heartbeat-driven turn, the handoff seed included, forces `requireExplicitMessageTarget` and mints no trusted message-action context (`src/auto-reply/reply/agent-runner-embedded-candidate.ts`). The host gate in `src/channels/plugins/message-action-dispatch.ts` then rejects every conversation-read action (`read`, `search`, `react`, …) of an **external** channel plugin, whatever target the model passes: `Delegated <channel>:read requires the exact current conversation and account for this plugin.` Bundled Slack and Discord declare `providerOwnedReadGates: true`, skip that gate, and fall back to their own channel allow policy. This is why the seed turn must not read the thread, and why the mock channels cannot show what a real deployment would return there.
 
-## `expectsCompletionMessage` — let a thread subagent speak for itself
+## `expectsCompletionMessage` — control the parent handoff
 
 `sessions_spawn` also accepts `expectsCompletionMessage: boolean` (default `true`). When `true`, OpenClaw injects a synthetic user-role message into the **parent's** transcript as soon as the child finishes a turn:
 
 ```text
 [Internal task completion event]
 …
-Action:
-A completed subagent task is ready for user delivery. Convert the result above
-into your normal assistant voice and send that user-facing update now.
+A completed subagent task is ready for parent review. Otherwise send a truthful
+user-facing update.
 ```
 
-The "Action:" line is hardcoded in `src/agents/subagent-announce.ts` (`buildAnnounceReplyInstruction()`) — it forces the parent to relay/summarize and cannot be overridden with prompt instructions in any local file (it's appended *after* them in the parent's user-role turn input).
+The reply instruction is hardcoded in `src/agents/subagents/announce/subagent-announce.ts` (`buildAnnounceReplyInstruction()`). It asks the parent to review the result and send a truthful user-facing update.
 
-For a thread-bound subagent that already talks to the user directly in its own Discord thread (`thread: true, mode: "session"`), this is exactly the wrong default — the parent ends up double-posting. **Pass `expectsCompletionMessage: false`** to suppress the synthetic message entirely; the subagent's reply lands in the thread and the parent stays silent.
+Pass `expectsCompletionMessage: false` only for fire-and-forget work. It suppresses the parent handoff, and the subagent has no direct user-facing delivery path.
 
 Per-session, runtime-configurable knob only — no global setting. There's an `agents.defaults.subagent.announceTimeoutMs` for delivery timeout, but nothing to disable the action text or switch defaults.
 
@@ -157,7 +161,7 @@ Per-session, runtime-configurable knob only — no global setting. There's an `a
 
 When the parent does react to the announce (default, `expectsCompletionMessage: true`), its reply is **not** routed to the parent's bound channel as the session key suggests. Empirical observation on Discord: a parent session keyed `agent:main:discord:channel:<channelId>` whose subagent was spawned `thread: true` posts its announce-reply **into the thread**, not into the parent channel.
 
-So the destination follows the **child's** binding, not the parent's. Worth knowing if you keep the announce enabled and want to predict where the reply appears — set `expectsCompletionMessage: false` whenever the subagent already owns the user-facing surface.
+So the destination follows the **child's** binding, not the parent's. Keep the announce enabled when the result must reach that surface.
 
 ## Debugging: see what the model actually receives
 

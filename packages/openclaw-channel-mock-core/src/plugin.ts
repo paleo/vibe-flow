@@ -59,13 +59,14 @@ export function createChannelMockPlugin(params: {
           threadId: ctx.threadId,
           replyToId: ctx.replyToId,
         });
-        const threadId = ctx.threadId == null ? undefined : String(ctx.threadId);
+        const requestedThreadId = ctx.threadId == null ? undefined : String(ctx.threadId);
         const replyToId = ctx.replyToId ?? undefined;
         return {
           messageId: result.messageId,
+          target: { kind: "channel", id: result.conversationId },
           receipt: createMessageReceiptFromOutboundResults({
             results: [{ channel: channelId, messageId: result.messageId }],
-            threadId,
+            threadId: result.threadId ?? requestedThreadId,
             replyToId,
             kind: "text",
           }),
@@ -211,15 +212,20 @@ export function createChannelMockPlugin(params: {
       },
       attachedResults: {
         channel: channelId,
-        sendText: async ({ cfg, to, text, accountId, threadId, replyToId }) =>
-          await sendText({
+        sendText: async ({ cfg, to, text, accountId, threadId, replyToId }) => {
+          const result = await sendText({
             cfg: cfg as CoreConfig,
             accountId,
             to,
             text,
             threadId,
             replyToId,
-          }),
+          });
+          return {
+            messageId: result.messageId,
+            target: { kind: "channel", id: result.conversationId },
+          };
+        },
       },
     },
   });

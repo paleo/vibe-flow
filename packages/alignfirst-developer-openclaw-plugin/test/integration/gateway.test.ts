@@ -10,12 +10,14 @@ const REPO_ROOT = resolve(import.meta.dirname, "../../../..");
 const OPENCLAW = resolve(REPO_ROOT, "node_modules/.bin/openclaw");
 const STARTER = "Project: Project-X\nTask: preserve this exact starter.";
 const MARKER = "TARGET_SESSION_STARTED";
+const RESTART_RECOVERY_PROMPT = "Your previous turn was interrupted by a gateway restart";
 
 type Surface = "slack" | "discord";
 
 type FixtureOptions = {
   duplicateStart?: boolean;
   holdFirstSeed?: boolean;
+  silenceAfterClaim?: boolean;
 };
 
 type Fixture = {
@@ -42,7 +44,38 @@ afterEach(async () => {
   }
 });
 
-describe("OpenClaw 2026.9.2 external-plugin gateway", () => {
+describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
+  it.each(["slack", "discord"] as const)(
+    "keeps a claimed %s seed silent while awaiting a human answer",
+    async (surface) => {
+      const fixture = await startFixture(surface, { silenceAfterClaim: true });
+      await injectQaBusInboundMessage({
+        baseUrl: serverUrl(fixture.busServer),
+        input: {
+          accountId: fixture.channelId,
+          conversation: { kind: "channel", id: "Project-X", title: "Project-X" },
+          senderId: "User-A",
+          text: "Start a task that needs a human answer.",
+        },
+      });
+      await waitUntil(
+        () => providerContentIncludes(fixture, '"status": "claimed"'),
+        20_000,
+        () => `claim result not observed\n${fixture.gatewayLog.join("")}`,
+      );
+      await new Promise((resolveWait) => setTimeout(resolveWait, 3_000));
+      expect(
+        fixture.gatewayLog.some((line) => line.includes("running isolated finalization")),
+      ).toBe(false);
+      expect(
+        fixture.bus.state
+          .getSnapshot()
+          .messages.filter((message) => message.direction === "outbound")
+          .map((message) => message.text),
+      ).toEqual([STARTER]);
+    },
+  );
+
   it.each(["slack", "discord"] as const)(
     "starts and continues the canonical %s thread without a human nudge",
     async (surface) => {
@@ -101,8 +134,8 @@ describe("OpenClaw 2026.9.2 external-plugin gateway", () => {
       expect(providerContentIncludes(fixture, '"status": "alreadyStarted"')).toBe(true);
       expect(
         surface === "slack"
-          ? providerContentIncludes(fixture, '"result"') &&
-              providerContentIncludes(fixture, '"threadTs"')
+          ? providerContentIncludes(fixture, '"receipt"') &&
+              providerContentIncludes(fixture, '"deliveryStatus"')
           : providerContentIncludes(fixture, '"thread"') &&
               providerContentIncludes(fixture, '"parentMessageId"'),
       ).toBe(true);
@@ -135,7 +168,8 @@ describe("OpenClaw 2026.9.2 external-plugin gateway", () => {
   );
 
   it("recovers one pending Slack startup across abrupt and post-claim restarts", async () => {
-    const fixture = await startFixture("slack", { holdFirstSeed: true });
+    const options = { holdFirstSeed: true };
+    const fixture = await startFixture("slack", options);
     await injectQaBusInboundMessage({
       baseUrl: serverUrl(fixture.busServer),
       input: {
@@ -157,6 +191,7 @@ describe("OpenClaw 2026.9.2 external-plugin gateway", () => {
     expect(pending).toHaveLength(1);
     expect(pending[0]?.state).toBe("pending");
 
+    options.holdFirstSeed = false;
     await restartGateway(fixture, "SIGKILL");
     await waitForMessage(fixture, (message) => message.text === MARKER, 45_000);
     expect(await handoffStates(fixture)).toEqual(["claimed"]);
@@ -317,7 +352,11 @@ function buildConfig(params: {
       },
     },
     agents: {
-      defaults: { model: "scripted/handoff-script", workspace: params.workspace },
+      defaults: {
+        model: "scripted/handoff-script",
+        workspace: params.workspace,
+        heartbeat: { target: "last" },
+      },
       entries: { main: { name: "Main" } },
     },
     channels: {
@@ -339,22 +378,22 @@ function createProviderScript(
 ) {
   let callSequence = 0;
   let repeatedStart = false;
-  let heldFirstSeed = false;
   return (body: Record<string, unknown>) => {
+    if (options.silenceAfterClaim && !Array.isArray(body.tools)) return { content: "NO_REPLY" };
     const messages = Array.isArray(body.messages) ? body.messages : [];
     const tailMessages = messages.slice(-4) as Array<{ role?: unknown; content?: unknown }>;
     const tail = JSON.stringify(tailMessages);
     const latestToolResult = tailMessages.findLast((message) => message.role === "tool")?.content;
     const latestToolText =
       typeof latestToolResult === "string" ? latestToolResult : JSON.stringify(latestToolResult);
+    if (tail.includes(RESTART_RECOVERY_PROMPT) && !tail.includes("[thread-handoff:v1]")) {
+      return { content: "NO_REPLY" };
+    }
     if (tail.includes("Continue in this same thread.")) {
       return { content: "SAME_SESSION_CONTINUED" };
     }
     if (tail.includes("[thread-handoff:v1]")) {
-      if (options.holdFirstSeed && !heldFirstSeed) {
-        heldFirstSeed = true;
-        return { content: "NO_REPLY" };
-      }
+      if (options.holdFirstSeed) return { content: "NO_REPLY" };
       const snapshot = bus.state.getSnapshot();
       if (snapshot.messages.some((message) => message.text === MARKER)) {
         return { content: "NO_REPLY" };
@@ -363,6 +402,7 @@ function createProviderScript(
         return { content: "HANDOFF_CLAIM_FAILED" };
       }
       if (/"status"\s*:\s*"(?:claimed|alreadyClaimed)"/u.test(latestToolText ?? "")) {
+        if (options.silenceAfterClaim) return { content: "HEARTBEAT_OK" };
         const threadId = resolveThreadId(surface, snapshot);
         return {
           tool: "message",

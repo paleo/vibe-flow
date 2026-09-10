@@ -34,10 +34,10 @@ tmp=$(mktemp) && jq '. + {disableClaudeAiConnectors: true, autoMemoryEnabled: fa
 
 ### Install
 
-**Role: operator**, during `03-toolchain.md`, once `~/.npmrc` points at the shared prefix. The seed in `04-openclaw.md` refuses to run without the binary.
+**Role: operator**, during `03-toolchain.md`, once `admin-npm` is installed. The seed in `04-openclaw.md` refuses to run without the binary.
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g @anthropic-ai/claude-code
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @anthropic-ai/claude-code
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'which claude && claude --version'
 # Expected: /home/{{SERVICE_USER}}/.npm-system-global/bin/claude
 ```
@@ -69,14 +69,16 @@ Trusting `~/projects` once covers every project cloned under it; `alcode` starts
 
 ### Skills
 
-**Role: operator**, as the service account, after [Authenticate](#authenticate). Two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent claude-code` adds the `~/.claude/skills/<name>` symlink that the `claude` CLI reads. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
+**Role: operator**, as the service account, after [Authenticate](#authenticate). The setup guide and `sharp-writing` use two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent claude-code` adds the `~/.claude/skills/<name>` symlink that the `claude` CLI reads. The playbook is copied to OpenClaw's managed `~/.openclaw/skills/` directory because its operating instructions would only cost tokens in the coding agent's context. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
 
 ```sh
 sudo -i -u {{SERVICE_USER}} bash <<'EOS'
 set -e
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent universal --agent claude-code \
-  --skill alignfirst-setup-guide --skill alignfirst-developer-openclaw-playbook < /dev/null
+  --skill alignfirst-setup-guide < /dev/null
+npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+  --agent openclaw --copy --skill alignfirst-developer-openclaw-playbook < /dev/null
 npx -y skills add https://github.com/paleo/skills --global --yes \
   --agent universal --agent claude-code --skill sharp-writing < /dev/null
 EOS
@@ -123,7 +125,13 @@ Run the coding-agent package update through its own package-scoped maintenance w
 
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- \
-  /usr/bin/npm install -g @anthropic-ai/claude-code@latest
+  /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @anthropic-ai/claude-code@latest
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=claude \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
 ```
 
 The `skills` scope of `update-developer.md` includes `~/.claude/skills`, so the symlink tier is restored with the canonical tree.

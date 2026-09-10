@@ -19,7 +19,7 @@ Resolve PROJECT and PROJECT_PATH from that result:
 - A mentioned name with several listed matches supplies PROJECT but leaves PROJECT_PATH unresolved. Ask the user to select one of the matching canonical paths.
 - A mentioned name with no listed match supplies the proposed PROJECT but leaves PROJECT_PATH unresolved.
 - With no mentioned project, infer both values only when the list contains exactly one project. Zero or several projects leave both values unresolved.
-- A request naming several projects retains every resolved PROJECT and PROJECT_PATH pair. Do not force one of them into the role of main project.
+- A request spanning several projects retains every resolved PROJECT and PROJECT_PATH pair. The request establishes this scope; several inventory candidates leave a single-project request unresolved.
 - A request to create an absent named project is project-lifecycle intent. Keep the proposed name as PROJECT and leave PROJECT_PATH absent for the lifecycle procedure to establish.
 - A request to clone a repository whose name matches no inventory entry is also project-lifecycle intent. The repository name is the proposed PROJECT; PROJECT_PATH stays absent.
 
@@ -96,7 +96,7 @@ The `{ask}` is one sentence, and it reflects the first unresolved requirement:
 - No TICKET_ID for single-project work → ask for the ticket id, unless the message contains a resource URL that can provide it, carries a detailed request, explicitly says there is no ticket or asks for a side ticket, or is operational work handled without an AlignFirst protocol. The working session handles ticket creation or collection for a detailed request.
 - No TASK → ask what needs to be done.
 - A resource URL that may provide the project or ticket → ask for neither; state that the working session will inspect the URL.
-- A multi-project request, or a request that may not need a project → ask for no main project; state that the working session will route the work.
+- A request explicitly spanning several projects, or work independent of any project → ask for no main project; state that the working session will route the work.
 - Nothing else needs an answer → state the intended continuation in this thread. Do not claim that project work has already begun.
 
 For project creation or repository onboarding, a proposed PROJECT with no PROJECT_PATH is complete enough for handoff. The lifecycle procedure establishes its path.

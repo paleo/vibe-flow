@@ -17,16 +17,16 @@ const LIFECYCLE = `${PRIMARY}/lifecycle-projects`;
 const PRIMARY_MARKER = {
   description:
     "Managed projects of the AlignFirst Developer test fixture. Adding a project is an operator's decision: ask before creating one.",
-  portRange: { first: 6500, last: 7700 },
+  portRanges: [{ first: 6500, last: 7700 }],
 };
 const EXTERNAL_MARKER = {
   description: "Projects hosted for external teams.",
-  portRange: { first: 6540, last: 6599 },
+  portRanges: [{ first: 6540, last: 6599 }],
 };
 const LIFECYCLE_MARKER = {
   description:
     "Allowed parent for new lifecycle fixtures. Create Node.js projects with pnpm. Keep bootstrap work and the initial commit on main. Claim a port block with free-ports before writing the project config.",
-  portRange: { first: 6600, last: 6699 },
+  portRanges: [{ first: 6600, last: 6699 }],
 };
 // Each fixture gets its own port block so two of them can run a dev server at
 // the same time. The template declares `maxWorkspaces: 10` over `perWorkspace: 2`,

@@ -1,6 +1,6 @@
 # alproject guide
 
-A projects directory groups projects and optional nested projects directories. Its `.alignfirst-projects.json` marker contains an optional description and inclusive `portRange`. A directory without the marker is skipped as a projects directory. Nested markers may claim sub-ranges inside their nearest enclosing range.
+A projects directory groups projects and optional nested projects directories. Its `.alignfirst-projects.json` marker contains an optional description and `portRanges`. Each range has `first`, `last`, and optional `code` and `description`. The entry without a code is the default; codes name the project kind a range serves. A directory without the marker is skipped as a projects directory. Nested markers may claim sub-ranges inside one nearest enclosing range.
 
 A project is a direct child whose `alignfirst config --json` report finds `.alignfirst.json` at its root. Linked Git worktrees are listed as its workspaces. Other child directories appear under `others`.
 
@@ -10,8 +10,8 @@ A project is a direct child whose `alignfirst config --json` report finds `.alig
 alproject list [--json] [--root <path>]
 alproject doctor [--root <path>]
 alproject status <path> [--json] [--root <path>]
-alproject init [--root <path>] [--description <text>] [--port-range <first>-<last>]
-alproject free-ports --size <n> [--json] [--root <path>]
+alproject init [--root <path>] [--description <text>] [--port-range [<code>=]<first>-<last>]...
+alproject free-ports --size <n> [--range <code>] [--json] [--root <path>]
 alproject --guide [--root <path>]
 ```
 
@@ -22,7 +22,7 @@ inventory issues.
 
 ## Port claims
 
-Run `alproject free-ports --size <n>` with the block size required by the project's workspace scheme: `perWorkspace × maxWorkspaces`. The setup guide writes the returned block as `portRange` in the project's `.alignfirst.json`.
+Run `alproject free-ports --size <n>` with the block size required by the project's workspace scheme: `perWorkspace × maxWorkspaces`. The directory section identifies the range for each project kind. Pass `--range <code>` for a coded range; the default needs no flag. The setup guide writes the returned block as `portRange` in the project's `.alignfirst.json`.
 
 The project config is its registration. Deleting the project removes it from the listing. The workspace kernel refuses a `workspace` command when the project's `portRange` disagrees with its port scheme.
 

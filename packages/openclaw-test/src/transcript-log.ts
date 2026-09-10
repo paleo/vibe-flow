@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync, rmSync } from "node:fs";
+import { getQaBusState } from "@paleo/openclaw-channel-mock-core";
 import { execInGateway, IPC_DIR } from "./exec-rpc.js";
 import type { AgentToolCall } from "./report.js";
 
@@ -10,6 +11,7 @@ import type { AgentToolCall } from "./report.js";
 // exec-watcher RPC: the dump script (shipped in this package's dist, mounted
 // into the gateway) writes them as JSON into the shared IPC volume.
 const DUMP_SCRIPT = "/opt/openclaw-test/src/dist/transcript-dump.js";
+const BUS_URL = process.env.OPENCLAW_TEST_BUS_URL ?? "http://bus:43123";
 
 export interface TranscriptSnapshot {
   /** Agent stores found in the gateway. 0 means no store yet — or none at all. */
@@ -35,15 +37,20 @@ interface ToolResultBlock {
   content?: unknown;
 }
 
-/** The transcripts of every session whose key carries the conversation id. */
+/** The transcripts of the conversation and its bus-owned thread sessions. */
 export async function fetchTranscriptSnapshot(opts: {
   conversationId: string;
   startedAtIso: string;
 }): Promise<TranscriptSnapshot> {
   const outPath = `${IPC_DIR}/${randomUUID()}.transcript.json`;
   try {
+    const { threads } = await getQaBusState(BUS_URL);
+    const conversationId = opts.conversationId.toLowerCase();
+    const threadIds = threads
+      .filter((thread) => thread.conversationId.toLowerCase() === conversationId)
+      .map((thread) => thread.id);
     const result = await execInGateway(
-      ["node", DUMP_SCRIPT, opts.startedAtIso, opts.conversationId, outPath],
+      ["node", DUMP_SCRIPT, opts.startedAtIso, opts.conversationId, outPath, ...threadIds],
       // A whole conversation can take a while to serialize; the default 30s
       // exec timeout is too tight for long cells.
       { timeoutMs: 60_000 },

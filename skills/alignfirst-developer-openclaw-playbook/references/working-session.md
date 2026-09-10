@@ -24,7 +24,7 @@ Call `thread_handoff` once, before history reads, workspace setup, delegation, o
 - **Seed turn**, with or without a human message: `{ "action": "claim", "handoffId": "<copied from the seed>" }`. The handoff ID is opaque and is not the thread ID; `claim` takes no other field.
 - **First human turn** of a thread that received no seed: `{ "action": "claim" }`.
 
-Then continue with the turn whatever the result: `claimed`, `alreadyClaimed`, or `none`. One exception: a seed turn with no human message whose claim returns `alreadyClaimed` is a duplicate wake; end it on `NO_REPLY`. On a claim error, stop and report the failure in the thread.
+A seed turn with no human message whose claim returns `alreadyClaimed` is a duplicate wake; end it on `HEARTBEAT_OK`. A `claimed` result activates the recorded request: recover its context in Step 2 and start work when its required values are present, without waiting for a human follow-up. On a human turn, continue whatever the result: `claimed`, `alreadyClaimed`, or `none`. On a claim error, stop and report the failure in the thread.
 
 ### Step 2 — Recover the thread context
 
@@ -35,7 +35,7 @@ Recover the task, the full request, every PROJECT / PROJECT_PATH pair, and TICKE
 
 What the seed turn says:
 
-- The starter asked for a value and no human message has supplied it: end on `NO_REPLY`. Only the user supplies that value; a lookup of your own is not an answer, and the question is not repeated.
+- The starter asked for a value and no human message has supplied it: end on `HEARTBEAT_OK`. Only the user supplies that value; a lookup of your own is not an answer, and the question is not repeated.
 - The starter asked nothing but a required value is missing (a detailed request without a ticket, for instance): ask for it now. A silent turn here leaves the thread dead.
 - The request is complete: proceed. It is the go-ahead; wait only for an explicit request to hold.
 
@@ -122,7 +122,7 @@ Skip this capture workflow for a multi-project request with no main project and 
 
 ### Multi-project and operational work
 
-Delegate a multi-project request with no main project, workspace cleanup, base-branch refresh, and similar operational work to alcode without an AlignFirst protocol. Refresh `alproject list --json --root ~/projects` when the affected project set is not already recorded. Run one project-bound alcode session from each affected PROJECT_PATH and coordinate their results in the thread. Supply the ticket ID when one identifies the workspaces and name every configured global tool the run can use. Set up project workspaces only when the operation needs them.
+Delegate a multi-project request with no main project, workspace cleanup, base-branch refresh, and similar operational work to alcode without an AlignFirst protocol. Refresh `alproject list --json --root ~/projects` when the affected project set is not already recorded. Run one project-bound alcode session from each affected PROJECT_PATH and coordinate their results in the thread. For a base-branch refresh, alcode owns the initial fetch, the fast-forward, and any dependency, build, or migration refresh; an already-current branch is one possible result of that delegation. Supply the ticket ID when one identifies the workspaces and name every configured global tool the run can use. Set up project workspaces only when the operation needs them.
 
 ### What you delegate vs do
 
@@ -188,7 +188,7 @@ Worktrees belong to the workspace tooling. Every creation, reuse, and teardown g
 
 ### Updating a branch with the base branch
 
-When the current branch needs to catch up:
+For an active development branch that needs to catch up with its base, follow the steps below. A request to refresh the base branch itself follows "Multi-project and operational work" above.
 
 1. Fetch and fast-forward the local base branch ref without checking it out.
 2. Inspect the working tree (`git status`, `git diff`) and prepare:

@@ -51,7 +51,7 @@ Healthchecks gate `gateway` on `bus`, and the one-shot `runner` invocation on `g
 
 ## Two-Dockerfile pattern
 
-`openclaw-test` ships `Dockerfile.base` (consumer-agnostic): Node 24 Alpine, `claw` user with host-matched UID/GID, the mock-CLI **shim binary** at `/opt/openclaw-test/mocks/bin/mock-cli-shim` (no per-command symlinks — consumers add their own), `/etc/profile` rewritten to keep `/opt/openclaw-test/mocks/bin` first in PATH, and the exec watcher binary at `/usr/local/bin/exec-watcher`. Anything else the fixture needs at runtime (`git`, `pnpm` via Corepack, reset scripts, per-command shim symlinks) is the consumer's responsibility.
+`openclaw-test` ships `Dockerfile.base` (consumer-agnostic): Node 26 Alpine, `claw` user with host-matched UID/GID, the mock-CLI **shim binary** at `/opt/openclaw-test/mocks/bin/mock-cli-shim` (no per-command symlinks — consumers add their own), `/etc/profile` rewritten to keep `/opt/openclaw-test/mocks/bin` first in PATH, and the exec watcher binary at `/usr/local/bin/exec-watcher`. Anything else the fixture needs at runtime (`git`, `pnpm` via Corepack, reset scripts, per-command shim symlinks) is the consumer's responsibility.
 
 The CLI's `env build` builds the base locally as `paleo/openclaw-test-base:<pkg-version>` and injects the tag into the consumer image via the `OPENCLAW_TEST_BASE_TAG` build arg.
 
@@ -62,6 +62,8 @@ The consumer-owned `Dockerfile` (dropped by `init`) does:
 3. `npm ci --include=dev` — pulls the four `@paleo/openclaw-*` packages from the registry.
 4. `npx openclaw plugins registry --refresh` so the gateway sees the loaded channels.
 5. Optional consumer customizations (extra system packages, skills install, etc.).
+
+The AlignFirst Developer consumer copies its OpenClaw-only playbook to `/home/claw/.openclaw/skills/alignfirst-developer-openclaw-playbook`. Its Compose overlay bind-mounts the checkout at that managed skill path, while shared skills remain under `/home/claw/.agents/skills/`.
 
 `openclaw-test run` does **not** rebuild. Re-run `npm run env:build` after edits to `openclaw.json` or the consumer `Dockerfile`, or after bumping any `@paleo/openclaw-*` dependency.
 
@@ -150,15 +152,13 @@ Both channels register together on every gateway boot. The runner selects which 
 - `discord-mock` — `surface: "discord"`, `autoThread: false`. Full Discord-shaped surface (`send`, `thread-create`, `thread-reply`, `react`, `read`, `edit`, `delete`, `search`). `thread-create` posts an optional `text`/`message`/`content` atomically with the new thread. Free-form agent text without a tool call lands in the parent channel.
 - `slack-mock` — `surface: "slack"`, `autoThread: true`. Slack-shaped surface with `send`,
   `react`, `read`, `edit`, `delete`, `reactions`, and `search`; fake thread creation/rename actions
-  remain disabled. `replyToMode: "all"` is the compatibility default and routes an eligible root
-  plus later replies through one thread session keyed by the root message ID. `"off"` keeps roots
-  in the channel session and routes only explicit replies through a thread session.
+  remain disabled. Its action adapter prepares `send` for core delivery through the mock's message adapter. `replyToMode: "all"` is the compatibility default and routes an eligible root plus later replies through one thread session keyed by the root message ID. `"off"` keeps roots in the channel session and routes only explicit replies through a thread session.
 
-Inbound metadata claims `Provider` / `Surface` / `OriginatingChannel` = the registered channel id, so the SDK routes tool-schema discovery back to the right plugin. Envelope targets follow the native surface: a Discord thread is `channel:<thread-id>`, while a Slack thread is `thread:<channel-id>/<thread-ts>`. The bus keeps its own composite thread target so scenario traffic remains attributable to the parent conversation.
+Inbound metadata claims `Provider` / `Surface` / `OriginatingChannel` = the registered channel id, so the SDK routes tool-schema discovery back to the right plugin. Envelope targets follow the native surface: a Discord thread is `channel:<thread-id>`, while a Slack thread is `thread:<channel-id>/<thread-ts>`. The bus generates numeric snowflake-shaped thread IDs and records each thread’s parent conversation. Transcript collection uses that ownership to include thread sessions without embedding scenario names in their IDs.
 
 The mocks are external plugins, so the host's exact-current gate applies to their conversation-read actions. In a heartbeat turn, the handoff seed included, that gate denies `read` for any target; bundled Slack and Discord skip it through `providerOwnedReadGates` (see "Heartbeat turns deny external-plugin reads" in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md)). The playbook keeps the thread read out of the seed turn for that reason; do not chase a mock fix.
 
-Discord renames an existing thread through `send` with `threadName`, targeting the thread's own channel ID. `thread-reply` ignores `threadName` in OpenClaw 2026.9.2 (`extensions/discord/src/actions/handle-action.guild-admin.ts` and `actions/runtime.messaging.send.ts`). The mock follows that distinction; rename assertions must check the stored thread title.
+Discord renames an existing thread through `send` with `threadName`, targeting the thread's own channel ID. `thread-reply` ignores `threadName` in OpenClaw 2026.9.3 (`extensions/discord/src/actions/handle-action.guild-admin.ts` and `actions/runtime.messaging.send.ts`). The mock follows that distinction; rename assertions must check the stored thread title.
 
 **Delivery semantics are the generic kernel's, and that is faithful.** The mocks dispatch through `runtime.channel.inbound.dispatchReply` with `replyPipeline: {}`; every payload the kernel hands to `delivery.deliver` becomes a bus message. Do not chase "missing" mid-turn posts in the mock: with an Anthropic model, OpenClaw itself withholds pre-tool narration (`phase: "commentary"`) from every channel — only turn finals and `message` tool-posts land, and the real Discord/Slack plugins get no more (investigated and settled 2026-07-28; see "Auto-stream delivers turn finals only on Anthropic" in [`openclaw-context-engineering.md`](./openclaw-context-engineering.md)). qwen/glm text is unphased and does stream mid-turn, so per-provider outbound counts legitimately differ.
 
@@ -177,11 +177,7 @@ Canonical destination param is `to`. Accepted shapes:
 
 Resolved in the order `to → target → channelId` to match the normalizer's output.
 
-Plugin actions and `send` route through different handlers in `message-action-runner.ts`. The mocks
-preserve that distinction. Slack `send` reports `{ ok: true, result: { messageId, channelId,
-threadTs? } }`; Discord `thread-create` reports `{ ok: true, thread }` and retains its parent-message
-anchor. A Discord starter-delivery failure is returned as an explicit partial result. The handoff
-plugin accepts only confirmed native results and never infers success from requested arguments.
+Plugin actions and prepared sends route through different handlers in `message-action-runner.ts`. Slack `send` uses `prepareSendPayload`, then core delivers it through the mock's message adapter and returns a `MessageSendResult` with `deliveryStatus`, `result.target`, `result.receipt.threadId`, and `messageDelivery`. Discord `thread-create` stays on the plugin path, reports `{ ok: true, thread }`, and retains its parent-message anchor. A Discord starter-delivery failure is an explicit partial result. The handoff plugin accepts only confirmed native results.
 
 The AlignFirst Developer consumer sets Slack to `replyToMode: "off"`. Its parent channel session
 posts one explicit native starter, then calls `thread_handoff start`. The plugin durably records and
@@ -189,7 +185,7 @@ wakes the canonical target session; that session claims before work. Scenario as
 tool calls by `AgentToolCall.sessionKey`, because target work may start before the parent turn's
 final `NO_REPLY`.
 
-The deterministic external-plugin suite uses the real OpenClaw 2026.9.2 executable, a scripted
+The deterministic external-plugin suite uses the real OpenClaw 2026.9.3 executable, a scripted
 local provider, the synthetic bus, and disposable state. Run it with
 `KEEP_THREAD_HANDOFF_ARTIFACTS=1 npm run test:integration --workspace
 @paleo/alignfirst-developer-openclaw-plugin`. Retained `/tmp/thread-handoff-*` fixtures include gateway and
@@ -232,7 +228,7 @@ Authoritative types: `packages/openclaw-test/src/report.ts`.
 
 OpenClaw (2026.8+) persists each session's transcript as SQLite rows in the gateway's per-agent store (`~/.openclaw/agents/<id>/agent/openclaw-agent.sqlite`, table `transcript_events`, with `session_nodes` mapping `session_key` → `current_session_id`). A session key can span several `session_windows` rows — compaction, reset, or recovery mints a successor session id — so the dump unions every window of the key, keeping earlier tool calls and costs across a mid-run rollover. The runner reads transcripts, not the trajectory diagnostics: the `trajectory_runtime_events` payloads run through OpenClaw's diagnostic projection, which caps the whole payload at ~64 nodes — a `model.completed` snapshot loses every message past the first few, so tool calls from any real turn are unrecoverable there. The transcript is the full-fidelity record the gateway itself replays, appended per message — tool calls become visible as they happen, not at turn end.
 
-The store lives outside the shared mounts and dies with the per-cell stack recreation, so the runner extracts a conversation's session transcripts through the exec-watcher RPC: `transcript-dump.js` (in this package's dist, mounted into the gateway) queries the store with `node:sqlite` (session keys matched on the conversation id) and writes the result as JSON into the shared IPC volume (stdout would hit the watcher's 1 MiB cap). The runner saves the fetched transcripts as `transcripts.json` in the cell's artifact dir for post-mortems.
+The store lives outside the shared mounts and dies with the per-cell stack recreation, so the runner extracts a conversation's session transcripts through the exec-watcher RPC: `transcript-dump.js` (in this package's dist, mounted into the gateway) queries the store with `node:sqlite` (session keys matched on the conversation ID and its bus-owned thread IDs) and writes the result as JSON into the shared IPC volume (stdout would hit the watcher's 1 MiB cap). The runner saves the fetched transcripts as `transcripts.json` in the cell's artifact dir for post-mortems.
 
 A conversation spans **multiple sessions** — Discord's channel session plus a per-thread session (the thread session is where the real work happens), and any subagent sessions — each with its own transcript. Before computing cost, the runner waits for the transcripts to go **quiescent** (`waitForTranscriptQuiescence`): no new message across a settle window AND no session whose last message leaves a turn open (a tool result, or an assistant stop for tool use), bounded by a max wait. The transcript is appended per message, so the settle window alone would return between two tool calls of one turn; the open-turn gate holds until the turn-final assistant message — the one carrying its usage — has landed.
 
@@ -256,7 +252,7 @@ Prefer structural assertions over `judgeLLM`; reserve the judge for free-form co
 
 ## Scenario loading
 
-Scenarios are `.ts` files under `scenarios/`, default-export `async (ctx: ScenarioContext) => void`. Loaded at runtime by Node 24's built-in TypeScript stripping (the image uses Node 24). Stick to the strip-compatible subset: type annotations, `as`, `satisfies`, generics, interfaces. Avoid `enum`, `namespace`, constructor parameter properties, decorators, `import =`.
+Scenarios are `.ts` files under `scenarios/`, default-export `async (ctx: ScenarioContext) => void`. Loaded at runtime by Node 26's built-in TypeScript stripping (the image uses Node 26). Stick to the strip-compatible subset: type annotations, `as`, `satisfies`, generics, interfaces. Avoid `enum`, `namespace`, constructor parameter properties, decorators, `import =`.
 
 `discoverScenarios()` filters on `.ts` suffix on file entries only — directories under `scenarios/` (e.g. `_lib/`) are ignored, which is the idiomatic place for shared scenario helpers.
 

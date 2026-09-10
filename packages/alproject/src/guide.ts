@@ -3,7 +3,7 @@ import { dirname } from "node:path";
 
 import type { ProjectInventory, ProjectsDirectory } from "./discovery.js";
 import { escapeAdditionalJsonCharacters, formatRange } from "./format.js";
-import type { PortRange } from "./markers.js";
+import type { MarkerPortRange, PortRange } from "./markers.js";
 
 export function renderProjectsGuide(inventory?: ProjectInventory): string {
   const guide = readTemplate("guide.md").trimEnd();
@@ -21,12 +21,19 @@ function renderDirectory(inventory: ProjectInventory, directory: ProjectsDirecto
   if (directory.description !== undefined) {
     lines.push("", `Description: ${renderData(directory.description)}`);
   }
-  lines.push("", `Port range: ${renderRange(directory.portRange)}`, "", "Projects:");
+  lines.push("", "Port ranges:");
+  if (directory.portRanges === undefined) lines.push("- (none)");
+  else {
+    for (const range of directory.portRanges) lines.push(`- ${renderMarkerRange(range)}`);
+  }
+  lines.push("", "Projects:");
   const projects = inventory.projects.filter((project) => project.directory === directory.path);
   if (projects.length === 0) lines.push("- (none)");
   else {
     for (const project of projects) {
-      lines.push(`- ${renderData(project.name)} — ${renderRange(project.portRange, "(portless)")}`);
+      lines.push(
+        `- ${renderData(project.name)} — ${renderProjectRange(project.portRange, project.portRangeCode)}`,
+      );
     }
   }
   lines.push("", "Nested directories:");
@@ -36,7 +43,7 @@ function renderDirectory(inventory: ProjectInventory, directory: ProjectsDirecto
   if (nested.length === 0) lines.push("- (none)");
   else {
     for (const child of nested) {
-      lines.push(`- ${renderData(child.path)} — ${renderRange(child.portRange)}`);
+      lines.push(`- ${renderData(child.path)} — ${renderRanges(child.portRanges)}`);
     }
   }
   return lines.join("\n");
@@ -56,4 +63,19 @@ function longestBacktickRun(value: string): number {
 
 function renderRange(range: PortRange | undefined, absent = "(none)"): string {
   return range === undefined ? absent : formatRange(range);
+}
+
+function renderProjectRange(range: PortRange | undefined, code: string | undefined): string {
+  const rendered = renderRange(range, "(portless)");
+  return `${rendered}${code === undefined ? "" : ` (${code})`}`;
+}
+
+function renderRanges(ranges: MarkerPortRange[] | undefined): string {
+  return ranges === undefined ? "(none)" : ranges.map(renderMarkerRange).join(", ");
+}
+
+function renderMarkerRange(range: MarkerPortRange): string {
+  const code = range.code ?? "default";
+  const description = range.description === undefined ? "" : ` — ${renderData(range.description)}`;
+  return `${formatRange(range)} (${code})${description}`;
 }

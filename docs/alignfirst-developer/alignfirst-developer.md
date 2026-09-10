@@ -24,7 +24,7 @@ The [`@paleo/alignfirst-developer-openclaw-plugin`](../../packages/alignfirst-de
 3. **Regression-test harness** —
    [`alignfirst-developer-tests/`](../../alignfirst-developer-tests/). This standalone Dockerised
    consumer drives the workspace through synthetic Discord and Slack channels and judges the result.
-   It bind-mounts the workspace, playbook skill, and monorepo root into the gateway, so `alcode`, `alignfirst` and `alproject` run from the checkout.
+   It bind-mounts the workspace, the playbook at `/home/claw/.openclaw/skills/alignfirst-developer-openclaw-playbook`, and the monorepo root into the gateway, so `alcode`, `alignfirst` and `alproject` run from the checkout. The managed skill path keeps the playbook out of the mock coding agent's context.
    The harness intercepts both supported delegated-agent subprocesses.
 
 ## How a turn flows
@@ -46,6 +46,8 @@ Layer 1 is the only thing OpenClaw injects automatically; everything in layer 2 
 A channel session answers ordinary conversation at the root. For project work, it runs `alproject list --json --root ~/projects`, resolves listed projects, records known project paths, ticket, one-line task, URLs, and the full text of a detailed request, then delivers one native thread starter. Discord uses anchored `thread-create`; Slack uses `send` with the triggering timestamp as `threadId`. After confirmed delivery, `thread_handoff start` durably queues a targeted system wake and the channel turn ends. Resource URLs, multi-project requests, and requests that may need no project can leave values for the working session to resolve. Duplicate names and missing paths remain unresolved. The channel session never performs project work.
 
 The fresh regular thread session recognizes the plugin seed, claims its opaque handoff before task effects, combines the seed's exact starter context with thread history, and proceeds without a mechanical user nudge. It waits silently only for genuinely missing input or an explicit hold. Completion and later user turns stay on the same canonical thread session. Project creation and repository onboarding remain exceptions to the initial path requirement. The older manual-follow-up contract and, before it, channel-owned setup both produced avoidable routing failures; the historical artifact at `alignfirst-developer-tests/artifacts/2026-07-15T10-31-39-655Z/` documents the latter.
+
+A regular agent turn could alternatively start the thread session through the gateway `agent` RPC behind `openclaw agent --session-key`, or through in-process `runtime.agent.runEmbeddedAgent` if external plugins can access it. That availability is unverified; the seed would arrive as a user message, and delivery routing to a Slack thread target remains untested. The current wake path stays `enqueueSystemEvent` plus `requestHeartbeat` with `source: "notifications-event"`, `intent: "immediate"`, and `reason: "wake"`: the production failure occurred before any wake. Revisit the alternative only after reproducing a wake failure.
 
 ## Reading order for maintainers
 

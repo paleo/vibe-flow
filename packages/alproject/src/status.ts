@@ -14,6 +14,7 @@ export interface ProjectDetails {
   directory: string;
   remoteHost: string | null;
   portRange: PortRange | null;
+  portRangeCode: string | null;
   plansFolder: string | null;
   ticketIdPattern: string | null;
   workspaces: string[];
@@ -55,6 +56,7 @@ function buildProjectDetails(project: DiscoveredProject): ProjectDetails {
     directory: project.directory,
     remoteHost: readRemoteHost(project.path),
     portRange: project.portRange ?? null,
+    portRangeCode: project.portRangeCode ?? null,
     plansFolder: project.description.config?.plans?.folder ?? null,
     ticketIdPattern: project.description.config?.ticketIdPattern ?? null,
     workspaces: project.workspaces,

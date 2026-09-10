@@ -8,9 +8,21 @@ read_when:
 
 Behaviors that look like bugs and are intentional, with the reason. Read the relevant section before changing anything.
 
-## No version manager in the service account's PATH
+## Keep OpenClaw's runtime and prefix fixed
 
-OpenClaw is installed under one prefix (`~/.npm-system-global/`, fed by `/usr/bin/npm`). A version manager shifts the active prefix: `which openclaw` returns nothing, and `openclaw update` installs the new version into the manager's prefix while the gateway unit keeps running the old one. `openclaw doctor` also flags version-manager Nodes as fragile runtimes. `openclaw update` is the core upgrade path and refreshes official channel plugins; `update-developer.md` separately updates the independent `alignfirst-developer` plugin. The procedure stays safe only with exactly one `npm` on `PATH`. A project that needs another Node runs it in a container.
+`/opt/{{SERVICE_USER}}/bin/openclaw` always executes the protected package with `/usr/bin/node`. The gateway unit uses the same system Node and a PATH without fnm. Protected-prefix changes use `/opt/{{SERVICE_USER}}/libexec/admin-npm`.
+
+OpenClaw's startup shell snapshot omits fnm's state variables, so a copied `cd` hook cannot select project versions. Its `SHELL` is `/opt/{{SERVICE_USER}}/libexec/project-shell`, which starts a login shell and rebuilds fnm state for every exec call.
+
+`openclaw gateway install --force` rewrites the unit. The service-owned `20-system-node-path.conf` drop-in survives and restores the fixed PATH and `project-shell`; foreign ownership makes the installer refuse the service definition. Recheck the effective unit after every forced install.
+
+`openclaw doctor` may suggest fnm directories for the service PATH. Ignore that recommendation: fnm belongs to project shells, not the gateway.
+
+An absent or unparseable Node declaration keeps fnm's default. A valid declaration for an unavailable version aborts shell startup. The `cd` hook reports a missing version but retains the current selection; run `fnm use` explicitly after `cd` in the same call when the selection must be certain.
+
+A background command that must own its process uses `exec node …`. A shell kept alive around a background child can orphan that child when the shell is killed.
+
+The audited PATH keeps `/opt/{{SERVICE_USER}}/bin` and `~/.npm-system-global/bin` ahead of fnm's writable runtime bin. A service-account `npm i -g` can install developer tools into the selected runtime but cannot shadow OpenClaw or the protected CLIs.
 
 ## Containers are per-user
 
@@ -24,14 +36,13 @@ A bare `docker …` without `DOCKER_HOST` fails on `unix:///var/run/docker.sock`
 
 ## `skills` CLI writes escaped symlinks under `~/.openclaw/skills/`
 
-For every skill it updates, `npx skills update` drops a symlink at `~/.openclaw/skills/<name>` pointing outside that directory, to the canonical `~/.agents/skills/<name>`. OpenClaw's path-safety check rejects it and `openclaw doctor` logs `Skipping escaped skill path …`. Discovery works through the `~/.agents/skills/` tier anyway. [update-developer.md](operations/update-developer.md) sweeps the links after each update.
+For every skill it updates, `npx skills update` drops a symlink at `~/.openclaw/skills/<name>` pointing outside that directory, to the canonical `~/.agents/skills/<name>`. OpenClaw's path-safety check rejects it and `openclaw doctor` logs `Skipping escaped skill path …`. Discovery of shared skills works through the `~/.agents/skills/` tier. [update-developer.md](operations/update-developer.md) sweeps the links inside the `skills` maintenance scope because the managed directory is locked. The copied playbook is a directory, so the `-type l` sweep leaves it in place.
 
-## `~/.agents/skills` is shared between OpenClaw and the coding agent
+## Shared skills live under `~/.agents/skills`
 
-Skills install once, into `~/.agents/skills/`, which OpenClaw and the delegated coding agent
-both scan. OpenClaw loads only its `agents.defaults.skills` allowlist, including
-`alignfirst-setup-guide` for project creation; the coding agent loads every skill there.
-`skills remove` deletes the canonical copy for both.
+The setup guide and `sharp-writing` install once under `~/.agents/skills/`. OpenClaw loads only its `agents.defaults.skills` allowlist, including `alignfirst-setup-guide` for project creation. The coding agent receives the shared skills through its own tier. `skills remove` deletes a shared skill for both.
+
+The playbook lives under OpenClaw's managed `~/.openclaw/skills/` directory, outside the coding agent's automatic skill discovery. Both agents run as the same Linux user, so the coding agent can still explicitly read the file. The separation controls prompt loading, not filesystem access.
 
 ## Moving a project breaks its workspace registry
 

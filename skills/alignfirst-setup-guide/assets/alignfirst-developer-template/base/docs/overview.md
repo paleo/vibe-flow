@@ -11,7 +11,7 @@ read_when:
 
 - **Host:** `{{SERVER_HOST}}`, Ubuntu 24.04, time zone `{{TIME_ZONE}}`.
 - **Admin account:** `{{SERVER_ADMIN_USER}}` (sudo, key-only SSH). Holds this repository at `~/{{ADMIN_REPOSITORY_NAME}}`.
-- **Service account:** `{{SERVICE_USER}}` (no sudo, no inbound SSH, lingering, rootless podman). Runs OpenClaw as `{{DEVELOPER_NAME}}`, the delegated coding agent, `alignfirst`, `alcode`, `alproject`, and the managed projects under `~/projects`.
+- **Service account:** `{{SERVICE_USER}}` (no sudo, no inbound SSH, lingering, rootless podman). Runs OpenClaw as `{{DEVELOPER_NAME}}` on system Node 26 through `/opt/{{SERVICE_USER}}/bin/openclaw`; project work uses fnm. Runs the delegated coding agent, `alignfirst`, `alcode`, `alproject`, and the managed projects under `~/projects`.
 - **Public IP:** deployment-specific, written `<vps-ip>` throughout the docs. Never substitute it from a guess.
 
 ## Request flow
@@ -33,6 +33,7 @@ The runtime model and the coding agent are independent choices: OpenClaw authent
 - This repository, in the admin account, describes the deployment. The service account never reads it; it works from the snapshot `~{{SERVICE_USER}}/seed/`, refreshed by the operator with `rsync` ([04 § 2](installations/04-openclaw.md#2-snapshot)).
 - `~{{SERVICE_USER}}/.openclaw/`: `openclaw.json` (written by the seed through `openclaw config set`), `workspace/` (applied from the snapshot), `secrets/secrets.json` (every credential, referenced from `openclaw.json` as file SecretRefs), `.env` (the gateway env file, `CONTEXT7_API_KEY` only), and `thread-handoff/state.sqlite` (the plugin's durable handoff state).
 - The gateway unit is written by `openclaw gateway install`; the environment comes from `~/.config/environment.d/`, installed by the seed.
+- `/opt/{{SERVICE_USER}}/` is root-owned; the gateway's persistent PATH and shell drop-in is service-owned.
 - Configuration, workspace files, skills, the coding agent's instructions and the npm prefix are immutable once [06](installations/06-security-hardening.md) has run.
 
 ## Firewall

@@ -27,22 +27,11 @@ export interface WaitForStarterOptions {
 }
 
 /**
- * Wait for the first substantive thread outbound — the starter — for this
- * conversation.
- *
- * Two provider-asymmetry tolerances (see "Auto-stream delivers turn finals only
- * on Anthropic" in `docs/alignfirst-developer/openclaw-context-engineering.md`):
- * `qwen3.7`/`glm-5.2` free-stream their mid-turn planning notes, an obedience
- * ceiling, not a regression.
- *
- * - Thread-less planning notes land on the channel root (Discord) — the same
- *   class `assertNoChannelRootLeak` tolerates. So no fail-fast on unmatched
- *   outbounds: the `threadId` predicate plus the timeout bound the wait.
- * - On Slack (auto-thread) the same notes land IN the thread, ahead of the
- *   starter — so narration-classified matches are skipped, and the wait
- *   re-enters until a substantive thread outbound arrives. A session that
- *   narrates and never posts a real starter now times out instead of failing
- *   the starter asserts on a planning note.
+ * Wait for the first substantive thread outbound. Qwen/GLM can stream
+ * mid-turn planning notes; see "Auto-stream delivers turn finals only on
+ * Anthropic" in `docs/alignfirst-developer/openclaw-context-engineering.md`.
+ * Ignore unmatched root posts and skip narration inside the thread. The
+ * timeout bounds a session that never posts a substantive starter.
  */
 export function waitForStarter(
   ctx: ScenarioContext,
@@ -192,13 +181,12 @@ const SELF_POST_ACTIONS = new Set(["send", "sendMessage", "thread-reply", "threa
 
 /**
  * Assert the thread-bound session never delivered the same reply twice — the
- * duplicate-replies incident (`.plans/33/from-paleoclaw/A1-diagnostic.md`). Its
+ * duplicate-replies. Its
  * plain text auto-streams into the thread, so a `send`/`thread-reply` at its own
  * thread posts that text a second time.
  *
  * The offending call is found structurally: `sessionKey` carries the thread id
- * (only the per-thread session's key does — `…-thread-<id>` on the mock,
- * `…-topic-<id>` on real Discord) and the input targets that same thread;
+ * (the per-thread session uses the native thread ID as its channel ID on Discord) and the input targets that same thread;
  * cross-surface posts stay allowed. A call whose text reached the thread exactly
  * once is not the incident, though — the playbook has the session route one line
  * through the tool when it needs a rename, and Discord offers no other way. So
@@ -263,8 +251,7 @@ function isSelfThreadMessagePost(call: AgentToolCall, threadId: string): boolean
   // (`to` → `target` → `channelId`) plus the explicit `threadId`. The `sessionKey`
   // gate above already narrows to the per-thread session, so a `channelId` that
   // happens to match a non-thread target can't produce a false positive here.
-  // Substring-matched against the mock's `…-thread-<id>` / `…-topic-<id>` shapes;
-  // revisit if a third channel plugin names sessions or targets differently.
+  // Match either the bare thread ID or its prefixed delivery target.
   return ["threadId", "to", "target", "channelId"].some((field) => {
     const value = input[field];
     return typeof value === "string" && value.toLowerCase().includes(needle);

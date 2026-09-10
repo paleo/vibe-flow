@@ -4,7 +4,7 @@ Use this procedure only to create a project, onboard a repository to clone, or p
 
 ## Start with the project guide
 
-Run `alproject --guide --root ~/projects` and read the complete output before any lifecycle action. This call is mandatory for creation, onboarding, and removal; the JSON project inventory does not replace it. The sections it renders for each projects directory carry the host's allowed directories, their descriptions, and port ranges. Follow those constraints throughout this procedure.
+Run `alproject --guide --root ~/projects` and read the complete output before any lifecycle action. This call is mandatory for creation, onboarding, and removal; the JSON project inventory does not replace it. The sections it renders for each projects directory carry the host's allowed directories, their descriptions, and port ranges. The project kind supplies the range code: when the selected parent lists a matching coded range, pass its code with `--range`; the default range needs no flag. Follow those constraints throughout this procedure.
 
 ## Create a project
 
@@ -16,7 +16,7 @@ Before creating a directory, load the `alignfirst-setup-guide` skill. If the ski
 
 1. Settle the stack, allowed parent directory, project name, and port requirements with the user. Use the `alproject --guide --root ~/projects` output to constrain the choices.
 2. Create the main-worktree directory under the selected allowed parent. Initialize its Git repository on `main`.
-3. Once the directory contains its `.git` directory, retain the canonical path as PROJECT_PATH. When the project declares ports, run `alproject free-ports --root <selected parent directory> --size <perWorkspace × maxWorkspaces>` and retain the block; preparation through the setup guide writes it into `.alignfirst.json`. The selected parent's marker owns its port range. Report that `.alignfirst.json` was written and name the block.
+3. Once the directory contains its `.git` directory, retain the canonical path as PROJECT_PATH. When the project declares ports, run `alproject free-ports --root <selected parent directory> --size <perWorkspace × maxWorkspaces> [--range <code>]` and retain the block; preparation through the setup guide writes it into `.alignfirst.json`. The selected parent's marker owns its port range. Report that `.alignfirst.json` was written and name the block.
 4. Create `.plans/`, then run `alignfirst sync`. With an external ticket, run `alignfirst ticket {TICKET_ID} --next request.md` and append FILE_NAME to TICKET_DIR to get the path, preserving the leading dot. Otherwise run `alignfirst ticket --side`; TICKET_ID is the reported `side-N`, and the path is `.plans/{TICKET_ID}/A1-request.md`. Write the complete creation request there, then run `alignfirst sync`. The bot chooses the identifier and writes the request; alcode does neither. A later plans setup migrates this content when it replaces the directory with a symlink.
 5. Before delegating the bootstrap, run `alcode --openclaw-guide`. Then bootstrap directly from PROJECT_PATH through `alcode new --message`, with no protocol. Explicitly instruct it to use `alignfirst-setup-guide` and prepare the repository for an AlignFirst Developer. It must run `alproject doctor --root ~/projects` after writing `.alignfirst.json` and before workspace setup, stopping on an unhealthy inventory. Include `.local/` as a gitignored shared directory in the workspace mechanism. Follow the selected stack and the host-specific guide.
 6. Verify the project through the setup guide, run `alignfirst sync`, and make its initial commit on `main` in PROJECT_PATH. Do not ask for confirmation before committing.
@@ -35,7 +35,7 @@ Before any discussion:
 
 1. Select a parent directory allowed by `alproject --guide --root ~/projects`. Ask the user when several qualify.
 2. Clone the repository into that parent. PROJECT is the clone's directory name; PROJECT_PATH is its canonical path.
-3. Retain the canonical path as PROJECT_PATH. When the project's workspace wrapper declares ports, run `alproject free-ports --root <selected parent directory> --size <perWorkspace × maxWorkspaces>` and retain the block; preparation through the setup guide writes it into `.alignfirst.json`.
+3. Retain the canonical path as PROJECT_PATH. When the project's workspace wrapper declares ports, run `alproject free-ports --root <selected parent directory> --size <perWorkspace × maxWorkspaces> [--range <code>]` and retain the block; preparation through the setup guide writes it into `.alignfirst.json`.
 4. Install dependencies and build, following the repository's own README.
 
 ### Step 2 — Check the AlignFirst Developer contract

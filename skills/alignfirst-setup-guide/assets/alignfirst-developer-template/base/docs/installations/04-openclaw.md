@@ -17,7 +17,8 @@ infra/openclaw/
 ├── seed.sh             # openclaw setup + openclaw config set …, secret store, environment.d
 ├── seed/               # common.sh, surface.sh, coding-agent.sh — the configuration modules
 ├── environment.d/      # non-secret variables for systemd --user and login shells
-├── bin/                # workspace, backup, kill-switch and maintenance scripts
+├── bin/                # OpenClaw launcher, workspace, backup, kill-switch and maintenance scripts
+├── node-runtime/       # project-shell, fnm initialization, maintenance npm and runtime checks
 ├── projects/           # .alignfirst-projects.json
 ├── workspace/          # curated workspace files (AGENTS.md, IDENTITY.md, …)
 ├── heartbeat-scratch.md # the heartbeat job's comment-only checklist (step 7)
@@ -56,6 +57,8 @@ sudo chown -R {{SERVICE_USER}}:{{SERVICE_USER}} /home/{{SERVICE_USER}}/seed
 ```
 
 The execute bits are tracked by git; no `chmod` is needed.
+
+The snapshot copies `bin/openclaw` and `node-runtime/` but executes neither. `03-toolchain.md` deploys their runtime files root-owned under `/opt/{{SERVICE_USER}}/`.
 
 ## 3. Seed
 
@@ -140,24 +143,34 @@ loginctl show-user {{SERVICE_USER}} | grep Linger
 # Expected: Linger=yes
 ```
 
-`openclaw gateway install` writes the user unit: `ExecStart` points at the installed `dist/index.js`, and the current `PATH` is baked in as `Environment=PATH=`. With the `.bash_profile` of `03`, that is `/usr/bin:…:~/.npm-system-global/bin`, which is what lets exec children find `alignfirst`, `alcode`, and the coding agent.
+`openclaw gateway install` writes the user unit. Install the persistent drop-in after it so `ExecStart` and the gateway stay on system Node while exec children enter the developer shell. The drop-in must belong to the service account because the installer refuses a foreign owner.
 
 The installer refuses group-writable unit paths, and the account's default umask creates them that way ([gotchas.md](../gotchas.md#gateway-install-refuses-group-writable-systemd-paths)). Strip the bit first:
 
 ```sh
-sudo -H -u {{SERVICE_USER}} bash -lc 'mkdir -p ~/.config/systemd/user && chmod go-w ~/.config ~/.config/systemd ~/.config/systemd/user'
+sudo -H -u {{SERVICE_USER}} bash -lc 'mkdir -p ~/.config/systemd/user/openclaw-gateway.service.d && chmod go-w ~/.config ~/.config/systemd ~/.config/systemd/user ~/.config/systemd/user/openclaw-gateway.service.d'
 sudo -i -u {{SERVICE_USER}} -- openclaw gateway install
+sudo install -o {{SERVICE_USER}} -g {{SERVICE_USER}} -m 644 \
+  /home/{{SERVICE_USER}}/seed/node-runtime/gateway-path.conf \
+  /home/{{SERVICE_USER}}/.config/systemd/user/openclaw-gateway.service.d/20-system-node-path.conf
+sudo -i -u {{SERVICE_USER}} -- systemctl --user daemon-reload
 sudo -i -u {{SERVICE_USER}} -- systemctl --user enable --now openclaw-gateway.service
 sudo -i -u {{SERVICE_USER}} -- systemctl --user status openclaw-gateway.service
+sudo -i -u {{SERVICE_USER}} -- systemctl --user cat openclaw-gateway.service
+# Expected: ExecStart names /usr/bin/node and ~/.npm-system-global/lib/node_modules/openclaw; effective PATH has no fnm entry; SHELL is /opt/{{SERVICE_USER}}/libexec/project-shell
 ```
 
 After an OpenClaw upgrade, refresh the unit (settings, node flags) with `--force`; the permission check now includes the unit file:
 
 ```sh
-sudo -H -u {{SERVICE_USER}} bash -lc 'chmod go-w ~/.config ~/.config/systemd ~/.config/systemd/user ~/.config/systemd/user/openclaw-gateway.service'
+sudo -H -u {{SERVICE_USER}} bash -lc 'chmod go-w ~/.config ~/.config/systemd ~/.config/systemd/user ~/.config/systemd/user/openclaw-gateway.service ~/.config/systemd/user/openclaw-gateway.service.d'
 sudo -i -u {{SERVICE_USER}} -- openclaw gateway install --force
+sudo install -o {{SERVICE_USER}} -g {{SERVICE_USER}} -m 644 \
+  /home/{{SERVICE_USER}}/seed/node-runtime/gateway-path.conf \
+  /home/{{SERVICE_USER}}/.config/systemd/user/openclaw-gateway.service.d/20-system-node-path.conf
 sudo -i -u {{SERVICE_USER}} -- systemctl --user daemon-reload
 sudo -i -u {{SERVICE_USER}} -- systemctl --user restart openclaw-gateway
+sudo -i -u {{SERVICE_USER}} -- systemctl --user cat openclaw-gateway.service
 ```
 
 ### Heartbeat scratch

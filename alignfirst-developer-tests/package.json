@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=24.15.0 <25",
+    "node": ">=24.16.0 <25 || >=26.1.0",
     "npm": ">=10"
   },
   "scripts": {
@@ -22,10 +22,10 @@
     "@paleo/openclaw-slack-mock": "file:vendor/openclaw-slack-mock.tgz",
     "@paleo/openclaw-test": "file:vendor/openclaw-test.tgz",
     "@paleo/alignfirst-developer-openclaw-plugin": "file:vendor/alignfirst-developer-openclaw-plugin.tgz",
-    "openclaw": "2026.9.2"
+    "openclaw": "2026.9.3"
   },
   "devDependencies": {
-    "@types/node": "~24.13.3",
+    "@types/node": "~26.5.0",
     "typescript": "~7.0.2"
   }
 }

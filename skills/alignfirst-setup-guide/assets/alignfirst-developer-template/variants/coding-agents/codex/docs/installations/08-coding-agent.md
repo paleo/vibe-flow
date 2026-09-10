@@ -31,10 +31,10 @@ source ~/.bashrc
 
 ### Install
 
-**Role: operator**, during `03-toolchain.md`, once `~/.npmrc` points at the shared prefix. The seed in `04-openclaw.md` refuses to run without the binary.
+**Role: operator**, during `03-toolchain.md`, once `admin-npm` is installed. The seed in `04-openclaw.md` refuses to run without the binary.
 
 ```sh
-sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g @openai/codex
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @openai/codex
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'which codex && codex --version'
 # Expected: /home/{{SERVICE_USER}}/.npm-system-global/bin/codex
 ```
@@ -62,14 +62,16 @@ exit
 
 ### Skills
 
-**Role: operator**, as the service account, after [Authenticate](#authenticate). Two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent codex` records the same canonical in the lock file for the `codex` CLI, which reads `~/.agents/skills/` too and needs no symlink. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
+**Role: operator**, as the service account, after [Authenticate](#authenticate). The setup guide and `sharp-writing` use two tiers: `--agent universal` writes the canonical `~/.agents/skills/<name>`, which OpenClaw scans; `--agent codex` records the same canonical in the lock file for the `codex` CLI, which reads `~/.agents/skills/` too and needs no symlink. The playbook is copied to OpenClaw's managed `~/.openclaw/skills/` directory because its operating instructions would only cost tokens in the coding agent's context. The delegated coder needs no protocol skill: `alcode` names the `alignfirst guide` command in its prompt, and a prepared project runs `alignfirst context` from its instruction file. `< /dev/null` on every `skills add`: its interactive UI reads stdin and would swallow the rest of the heredoc.
 
 ```sh
 sudo -i -u {{SERVICE_USER}} bash <<'EOS'
 set -e
 npx -y skills add https://github.com/paleo/alignfirst --global --yes \
   --agent universal --agent codex \
-  --skill alignfirst-setup-guide --skill alignfirst-developer-openclaw-playbook < /dev/null
+  --skill alignfirst-setup-guide < /dev/null
+npx -y skills add https://github.com/paleo/alignfirst --global --yes \
+  --agent openclaw --copy --skill alignfirst-developer-openclaw-playbook < /dev/null
 npx -y skills add https://github.com/paleo/skills --global --yes \
   --agent universal --agent codex --skill sharp-writing < /dev/null
 EOS
@@ -140,7 +142,13 @@ Run the coding-agent package update through its own package-scoped maintenance w
 
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- \
-  /usr/bin/npm install -g @openai/codex@latest
+  /opt/{{SERVICE_USER}}/libexec/admin-npm install -g @openai/codex@latest
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=codex \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
 ```
 
 A Codex upgrade changes the system-skills marker, so repeat the post-hardening maintenance command in [Skills](#skills). Then verify the marker took: a second session prints nothing.
@@ -149,7 +157,7 @@ A Codex upgrade changes the system-skills marker, so repeat the post-hardening m
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'cd /tmp && codex exec --sandbox read-only --skip-git-repo-check -C /tmp "Reply with exactly OK and stop." 2>&1 | grep -i "system skills"' < /dev/null
 ```
 
-The `skills` scope of `update-developer.md` covers `~/.agents` only. `skills update` writes nothing under `~/.codex/skills`, which holds Codex's own skills alone.
+The `skills` scope of `update-developer.md` covers `~/.agents` and `~/.openclaw/skills`. Codex's bundled skills under `~/.codex/skills` use the separate `agent-skills` scope.
 
 ### Verification
 

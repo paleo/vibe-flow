@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+export PATH=/usr/bin:/opt/{{SERVICE_USER}}/bin:/usr/local/bin:/bin:/home/{{SERVICE_USER}}/.local/bin:/home/{{SERVICE_USER}}/.npm-system-global/bin
+export SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell
+exec /usr/bin/node /home/{{SERVICE_USER}}/.npm-system-global/lib/node_modules/openclaw/openclaw.mjs "$@"

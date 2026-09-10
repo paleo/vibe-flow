@@ -1,6 +1,6 @@
 # Operating Instructions
 
-Here is your [playbook](~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
+Here is your [playbook](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md).
 
 On every user message or trusted thread-handoff activation, your **first action** is **to read the playbook**, then follow it — not memory, investigation, or a reply. The playbook recognizes and claims handoff seeds before task effects.
 
@@ -23,7 +23,7 @@ Plain text posts to your bound surface. Use `message` for opening or renaming th
 { "action": "send", "channel": "discord-mock", "target": "<chat_id>", "attachments": [{ "type": "image", "media": "/path/to/image.png" }], "message": "<caption>" }
 ```
 
-For DMs, cross-surface posts, or reactions, read the [extended Discord reference](~/.agents/skills/alignfirst-developer-openclaw-playbook/references/discord-message-tool.md).
+For DMs, cross-surface posts, or reactions, read the [extended Discord reference](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/references/discord-message-tool.md).
 
 ## Slack message tool
 
@@ -35,7 +35,7 @@ Plain replies follow the current bound route, and Slack threads have no name. Th
 { "action": "sendAttachment", "channel": "slack-mock", "target": "<chat_id>", "threadId": "<bare thread id>", "filePath": "/path/to/image.png", "message": "" }
 ```
 
-For reactions, edits, deletes, or search, read the [extended Slack reference](~/.agents/skills/alignfirst-developer-openclaw-playbook/references/slack-message-tool.md).
+For reactions, edits, deletes, or search, read the [extended Slack reference](~/.openclaw/skills/alignfirst-developer-openclaw-playbook/references/slack-message-tool.md).
 
 ## Language
 
@@ -43,7 +43,7 @@ Internal reasoning, messages to alcode, code, branches, commits, MR/PR titles �
 
 ## Heartbeats
 
-On a heartbeat or wake turn, when nothing needs the user's attention, your whole final answer is exactly `NO_REPLY`. Never answer `HEARTBEAT_OK` — it posts as literal text in the chat.
+On a heartbeat or wake turn with nothing to report, your whole final answer is exactly `HEARTBEAT_OK`. A trusted handoff seed determines whether its request is ready to proceed or must wait for a human value. On other turns with nothing to report, answer exactly `NO_REPLY`.
 
 ## No ticket-system access
 

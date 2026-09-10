@@ -18,7 +18,7 @@ read_when:
 
 `{{SERVICE_USER}}` has no sudo, so filesystem permissions are a guarantee, not an instruction. Two mechanisms: `chattr +i` (the owner can neither modify nor delete the file; only root removes the flag), and ownership handoff to `root` or `{{SERVER_ADMIN_USER}}` with the write bits stripped. Each locked directory root that sits in a service-writable parent is flagged as well; otherwise the tree could be renamed and recreated writable.
 
-The developer can no longer edit its own instruction files or install global packages. Its improvement path is a proposal, reviewed and applied through this repository. Memory, sessions, logs and `workspace/scratch/` stay writable.
+The developer can no longer edit its own instruction files or protected global packages. Its improvement path is a proposal, reviewed and applied through this repository. Memory, sessions, logs, `workspace/scratch/`, and project-runtime globals stay writable.
 
 ## Install the maintenance controls
 
@@ -59,25 +59,67 @@ sudo chattr +i /home/{{SERVICE_USER}}/projects/.alignfirst-projects.json
 
 ## Skills and instructions
 
-The canonical skills at `~/.agents/skills/` feed both OpenClaw and the delegated coding agent, so the tree belongs to the admin account:
+The setup guide and `sharp-writing` under `~/.agents/skills/` feed both OpenClaw and the delegated coding agent. Only OpenClaw automatically discovers the playbook under `~/.openclaw/skills/`. The commands below protect both trees from service-account writes: admin ownership and modes prevent content changes; the immutable flag on each root prevents its removal or replacement. Both agents can still read the files. `~/.openclaw` stays writable for gateway state.
 
 ```sh
 sudo chown -Rh {{SERVER_ADMIN_USER}}:{{SERVER_ADMIN_USER}} /home/{{SERVICE_USER}}/.agents
 sudo find /home/{{SERVICE_USER}}/.agents -type d -exec chmod 755 {} +
 sudo find /home/{{SERVICE_USER}}/.agents -type f -exec chmod 644 {} +
 sudo chattr +i /home/{{SERVICE_USER}}/.agents
+sudo chown -Rh {{SERVER_ADMIN_USER}}:{{SERVER_ADMIN_USER}} /home/{{SERVICE_USER}}/.openclaw/skills
+sudo find /home/{{SERVICE_USER}}/.openclaw/skills -type d -exec chmod 755 {} +
+sudo find /home/{{SERVICE_USER}}/.openclaw/skills -type f -exec chmod 644 {} +
+sudo chattr +i /home/{{SERVICE_USER}}/.openclaw/skills
 ```
 
 The coding agent's own skill directory and global instruction file: [08-coding-agent.md § Hardening](08-coding-agent.md#hardening).
 
+## Runtime launchers
+
+The launchers and initialization files under `/opt/{{SERVICE_USER}}/` are root-owned. The gateway drop-in remains service-owned because `openclaw gateway install` refuses a unit definition owned by another user.
+
+```sh
+sudo chown -R root:root /opt/{{SERVICE_USER}}
+sudo find /opt/{{SERVICE_USER}} -type d -exec chmod 755 {} +
+sudo chmod 755 /opt/{{SERVICE_USER}}/bin/openclaw \
+  /opt/{{SERVICE_USER}}/libexec/project-shell \
+  /opt/{{SERVICE_USER}}/libexec/admin-npm \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+sudo chmod 644 /opt/{{SERVICE_USER}}/libexec/init.bash
+sudo chown {{SERVICE_USER}}:{{SERVICE_USER}} \
+  /home/{{SERVICE_USER}}/.config/systemd/user/openclaw-gateway.service.d/20-system-node-path.conf
+sudo chmod 644 \
+  /home/{{SERVICE_USER}}/.config/systemd/user/openclaw-gateway.service.d/20-system-node-path.conf
+```
+
 ## Global packages
 
-`~/.npm-system-global/` holds `openclaw`, the coding agent, `alignfirst`, `@paleo/alcode` and `ctx7`. Contract: as the service account, `npm install -g` fails with `EACCES`; project-level installs still work.
+`~/.npm-system-global/` holds `openclaw`, the coding agent, `alignfirst`, `@paleo/alcode`, `@paleo/alproject` and `ctx7`. It is root-owned and immutable. A global install by the service account instead lands in its selected fnm runtime. The audited PATH keeps that writable runtime from shadowing `openclaw`, `alcode` or the coding agent.
 
 ```sh
 sudo chown -R root:root /home/{{SERVICE_USER}}/.npm-system-global
 sudo chmod -R go-w /home/{{SERVICE_USER}}/.npm-system-global
 sudo chattr +i /home/{{SERVICE_USER}}/.npm-system-global
+```
+
+### Project-runtime audit
+
+Accepted trade-off: the service-writable fnm bin precedes system tools in project shells, so it can shadow commands such as `git`, `curl` or `ssh` for the same Linux user. The protected CLI paths stay ahead of it. This is an operational audit, not an integrity guarantee for service-owned tools.
+
+Inspect every installed runtime, including inactive versions. The bin listing exposes manually added files and symlinks as well as npm-installed commands; compare the package listing with the developer tools intended for that version:
+
+```sh
+sudo -H -u {{SERVICE_USER}} bash --noprofile --norc <<'EOS'
+set -e
+audit_status=0
+for runtime in "$HOME"/.local/share/fnm/node-versions/*/installation; do
+  [ -d "$runtime" ] || continue
+  printf '\nRuntime: %s\n' "$runtime"
+  /usr/bin/find "$runtime/bin" -mindepth 1 -maxdepth 1 -printf '%f -> %l\n' || audit_status=1
+  /usr/bin/node /usr/lib/node_modules/npm/bin/npm-cli.js --prefix "$runtime" ls -g --depth=0 || audit_status=1
+done
+exit "$audit_status"
+EOS
 ```
 
 ## Unlocking for maintenance
@@ -104,12 +146,42 @@ As the service account, every write must fail with `Operation not permitted` or 
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/.openclaw/workspace/AGENTS.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/.openclaw/openclaw.json'
 sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/projects/.alignfirst-projects.json'
-sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.agents/skills/alignfirst-developer-openclaw-playbook/SKILL.md'
+sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.agents ~/.agents-x'
-sudo -i -u {{SERVICE_USER}} -- /usr/bin/npm install -g cowsay
+sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.openclaw/skills ~/.openclaw/skills-x'
 ```
 
-Still working: reads of the instructions, skills and project listing; writes under `~/.openclaw/workspace/scratch/`; `npm install` inside a project; the coding agent's authentication and session state.
+A project-runtime global install must succeed and leave the protected launcher selected. The trap removes the test package on success or failure. If this runtime already contains `cowsay`, use a clean test runtime to preserve that installation:
+
+```sh
+sudo -H -u {{SERVICE_USER}} bash -l <<'EOS'
+set -e
+cd "$HOME"
+runtime_prefix=$(readlink -f "${FNM_MULTISHELL_PATH:?}")
+npm_prefix=$(npm prefix -g)
+test "$(readlink -f "$npm_prefix")" = "$runtime_prefix"
+test ! -e "$(npm root -g)/cowsay"
+test ! -L "$(npm root -g)/cowsay"
+for name in cowsay cowthink; do
+  test ! -e "$runtime_prefix/bin/$name" && test ! -L "$runtime_prefix/bin/$name"
+done
+trap 'npm uninstall -g cowsay' EXIT
+npm install -g cowsay
+test "$(command -v openclaw)" = /opt/{{SERVICE_USER}}/bin/openclaw
+command -v openclaw
+EOS
+# Expected: /opt/{{SERVICE_USER}}/bin/openclaw
+sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm ls -g --depth=0
+# Expected: exactly openclaw, the coding agent, alignfirst, @paleo/alcode, @paleo/alproject and ctx7
+sudo -H -u {{SERVICE_USER}} bash -lc '
+PROJECT_SHELL=/opt/{{SERVICE_USER}}/libexec/project-shell \
+DEFAULT_NODE=<default-node-version> PINNED_NODE=<project-node-version> \
+ALIGNFIRST_CODE_AGENT=<claude|codex> \
+  /opt/{{SERVICE_USER}}/libexec/check-project-runtimes.sh
+'
+```
+
+Still working: reads of the instructions, skills and project listing; writes under `~/.openclaw/workspace/scratch/`; project-level and fnm-runtime global npm installs; the coding agent's authentication and session state.
 
 Rootless podman closes the bind-mount bypass: container root maps to the service account, which cannot override the flag.
 

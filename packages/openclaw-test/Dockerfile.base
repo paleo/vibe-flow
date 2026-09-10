@@ -6,7 +6,7 @@
 # and adds whatever else the fixture needs (e.g. git, pnpm via corepack, mock symlinks).
 # Build context: this package's directory (so `dist/mock-cli-shim.js` is COPY-able).
 
-FROM node:24-alpine
+FROM node:26-alpine
 
 RUN apk add --no-cache shadow
 
