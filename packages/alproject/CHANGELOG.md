@@ -1,5 +1,12 @@
 # @paleo/alproject
 
+## 3.0.0
+
+### Major Changes
+
+- 348c407: Changed the projects marker's `portRange` to a `portRanges` array with optional codes and descriptions. Select a coded range with `free-ports --range <code>`, and repeat `init --port-range [<code>=]<first>-<last>` to declare ranges.
+- 348c407: Required Node.js 24.16.0 or newer.
+
 ## 2.0.0
 
 ### Major Changes

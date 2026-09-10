@@ -1,5 +1,15 @@
 # @paleo/alcode
 
+## 0.15.0
+
+### Minor Changes
+
+- 348c407: Required Node.js 24.16.0 or newer.
+
+### Patch Changes
+
+- 348c407: Correct the OpenClaw guide's Slack delivery instructions and use the supported heartbeat acknowledgement for silent coding wakes.
+
 ## 0.14.0
 
 ### Minor Changes
