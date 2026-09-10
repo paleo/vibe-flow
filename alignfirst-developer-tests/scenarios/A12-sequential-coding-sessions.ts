@@ -11,11 +11,11 @@ import {
   waitForCompletionReport,
 } from "./_lib/coding-session.ts";
 import { setupCodingAgentMock } from "./_lib/mock-coding-agent.ts";
-import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
 import { setupGhMock } from "./_lib/mock-gh.ts";
 import { assertNoChannelRootLeak, assertNoSelfThreadMessagePost } from "./_lib/outbound.ts";
-import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { NIMBUS_PROJECT_PATH } from "./_lib/project-fixtures.ts";
+import { waitForProjectListing } from "./_lib/project-lifecycle.ts";
+import { resetFixtures } from "./_lib/reset-fixture.ts";
 import { bootstrapThreadFromChannel, sendInThread } from "./_lib/thread-bootstrap.ts";
 
 // A<S> → ABC-0<S>N (README convention); scenario A12 → ABC-012N, first ticket ABC-0120.
@@ -33,8 +33,7 @@ const launchedSince = (notBefore: string) => (call: AgentToolCall) =>
   isAlcodeLaunch(call) && call.startedAt !== undefined && call.startedAt >= notBefore;
 
 /**
- * Regression for the heartbeat-cooldown wake gate (incident `.plans/32/from-paleoclaw/
- * A1-diagnostic.md`): OpenClaw defers `event`-intent wakes whenever `now < nextDueMs`, and any
+ * Regression for the heartbeat-cooldown wake gate: OpenClaw defers `event`-intent wakes whenever `now < nextDueMs`, and any
  * heartbeat run re-arms `nextDueMs = now + every` (24h here, as in production). A fresh gateway's
  * FIRST exec-exit wake always takes the never-ran-before bootstrap path — which is why every
  * one-delegation scenario stayed green while production lost completion reports. The SECOND

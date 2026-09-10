@@ -192,7 +192,7 @@ const SELF_POST_ACTIONS = new Set(["send", "sendMessage", "thread-reply", "threa
 
 /**
  * Assert the thread-bound session never delivered the same reply twice — the
- * duplicate-replies incident (`.plans/33/from-paleoclaw/A1-diagnostic.md`). Its
+ * duplicate-replies. Its
  * plain text auto-streams into the thread, so a `send`/`thread-reply` at its own
  * thread posts that text a second time.
  *
