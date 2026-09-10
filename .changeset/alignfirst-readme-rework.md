@@ -1,0 +1,5 @@
+---
+"alignfirst": patch
+---
+
+Improved README.
