@@ -1,5 +1,21 @@
 # @paleo/openclaw-test
 
+## 0.18.0
+
+### Minor Changes
+
+- 348c407: Required OpenClaw 2026.9.3 and Node 24.16+ or 26; the test image now runs Node 26.
+
+### Patch Changes
+
+- 348c407: Generate numeric thread IDs and retain their tool calls and costs in scenario reports through explicit bus ownership.
+- Updated dependencies [348c407]
+- Updated dependencies [348c407]
+- Updated dependencies [348c407]
+  - @paleo/openclaw-channel-mock-core@0.9.0
+  - @paleo/openclaw-slack-mock@0.5.0
+  - @paleo/openclaw-discord-mock@0.5.0
+
 ## 0.17.0
 
 ### Minor Changes
