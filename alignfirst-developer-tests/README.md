@@ -57,7 +57,7 @@ The root and its nested `external-projects` and `lifecycle-projects` directories
 
 ## Scenarios
 
-Drop `scenarios/<id>.ts`, default-export `async (ctx: ScenarioContext) => void`. Shared helpers under `scenarios/_lib/` (skipped by the runner's discovery). Current scenarios: `A01`–`A21` and `A23`–`A28`.
+Drop `scenarios/<id>.ts`, default-export `async (ctx: ScenarioContext) => void`. Shared helpers under `scenarios/_lib/` (skipped by the runner's discovery). Current scenarios: `A01`–`A21` and `A23`–`A29`.
 
 Almost every one starts with `bootstrapThreadFromChannel` (`_lib/thread-bootstrap.ts`). It sends the
 channel message, waits for exactly one confirmed native starter and one `thread_handoff start`, and
@@ -73,6 +73,8 @@ before the parent emits its final `NO_REPLY`, so assertions follow the starter's
 `A17` creates and prepares `nova`, bootstraps it on `main` without an AlignFirst protocol, and checks the initial commit. `A18` confirms exact paths before removing a linked workspace and its main worktree. `A19` makes workspace removal fail on an uncommitted file and checks that the filesystem and project config remain intact.
 
 `A23` resolves a PR URL through review and its reported outcome. `A24` carries a multi-project base refresh through one no-protocol delegation per project. `A25` captures a detailed request before workspace setup and coding. `A26` reserves the next side ticket `side-N` before workspace setup for explicit no-ticket work.
+
+`A29-already-reported-wake` limits its request to implementation and local verification, excluding review and PR work. It completes the delegation, injects a duplicate completion event into the same thread session, and requires a terminal `HEARTBEAT_OK` with no outbound message or isolated finalizer. It also checks that the preceding human-turn handoff and completion needed no finalizer.
 
 `A27-human-reply-racing-startup` sends a genuine missing-ticket answer immediately after native
 starter delivery. `A28-recoverable-handoff-failure` injects one test-bus delivery failure, then

@@ -156,6 +156,9 @@ describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
         (message) => message.text === "SAME_SESSION_CONTINUED",
       );
       expect(continued.threadId).toBe(expectedThreadId);
+      expect(
+        fixture.gatewayLog.some((line) => line.includes("running isolated finalization")),
+      ).toBe(false);
 
       expect(
         fixture.bus.state
