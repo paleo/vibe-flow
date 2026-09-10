@@ -54,7 +54,14 @@ const SLACK_REJECTIONS: Array<{ details: unknown; reason: string }> = [
       ok: true,
       result: { channelId: "C0BJ7KLRXEZ", messageId: "1788946879.083059" },
     },
-    reason: "channelMismatch",
+    reason: "unsupportedResultShape",
+  },
+  {
+    details: {
+      ...PRODUCTION_SLACK_RESULT,
+      result: { ...PRODUCTION_SLACK_RESULT.result, target: { kind: "channel" } },
+    },
+    reason: "unsupportedResultShape",
   },
 ];
 

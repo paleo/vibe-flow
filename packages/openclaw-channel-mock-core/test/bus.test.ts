@@ -112,7 +112,7 @@ describe("bus HTTP round-trip", () => {
     const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
       fixture.baseUrl,
       "/v1/outbound/message",
-      { to: `channel:${created.thread.id.toLowerCase()}`, text: "wake" },
+      { to: `channel:${created.thread.id}`, text: "wake" },
     );
     expect(sent.message).toMatchObject({
       conversation: { id: "Project-With-Case" },

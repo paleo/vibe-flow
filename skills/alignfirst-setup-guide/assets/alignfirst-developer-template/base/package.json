@@ -2,7 +2,7 @@
   "name": "{{ADMIN_REPOSITORY_NAME}}",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.11.0" },
+  "engines": { "node": ">=24.16.0" },
   "scripts": {
     "docmap": "alignfirst docmap",
     "workspace": "node scripts/workspace/workspace.mjs",

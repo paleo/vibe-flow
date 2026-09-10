@@ -45,8 +45,9 @@ export async function fetchTranscriptSnapshot(opts: {
   const outPath = `${IPC_DIR}/${randomUUID()}.transcript.json`;
   try {
     const { threads } = await getQaBusState(BUS_URL);
+    const conversationId = opts.conversationId.toLowerCase();
     const threadIds = threads
-      .filter((thread) => thread.conversationId === opts.conversationId)
+      .filter((thread) => thread.conversationId.toLowerCase() === conversationId)
       .map((thread) => thread.id);
     const result = await execInGateway(
       ["node", DUMP_SCRIPT, opts.startedAtIso, opts.conversationId, outPath, ...threadIds],

@@ -312,7 +312,6 @@ function resolveProjectsRoot(ctx: ProjectsContext, rootOption: string | undefine
 function initializeProjectsDirectory(root: string, args: ProjectsArgs, stdout: Output): number {
   const markerPath = join(root, MARKER_FILENAME);
   if (readMarker(root) !== undefined) throw new Error(`${markerPath} already exists.`);
-  if (args.portRanges !== undefined) assertValidPortRanges(args.portRanges, "--port-range");
   writeMarker(root, {
     ...(args.description === undefined ? {} : { description: args.description }),
     ...(args.portRanges === undefined ? {} : { portRanges: args.portRanges }),

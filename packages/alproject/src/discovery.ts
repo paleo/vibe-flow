@@ -396,7 +396,7 @@ function reportOutsideRange(
   issues.push({
     path,
     message:
-      `port range ${formatRange(range)} is outside the enclosing ranges ` +
+      `port range ${formatRange(range)} fits no single enclosing range: ` +
       enclosingRanges.map(formatRange).join(", "),
   });
 }

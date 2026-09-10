@@ -35,11 +35,12 @@ sudo install -m 755 -o root -g root "$runtime_tmp/fnm" /usr/local/bin/fnm
 rm -rf "$runtime_tmp"
 ```
 
-Create fnm's state directory, install the latest patch of the current Node LTS as the default, then install every version declared by a managed project:
+Create fnm's state directory, install the latest patch of the current Node LTS as the default (at least 24.16.0 for the developer CLIs), then install every version declared by a managed project. Provision without loading profiles so an unavailable default cannot block this step:
 
 ```sh
 sudo install -d -m 755 -o {{SERVICE_USER}} -g {{SERVICE_USER}} /home/{{SERVICE_USER}}/.local/share/fnm
-sudo -H -u {{SERVICE_USER}} bash -lc '
+sudo -H -u {{SERVICE_USER}} bash --noprofile --norc -c '
+set -e
 export FNM_DIR="$HOME/.local/share/fnm"
 eval "$(/usr/local/bin/fnm env --shell bash)"
 fnm install --lts

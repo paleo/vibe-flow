@@ -27,22 +27,11 @@ export interface WaitForStarterOptions {
 }
 
 /**
- * Wait for the first substantive thread outbound — the starter — for this
- * conversation.
- *
- * Two provider-asymmetry tolerances (see "Auto-stream delivers turn finals only
- * on Anthropic" in `docs/alignfirst-developer/openclaw-context-engineering.md`):
- * `qwen3.7`/`glm-5.2` free-stream their mid-turn planning notes, an obedience
- * ceiling, not a regression.
- *
- * - Thread-less planning notes land on the channel root (Discord) — the same
- *   class `assertNoChannelRootLeak` tolerates. So no fail-fast on unmatched
- *   outbounds: the `threadId` predicate plus the timeout bound the wait.
- * - On Slack (auto-thread) the same notes land IN the thread, ahead of the
- *   starter — so narration-classified matches are skipped, and the wait
- *   re-enters until a substantive thread outbound arrives. A session that
- *   narrates and never posts a real starter now times out instead of failing
- *   the starter asserts on a planning note.
+ * Wait for the first substantive thread outbound. Qwen/GLM can stream
+ * mid-turn planning notes; see "Auto-stream delivers turn finals only on
+ * Anthropic" in `docs/alignfirst-developer/openclaw-context-engineering.md`.
+ * Ignore unmatched root posts and skip narration inside the thread. The
+ * timeout bounds a session that never posts a substantive starter.
  */
 export function waitForStarter(
   ctx: ScenarioContext,

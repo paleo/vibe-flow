@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { renderReceipts } from "../src/thread-handoff/cli.js";
-import { receipt } from "./helpers.js";
+import { renderHandoffs, renderReceipts } from "../src/thread-handoff/cli.js";
+import { handoff, receipt } from "./helpers.js";
+
+describe("thread-handoff list rendering", () => {
+  it("renders JSON without starter text while preserving handoff metadata", () => {
+    const record = handoff({ starterText: "private starter text" });
+    const output = renderHandoffs([record], true);
+    const { starterText, ...metadata } = record;
+    expect(JSON.parse(output)).toEqual([metadata]);
+    expect(output).not.toContain(starterText);
+    expect(record.starterText).toBe(starterText);
+  });
+});
 
 describe("thread-handoff receipt rendering", () => {
   it("renders empty JSON and text output", () => {

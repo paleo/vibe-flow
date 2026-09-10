@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { type } from "arktype";
 
 import { errorMessage } from "./errors.js";
+import { formatRange } from "./format.js";
 
 export const MARKER_FILENAME = ".alignfirst-projects.json";
 
@@ -68,7 +69,7 @@ export function assertValidPortRanges(ranges: MarkerPortRange[], label: string):
       const other = ranges[previous];
       if (!rangesOverlap(range, other)) continue;
       throw new Error(
-        `Invalid ${label}: port ranges ${formatPortRange(other)} and ${formatPortRange(range)} overlap`,
+        `Invalid ${label}: port ranges ${formatRange(other)} and ${formatRange(range)} overlap`,
       );
     }
   }
@@ -99,10 +100,6 @@ function assertUniquePortRangeCodes(ranges: MarkerPortRange[], label: string): v
     }
     codes.add(code);
   }
-}
-
-function formatPortRange(range: PortRange): string {
-  return `${range.first}..${range.last}`;
 }
 
 export function containsRange(available: PortRange, allocation: PortRange): boolean {

@@ -368,8 +368,8 @@ describe("project discovery", () => {
     const report = JSON.parse(result.stdout);
     const messages = report.issues.map((issue: { message: string }) => issue.message);
     expect(messages).toContain("port range 8030..8059 overlaps a");
-    expect(messages).toContain("port range 8200..8299 is outside the enclosing ranges 8000..8099");
-    expect(messages).toContain("port range 9000..9099 is outside the enclosing ranges 8000..8099");
+    expect(messages).toContain("port range 8200..8299 fits no single enclosing range: 8000..8099");
+    expect(messages).toContain("port range 9000..9099 fits no single enclosing range: 8000..8099");
     expect(messages).toContain("not a git main worktree");
     expect(
       messages.some(
@@ -393,10 +393,10 @@ describe("project discovery", () => {
       (issue: { message: string }) => issue.message,
     );
     expect(messages).toContain(
-      "port range 8200..8219 is outside the enclosing ranges 8000..8049, 8050..8099",
+      "port range 8200..8219 fits no single enclosing range: 8000..8049, 8050..8099",
     );
     expect(messages).toContain(
-      "port range 8040..8059 is outside the enclosing ranges 8000..8049, 8050..8099",
+      "port range 8040..8059 fits no single enclosing range: 8000..8049, 8050..8099",
     );
   });
 

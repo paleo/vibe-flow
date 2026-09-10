@@ -12,6 +12,8 @@ A projects directory groups projects and optional nested projects directories. I
 }
 ```
 
+When upgrading from v2, replace the marker's `"portRange": { ... }` with `"portRanges": [{ ... }]`. The old marker key is rejected. Project configuration in `.alignfirst.json` keeps its singular `portRange` key.
+
 Prerequisite: install the `alignfirst` CLI on `PATH` with `npm install -g alignfirst`.
 
 Install `alproject` with `npm install -g @paleo/alproject`.

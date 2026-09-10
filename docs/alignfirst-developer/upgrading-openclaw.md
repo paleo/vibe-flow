@@ -34,6 +34,7 @@ git clone --quiet --depth=1 --branch v<version> https://github.com/openclaw/open
 - Compare the deployment template's workspace files (`skills/alignfirst-setup-guide/assets/alignfirst-developer-template/base/infra/openclaw/workspace/`) with `WORKSPACE_BOOTSTRAP_FILENAMES` in `src/agents/workspace.ts`. A file the runtime stopped reading must leave the template and its `chattr` lists; 2026.8.1 retired `HEARTBEAT.md` this way and the check above did not catch it.
 - Diff the config help between the tags: `git -C .local/openclaw diff v<old> v<new> -- 'src/config/schema.help.*.ts'`. A default that turns on a background behavior (a scheduled model run, a memory feature, a telemetry ping) appears there and nowhere doctor looks; see [Propagate](#propagate-to-the-deployment-template).
 - Recheck the public plugin tool/hook context, routing helpers, state-root resolver, system-event and heartbeat APIs required by `@paleo/alignfirst-developer-openclaw-plugin`. Load it from an ordinary external path; an allowlist is not an official-plugin trust grant.
+- Recheck silent post-tool heartbeat and event wakes on both surfaces. OpenClaw 2026.9.3 requires the `HEARTBEAT_OK` workaround documented in [context engineering](openclaw-context-engineering.md#heartbeat-cron-scratch-and-no_reply). Retire it only after deterministic gateway tests show that `NO_REPLY` suppresses delivery without invoking isolated finalization. Until then, keep acknowledgements token-only and verify their suppression after each upgrade.
 
 ## Bump the pins
 

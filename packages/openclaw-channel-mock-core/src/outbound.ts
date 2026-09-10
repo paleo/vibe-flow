@@ -17,7 +17,7 @@ export function createSendChannelMockText(params: { helpers: ChannelMockAccountH
     text: string;
     threadId?: string | number | null;
     replyToId?: string | number | null;
-  }) {
+  }): Promise<ChannelMockSendResult> {
     const account = helpers.resolveAccount({ cfg: input.cfg, accountId: input.accountId });
     const parsed = parseQaTarget(input.to);
     const resolvedThreadId = input.threadId == null ? parsed.threadId : String(input.threadId);
@@ -39,6 +39,6 @@ export function createSendChannelMockText(params: { helpers: ChannelMockAccountH
       messageId: message.id,
       conversationId: message.conversation.id,
       ...(message.threadId ? { threadId: message.threadId } : {}),
-    } satisfies ChannelMockSendResult;
+    };
   };
 }

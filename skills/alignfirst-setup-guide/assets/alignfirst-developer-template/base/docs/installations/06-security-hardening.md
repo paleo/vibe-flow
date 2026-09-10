@@ -18,7 +18,7 @@ read_when:
 
 `{{SERVICE_USER}}` has no sudo, so filesystem permissions are a guarantee, not an instruction. Two mechanisms: `chattr +i` (the owner can neither modify nor delete the file; only root removes the flag), and ownership handoff to `root` or `{{SERVER_ADMIN_USER}}` with the write bits stripped. Each locked directory root that sits in a service-writable parent is flagged as well; otherwise the tree could be renamed and recreated writable.
 
-The developer can no longer edit its own instruction files or install global packages. Its improvement path is a proposal, reviewed and applied through this repository. Memory, sessions, logs and `workspace/scratch/` stay writable.
+The developer can no longer edit its own instruction files or protected global packages. Its improvement path is a proposal, reviewed and applied through this repository. Memory, sessions, logs, `workspace/scratch/`, and project-runtime globals stay writable.
 
 ## Install the maintenance controls
 
@@ -102,6 +102,26 @@ sudo chmod -R go-w /home/{{SERVICE_USER}}/.npm-system-global
 sudo chattr +i /home/{{SERVICE_USER}}/.npm-system-global
 ```
 
+### Project-runtime audit
+
+Accepted trade-off: the service-writable fnm bin precedes system tools in project shells, so it can shadow commands such as `git`, `curl` or `ssh` for the same Linux user. The protected CLI paths stay ahead of it. This is an operational audit, not an integrity guarantee for service-owned tools.
+
+Inspect every installed runtime, including inactive versions. The bin listing exposes manually added files and symlinks as well as npm-installed commands; compare the package listing with the developer tools intended for that version:
+
+```sh
+sudo -H -u {{SERVICE_USER}} bash --noprofile --norc <<'EOS'
+set -e
+audit_status=0
+for runtime in "$HOME"/.local/share/fnm/node-versions/*/installation; do
+  [ -d "$runtime" ] || continue
+  printf '\nRuntime: %s\n' "$runtime"
+  /usr/bin/find "$runtime/bin" -mindepth 1 -maxdepth 1 -printf '%f -> %l\n' || audit_status=1
+  /usr/bin/node /usr/lib/node_modules/npm/bin/npm-cli.js --prefix "$runtime" ls -g --depth=0 || audit_status=1
+done
+exit "$audit_status"
+EOS
+```
+
 ## Unlocking for maintenance
 
 Use `/usr/local/sbin/alignfirst-developer-maintenance`. It accepts only named scopes: `config`, `workspace`, `packages`, `skills`, `projects`, `instructions` and `agent-skills`. Before an unlock, it contains the account and refreshes `~/seed/` from this repository. Its `EXIT` trap contains the account again and restores ownership, modes and immutable flags on success, failure or interruption. The gateway stays stopped.
@@ -129,7 +149,27 @@ sudo -H -u {{SERVICE_USER}} bash -lc 'echo x >> ~/projects/.alignfirst-projects.
 sudo -H -u {{SERVICE_USER}} bash -lc 'touch ~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md'
 sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.agents ~/.agents-x'
 sudo -H -u {{SERVICE_USER}} bash -lc 'mv ~/.openclaw/skills ~/.openclaw/skills-x'
-sudo -H -u {{SERVICE_USER}} bash -lc 'npm install -g cowsay && case "$(npm root -g)" in "$FNM_MULTISHELL_PATH"/*) ;; *) exit 1 ;; esac && which openclaw'
+```
+
+A project-runtime global install must succeed and leave the protected launcher selected. The trap removes the test package on success or failure. If this runtime already contains `cowsay`, use a clean test runtime to preserve that installation:
+
+```sh
+sudo -H -u {{SERVICE_USER}} bash -l <<'EOS'
+set -e
+cd "$HOME"
+runtime_prefix=$(readlink -f "${FNM_MULTISHELL_PATH:?}")
+npm_prefix=$(npm prefix -g)
+test "$(readlink -f "$npm_prefix")" = "$runtime_prefix"
+test ! -e "$(npm root -g)/cowsay"
+test ! -L "$(npm root -g)/cowsay"
+for name in cowsay cowthink; do
+  test ! -e "$runtime_prefix/bin/$name" && test ! -L "$runtime_prefix/bin/$name"
+done
+trap 'npm uninstall -g cowsay' EXIT
+npm install -g cowsay
+test "$(command -v openclaw)" = /opt/{{SERVICE_USER}}/bin/openclaw
+command -v openclaw
+EOS
 # Expected: /opt/{{SERVICE_USER}}/bin/openclaw
 sudo -i -u {{SERVICE_USER}} -- /opt/{{SERVICE_USER}}/libexec/admin-npm ls -g --depth=0
 # Expected: exactly openclaw, the coding agent, alignfirst, @paleo/alcode, @paleo/alproject and ctx7

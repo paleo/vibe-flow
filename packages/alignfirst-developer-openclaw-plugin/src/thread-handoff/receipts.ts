@@ -40,6 +40,7 @@ interface CachedContext {
 }
 
 type RejectionReason =
+  | "unsupportedResultShape"
   | "notSent"
   | "partialDelivery"
   | "channelMismatch"
@@ -161,10 +162,13 @@ function parseSlackReceipt(params: {
   const details = readResultDetails(event.result);
   const result = asRecord(details?.result);
   const target = asRecord(result?.target);
+  const targetKind = nonempty(target?.kind);
+  const targetId = nonempty(target?.id);
+  if (targetKind === undefined || targetId === undefined) return "unsupportedResultShape";
   if (
     !matchesConversation(destination, source.parentConversationId) ||
-    nonempty(target?.kind) !== "channel" ||
-    nonempty(target?.id)?.toLowerCase() !== source.parentConversationId.toLowerCase()
+    targetKind !== "channel" ||
+    targetId.toLowerCase() !== source.parentConversationId.toLowerCase()
   ) {
     return "channelMismatch";
   }
