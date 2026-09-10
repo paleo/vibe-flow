@@ -17,6 +17,7 @@ type Surface = "slack" | "discord";
 type FixtureOptions = {
   duplicateStart?: boolean;
   holdFirstSeed?: boolean;
+  silenceAfterClaim?: boolean;
 };
 
 type Fixture = {
@@ -44,6 +45,37 @@ afterEach(async () => {
 });
 
 describe("OpenClaw 2026.9.3 external-plugin gateway", () => {
+  it.each(["slack", "discord"] as const)(
+    "keeps a claimed %s seed silent while awaiting a human answer",
+    async (surface) => {
+      const fixture = await startFixture(surface, { silenceAfterClaim: true });
+      await injectQaBusInboundMessage({
+        baseUrl: serverUrl(fixture.busServer),
+        input: {
+          accountId: fixture.channelId,
+          conversation: { kind: "channel", id: "Project-X", title: "Project-X" },
+          senderId: "User-A",
+          text: "Start a task that needs a human answer.",
+        },
+      });
+      await waitUntil(
+        () => providerContentIncludes(fixture, '"status": "claimed"'),
+        20_000,
+        () => `claim result not observed\n${fixture.gatewayLog.join("")}`,
+      );
+      await new Promise((resolveWait) => setTimeout(resolveWait, 3_000));
+      expect(
+        fixture.gatewayLog.some((line) => line.includes("running isolated finalization")),
+      ).toBe(false);
+      expect(
+        fixture.bus.state
+          .getSnapshot()
+          .messages.filter((message) => message.direction === "outbound")
+          .map((message) => message.text),
+      ).toEqual([STARTER]);
+    },
+  );
+
   it.each(["slack", "discord"] as const)(
     "starts and continues the canonical %s thread without a human nudge",
     async (surface) => {
@@ -320,7 +352,11 @@ function buildConfig(params: {
       },
     },
     agents: {
-      defaults: { model: "scripted/handoff-script", workspace: params.workspace },
+      defaults: {
+        model: "scripted/handoff-script",
+        workspace: params.workspace,
+        heartbeat: { target: "last" },
+      },
       entries: { main: { name: "Main" } },
     },
     channels: {
@@ -343,6 +379,7 @@ function createProviderScript(
   let callSequence = 0;
   let repeatedStart = false;
   return (body: Record<string, unknown>) => {
+    if (options.silenceAfterClaim && !Array.isArray(body.tools)) return { content: "NO_REPLY" };
     const messages = Array.isArray(body.messages) ? body.messages : [];
     const tailMessages = messages.slice(-4) as Array<{ role?: unknown; content?: unknown }>;
     const tail = JSON.stringify(tailMessages);
@@ -365,6 +402,7 @@ function createProviderScript(
         return { content: "HANDOFF_CLAIM_FAILED" };
       }
       if (/"status"\s*:\s*"(?:claimed|alreadyClaimed)"/u.test(latestToolText ?? "")) {
+        if (options.silenceAfterClaim) return { content: "HEARTBEAT_OK" };
         const threadId = resolveThreadId(surface, snapshot);
         return {
           tool: "message",

@@ -22,10 +22,12 @@ const STARTED_ACK_RUBRIC =
   "claim that the work is already FINISHED.";
 
 const COMPLETION_RUBRIC =
-  "This is a single message an assistant posted in a chat thread while running a coding task. PASS if it " +
-  "reports to the user that the coding task FINISHED — the delegated work completed and it is relaying " +
+  "This is a single message an assistant posted in a chat thread while running a coding task. Judge " +
+  "completion of the delegated coding run. PASS if it reports that the run FINISHED and relays " +
   "the outcome (change done, or a result summary, often with a ✅): 'c'est fait', 'the coding agent " +
-  "finished successfully', 'j'ai terminé', '✅ … terminé'. FAIL if it merely says the work is still " +
+  "finished successfully', 'j'ai terminé', '✅ … terminé'. A completed coding result still passes when " +
+  "pushing, opening a PR, CI, or another downstream step awaits a decision. FAIL if implementation " +
+  "itself is awaiting a decision, or the message merely says the work is still " +
   "starting or in progress ('je te préviens dès que c'est terminé', 'je lance le travail'), or is a " +
   "workspace/launch announcement that carries a ✅ only for setup readiness ('Status: ready ✅ | " +
   "Lancement…').";

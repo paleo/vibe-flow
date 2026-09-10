@@ -197,8 +197,7 @@ const SELF_POST_ACTIONS = new Set(["send", "sendMessage", "thread-reply", "threa
  * thread posts that text a second time.
  *
  * The offending call is found structurally: `sessionKey` carries the thread id
- * (only the per-thread session's key does — `…-thread-<id>` on the mock,
- * `…-topic-<id>` on real Discord) and the input targets that same thread;
+ * (the per-thread session uses the native thread ID as its channel ID on Discord) and the input targets that same thread;
  * cross-surface posts stay allowed. A call whose text reached the thread exactly
  * once is not the incident, though — the playbook has the session route one line
  * through the tool when it needs a rename, and Discord offers no other way. So
@@ -263,8 +262,7 @@ function isSelfThreadMessagePost(call: AgentToolCall, threadId: string): boolean
   // (`to` → `target` → `channelId`) plus the explicit `threadId`. The `sessionKey`
   // gate above already narrows to the per-thread session, so a `channelId` that
   // happens to match a non-thread target can't produce a false positive here.
-  // Substring-matched against the mock's `…-thread-<id>` / `…-topic-<id>` shapes;
-  // revisit if a third channel plugin names sessions or targets differently.
+  // Match either the bare thread ID or its prefixed delivery target.
   return ["threadId", "to", "target", "channelId"].some((field) => {
     const value = input[field];
     return typeof value === "string" && value.toLowerCase().includes(needle);

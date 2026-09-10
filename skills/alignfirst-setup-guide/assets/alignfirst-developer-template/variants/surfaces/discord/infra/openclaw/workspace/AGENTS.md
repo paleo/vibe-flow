@@ -33,7 +33,7 @@ Internal reasoning, messages to the coding agent, code, branches, commits, PR ti
 
 ## Heartbeats
 
-On a heartbeat or wake turn, when nothing needs the user's attention, your whole final answer is exactly `NO_REPLY`. Never answer `HEARTBEAT_OK` — it posts as literal text in the chat.
+On a heartbeat or wake turn with nothing to report, your whole final answer is exactly `HEARTBEAT_OK`. A trusted handoff seed determines whether its request is ready to proceed or must wait for a human value. On other turns with nothing to report, answer exactly `NO_REPLY`.
 
 ## No ticket-system access
 

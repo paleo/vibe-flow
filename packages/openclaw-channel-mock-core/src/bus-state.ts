@@ -36,6 +36,7 @@ import type {
 
 const DEFAULT_BOT_ID = "openclaw";
 const DEFAULT_BOT_NAME = "OpenClaw Test";
+const DISCORD_EPOCH_MS = 1_420_070_400_000n;
 
 type QaBusEventSeed =
   | { kind: "inbound-message"; accountId: string; message: QaBusMessage }
@@ -64,6 +65,7 @@ export function createQaBusState() {
   const faults = new Map<QaBusFaultOperation, QaBusFault>();
   const events: QaBusEvent[] = [];
   let cursor = 0;
+  let lastThreadId = 0n;
   const waiters = createQaBusWaiterStore(() =>
     buildQaBusSnapshot({ cursor, conversations, threads, messages, events }),
   );
@@ -133,17 +135,6 @@ export function createQaBusState() {
     return message;
   };
 
-  // Stored thread ids are `<conversation>-thread-<uuid>`; agents sometimes pass only the uuid.
-  // Resolve either form to the stored id; anything else (a Slack root id) passes through.
-  function resolveThreadId(raw: string | undefined): string | undefined {
-    if (raw === undefined || threads.has(raw)) return raw;
-    const suffix = `-thread-${raw}`;
-    for (const id of threads.keys()) {
-      if (id.endsWith(suffix)) return id;
-    }
-    return raw;
-  }
-
   return {
     reset() {
       conversations.clear();
@@ -182,14 +173,14 @@ export function createQaBusState() {
       const normalizedTarget = normalizeConversationFromTarget(input.to);
       // A thread is a channel on Discord: a target naming a stored thread delivers into that
       // thread under its parent conversation, whether or not a threadId accompanies it.
-      const requestedThreadId = resolveThreadId(normalizedTarget.threadId);
+      const requestedThreadId = normalizedTarget.threadId;
       const storedThread =
-        threads.get(resolveThreadId(normalizedTarget.conversation.id) ?? "") ??
-        (requestedThreadId ? threads.get(requestedThreadId) : undefined);
+        threads.get(normalizedTarget.conversation.id) ??
+        (requestedThreadId !== undefined ? threads.get(requestedThreadId) : undefined);
       const conversation = storedThread
         ? ensureConversation({ id: storedThread.conversationId, kind: "channel" })
         : normalizedTarget.conversation;
-      const threadId = storedThread?.id ?? requestedThreadId ?? resolveThreadId(input.threadId);
+      const threadId = storedThread?.id ?? requestedThreadId ?? input.threadId;
       consumeFault("outbound-message", threadId !== undefined);
       const message = createMessage({
         direction: "outbound",
@@ -210,12 +201,10 @@ export function createQaBusState() {
     createThread(input: QaBusCreateThreadInput) {
       consumeFault("thread-create");
       const accountId = normalizeAccountId(input.accountId);
+      const timeId = (BigInt(Date.now()) - DISCORD_EPOCH_MS) << 22n;
+      lastThreadId = timeId > lastThreadId ? timeId : lastThreadId + 1n;
       const thread: QaBusThread = {
-        // The conversation prefix keeps thread SESSIONS attributable to their conversation: with
-        // real-shaped Discord thread session keys the key carries only the thread id, and the
-        // runner matches trajectory sessions by `sessionKey.includes(conversationId)`. Real Discord
-        // thread ids are opaque snowflakes, so the prefix is fidelity-neutral.
-        id: `${input.conversationId}-thread-${randomUUID()}`,
+        id: lastThreadId.toString(),
         accountId,
         conversationId: input.conversationId,
         title: input.title,
@@ -238,7 +227,7 @@ export function createQaBusState() {
       });
     },
     getThread(input: QaBusGetThreadInput) {
-      const thread = threads.get(resolveThreadId(input.threadId) ?? "");
+      const thread = threads.get(input.threadId);
       if (!thread) {
         throw new Error(`test bus thread not found: ${input.threadId}`);
       }
@@ -246,7 +235,7 @@ export function createQaBusState() {
     },
     renameThread(input: QaBusRenameThreadInput) {
       const accountId = normalizeAccountId(input.accountId);
-      const thread = threads.get(resolveThreadId(input.threadId) ?? "");
+      const thread = threads.get(input.threadId);
       if (!thread) {
         throw new Error(`test bus thread not found: ${input.threadId}`);
       }
@@ -303,7 +292,7 @@ export function createQaBusState() {
       return searchQaBusMessages({
         messages,
         threads,
-        input: { ...input, threadId: resolveThreadId(input.threadId) },
+        input,
       });
     },
     poll(input: QaBusPollInput = {}) {

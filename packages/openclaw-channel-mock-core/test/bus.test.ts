@@ -54,7 +54,7 @@ describe("bus HTTP round-trip", () => {
       "/v1/actions/thread-create",
       { conversationId: "sample-project", title: "T" },
     );
-    expect(createResp.thread.id.startsWith("sample-project-thread-")).toBe(true);
+    expect(createResp.thread.id).toMatch(/^\d{17,20}$/u);
     expect(createResp.thread.conversationId).toBe("sample-project");
 
     await post<{ message: unknown }>(fixture.baseUrl, "/v1/outbound/message", {
@@ -112,7 +112,7 @@ describe("bus HTTP round-trip", () => {
     const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
       fixture.baseUrl,
       "/v1/outbound/message",
-      { to: `channel:${created.thread.id}`, text: "wake" },
+      { to: `channel:${created.thread.id.toLowerCase()}`, text: "wake" },
     );
     expect(sent.message).toMatchObject({
       conversation: { id: "Project-With-Case" },
@@ -137,26 +137,29 @@ describe("bus HTTP round-trip", () => {
     });
   });
 
-  it("resolves a bare thread uuid to the stored thread and rejects unknown threads", async () => {
+  it("keeps generated thread IDs distinct and rejects unknown threads", async () => {
     const created = await post<{ thread: { id: string } }>(
       fixture.baseUrl,
       "/v1/actions/thread-create",
       { conversationId: "Project-With-Case", title: "T" },
     );
-    const suffix = created.thread.id.slice(
-      created.thread.id.indexOf("-thread-") + "-thread-".length,
+    const second = await post<{ thread: { id: string } }>(
+      fixture.baseUrl,
+      "/v1/actions/thread-create",
+      { conversationId: "Project-With-Case", title: "Other thread" },
     );
+    expect(second.thread.id).not.toBe(created.thread.id);
     const sent = await post<{ message: { conversation: { id: string }; threadId?: string } }>(
       fixture.baseUrl,
       "/v1/outbound/message",
-      { to: `thread:Project-With-Case/${suffix}`, text: "report" },
+      { to: `thread:Project-With-Case/${created.thread.id}`, text: "report" },
     );
     expect(sent.message).toMatchObject({
       conversation: { id: "Project-With-Case" },
       threadId: created.thread.id,
     });
     const got = await post<{ thread: { id: string } }>(fixture.baseUrl, "/v1/actions/thread-get", {
-      threadId: suffix,
+      threadId: created.thread.id,
     });
     expect(got.thread.id).toBe(created.thread.id);
     await expect(

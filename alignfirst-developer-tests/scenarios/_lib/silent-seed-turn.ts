@@ -11,7 +11,7 @@ const QUIET_WINDOW_MS = 90_000;
 /**
  * The seed turn is a heartbeat wake of the thread session. When the starter already asked the
  * user for a missing value, the turn has nothing to say: it claims the handoff, reads no thread
- * history, and ends on `NO_REPLY`. Call it after `bootstrapThreadFromChannel` and the starter
+ * history, and ends on the heartbeat acknowledgement. Call it after `bootstrapThreadFromChannel` and the starter
  * judgment; it returns the bus cursor after the quiet window so a caller can continue the thread.
  */
 export async function expectSilentSeedTurn(ctx: ScenarioContext, starter: Step): Promise<number> {
