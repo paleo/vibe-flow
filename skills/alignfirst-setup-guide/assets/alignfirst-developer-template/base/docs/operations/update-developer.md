@@ -41,7 +41,7 @@ The prefix is root-owned and immutable ([06](../installations/06-security-harden
 sudo /usr/local/sbin/alignfirst-developer-maintenance packages -- bash -lc '
 openclaw update --yes --no-restart --accept-capabilities
 openclaw plugins list --json | grep -q "\"alignfirst-developer\"" &&
-  openclaw plugins update alignfirst-developer --accept-capabilities
+  openclaw plugins update @paleo/alignfirst-developer-openclaw-plugin@latest --accept-capabilities
 /opt/{{SERVICE_USER}}/libexec/admin-npm install -g alignfirst@latest @paleo/alcode@latest @paleo/alproject@latest ctx7@latest
 '
 ```
@@ -50,7 +50,7 @@ openclaw plugins list --json | grep -q "\"alignfirst-developer\"" &&
 
 `alignfirst-developer` is an independent npm plugin, so its explicit update is separate from the core and
 official channel-plugin update. The seed installs it the first time, in the re-seed step below, and
-its state directory remains in place across package replacement.
+its state directory remains in place across package replacement. The explicit `@latest` replaces any older version pin in its tracked npm source.
 
 Update the coding agent through its package-scoped command: [08-coding-agent.md § Update](../installations/08-coding-agent.md#update).
 
@@ -117,17 +117,32 @@ sudo /usr/local/sbin/alignfirst-developer-maintenance skills -- \
   find /home/{{SERVICE_USER}}/.openclaw/skills -maxdepth 1 -type l -print -delete
 ```
 
-The setup guide and `sharp-writing` remain shared through `~/.agents/skills/`. The playbook lives in OpenClaw's managed directory and reaches no coding agent. See [gotchas.md](../gotchas.md#shared-skills-live-under-agentsskills).
+Verify the playbook is a real directory and its old shared and coding-agent entries are absent:
+
+```sh
+sudo -i -u {{SERVICE_USER}} bash <<'EOS'
+set -e
+test -f ~/.openclaw/skills/alignfirst-developer-openclaw-playbook/SKILL.md
+test ! -L ~/.openclaw/skills/alignfirst-developer-openclaw-playbook
+for root in ~/.agents/skills ~/.codex/skills ~/.claude/skills; do
+  test ! -e "$root/alignfirst-developer-openclaw-playbook"
+  test ! -L "$root/alignfirst-developer-openclaw-playbook"
+done
+EOS
+```
+
+The setup guide and `sharp-writing` remain shared through `~/.agents/skills/`. Only OpenClaw automatically discovers the managed playbook. See [gotchas.md](../gotchas.md#shared-skills-live-under-agentsskills).
 
 ## Seed snapshot and projects marker
 
 The wrapper refreshes the contained seed snapshot before each unlock.
 
-Reinstall the repository-managed projects marker:
+Reinstall the repository-managed projects marker with the alproject update. Directory markers use `portRanges`; individual project `.alignfirst.json` files retain their singular `portRange` claims:
 
 ```sh
 sudo /usr/local/sbin/alignfirst-developer-maintenance projects -- bash -lc '
 install -m 644 ~/seed/projects/.alignfirst-projects.json ~/projects/.alignfirst-projects.json
+alproject doctor --root ~/projects
 alproject list --root ~/projects
 '
 ```

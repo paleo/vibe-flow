@@ -42,7 +42,7 @@ For every skill it updates, `npx skills update` drops a symlink at `~/.openclaw/
 
 The setup guide and `sharp-writing` install once under `~/.agents/skills/`. OpenClaw loads only its `agents.defaults.skills` allowlist, including `alignfirst-setup-guide` for project creation. The coding agent receives the shared skills through its own tier. `skills remove` deletes a shared skill for both.
 
-The playbook lives under OpenClaw's managed `~/.openclaw/skills/` directory and reaches no coding agent.
+The playbook lives under OpenClaw's managed `~/.openclaw/skills/` directory, outside the coding agent's automatic skill discovery. Both agents run as the same Linux user, so the coding agent can still explicitly read the file. The separation controls prompt loading, not filesystem access.
 
 ## Moving a project breaks its workspace registry
 

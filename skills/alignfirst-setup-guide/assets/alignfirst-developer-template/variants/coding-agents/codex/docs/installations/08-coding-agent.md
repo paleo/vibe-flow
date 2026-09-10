@@ -157,7 +157,7 @@ A Codex upgrade changes the system-skills marker, so repeat the post-hardening m
 sudo -i -u {{SERVICE_USER}} -- bash -lc 'cd /tmp && codex exec --sandbox read-only --skip-git-repo-check -C /tmp "Reply with exactly OK and stop." 2>&1 | grep -i "system skills"' < /dev/null
 ```
 
-The `skills` scope of `update-developer.md` covers `~/.agents` only. `skills update` writes nothing under `~/.codex/skills`, which holds Codex's own skills alone.
+The `skills` scope of `update-developer.md` covers `~/.agents` and `~/.openclaw/skills`. Codex's bundled skills under `~/.codex/skills` use the separate `agent-skills` scope.
 
 ### Verification
 

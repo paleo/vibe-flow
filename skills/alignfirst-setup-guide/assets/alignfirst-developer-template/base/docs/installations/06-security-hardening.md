@@ -59,7 +59,7 @@ sudo chattr +i /home/{{SERVICE_USER}}/projects/.alignfirst-projects.json
 
 ## Skills and instructions
 
-The setup guide and `sharp-writing` under `~/.agents/skills/` feed both OpenClaw and the delegated coding agent. The playbook under OpenClaw's managed `~/.openclaw/skills/` directory feeds OpenClaw only. Both trees belong to the admin account; `~/.openclaw` stays writable for gateway state.
+The setup guide and `sharp-writing` under `~/.agents/skills/` feed both OpenClaw and the delegated coding agent. Only OpenClaw automatically discovers the playbook under `~/.openclaw/skills/`. The commands below protect both trees from service-account writes: admin ownership and modes prevent content changes; the immutable flag on each root prevents its removal or replacement. Both agents can still read the files. `~/.openclaw` stays writable for gateway state.
 
 ```sh
 sudo chown -Rh {{SERVER_ADMIN_USER}}:{{SERVER_ADMIN_USER}} /home/{{SERVICE_USER}}/.agents
